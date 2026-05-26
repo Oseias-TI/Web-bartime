@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  BARBER
+  RECEPTIONIST
+}
+
+model Tenant {
+  id                   String    @id @default(uuid())
+  cnpj                 String    @unique
+  name                 String
+  slug                 String?   @unique
+  logoUrl              String?
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  subscriptionStatus   String    @default("TRIAL")
+  currentPeriodEnd     DateTime?
+  trialEndsAt          DateTime?
+  createdAt            DateTime  @default(now())
+
+  professionals Professional[]
+  clients       Client[]
+  services      Service[]
+  appointments  Appointment[]
+  commissions   Commission[]
+  businessHours BusinessHour[]
+  transactions  Transaction[]
+  auditLogs     AuditLog[]
+  @@map("tenants")
+}
+
+model BusinessHour {
+  id        String  @id @default(uuid())
+  tenantId  String
+  dayOfWeek Int
+  open      Boolean @default(true)
+  openTime  String?
+  closeTime String?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, dayOfWeek])
+  @@map("business_hours")
+}
+
+model Client {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  phone         String
+  email         String?
+  password      String?
+  preferences   String?
+  loyaltyPoints Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  appointments Appointment[]
+
+  @@unique([tenantId, phone])
+  @@map("clients")
+}
+
+model Service {
+  id          String  @id @default(uuid())
+  tenantId    String
+  name        String
+  price       Decimal @db.Decimal(10, 2)
+  durationMin Int
+  active      Boolean @default(true)
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+model Appointment {
+  id             String   @id @default(uuid())
+  tenantId       String
+  clientId       String
+  professionalId String
+  serviceId      String
+  startTime      DateTime
+  endTime        DateTime
+  status         String   @default("PENDING")
+  paymentMethod  String?
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  client       Client       @relation(fields: [clientId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+  service      Service      @relation(fields: [serviceId], references: [id])
+  commission   Commission?
+  transaction  Transaction?
+  reminders    AppointmentReminder[]
+  @@map("appointments")
+}
+
+model Commission {
+  id             String   @id @default(uuid())
+  tenantId       String
+  appointmentId  String   @unique
+  professionalId String
+  amount         Decimal  @db.Decimal(10, 2)
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  appointment  Appointment  @relation(fields: [appointmentId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@map("commissions")
+}
+
+model Transaction {
+  id            String   @id @default(uuid())
+  tenantId      String
+  appointmentId String?  @unique
+  type          String
+  category      String
+  paymentMethod String?
+  amount        Decimal  @db.Decimal(10, 2)
+  description   String?
+  createdAt     DateTime @default(now())
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@map("transactions")
+}
+
+model RefreshToken {
+  id             String   @id @default(uuid())
+  token          String   @unique
+  professionalId String
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id             String   @id @default(uuid())
+  token          String   @unique
+  professionalId String
+  expiresAt      DateTime
+  used           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@map("password_reset_tokens")
+}
+
+model Professional {
+  id             String  @id @default(uuid())
+  tenantId       String
+  name           String
+  email          String
+  password       String
+  avatarUrl      String?
+  commissionRate Decimal @default(50.0) @db.Decimal(5, 2)
+  role           Role    @default(BARBER)
+  active         Boolean @default(true)
+  emailVerified  Boolean @default(false) 
+
+  tenant                  Tenant                   @relation(fields: [tenantId], references: [id])
+  appointments            Appointment[]
+  commissions             Commission[]
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[] 
+
+  @@unique([tenantId, email])
+  @@map("professionals")
+}
+
+model EmailVerificationToken {
+  id             String   @id @default(uuid())
+  token          String   @unique
+  professionalId String
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@map("email_verification_tokens")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  tenantId       String?  // null = ação de super admin
+  professionalId String?  // null = ação do sistema
+  action         String   // ex: APPOINTMENT_CANCELED, CLIENT_CREATED
+  entity         String   // ex: Appointment, Client
+  entityId       String?
+  metadata       Json?    // dados extras da ação
+  ipAddress      String?
+  createdAt      DateTime @default(now())
+
+  tenant         Tenant?  @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model AppointmentReminder {
+  id            String   @id @default(uuid())
+  appointmentId String
+  type          String   // EMAIL_24H | EMAIL_1H
+  sentAt        DateTime @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+  @@unique([appointmentId, type])
+  @@map("appointment_reminders")
+}
+

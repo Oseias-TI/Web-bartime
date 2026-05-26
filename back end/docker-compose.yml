@@ -1,0 +1,87 @@
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: barberflow_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - barberflow_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - barberflow_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: barberflow_api
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3333}:3333"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB}?schema=public
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - barberflow_net
+    volumes:
+      - barberflow_backups:/backups
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 512M
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: barberflow_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - barberflow_pgadmin:/var/lib/pgadmin
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - barberflow_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+volumes:
+  barberflow_pgdata:
+    driver: local
+  barberflow_pgadmin:
+    driver: local
+  barberflow_backups:
+    driver: local
+
+networks:
+  barberflow_net:
+    driver: bridge

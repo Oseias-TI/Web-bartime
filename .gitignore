@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+build/
+.env
+.env.*
+!.env.example
+barberflow_pgdata/
+barberflow_pgadmin/
+barberflow_backups/
+postgres-data/
+*.log
+.DS_Store
+coverage/
+.idea/
+.vscode/
