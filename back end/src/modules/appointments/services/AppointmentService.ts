@@ -19,16 +19,14 @@ export class AppointmentService {
 
         const [service, businessHour] = await Promise.all([
             prisma.service.findFirst({ where: { id: data.serviceId, tenantId: data.tenantId, active: true } }),
-            // BUG-01: Usar getDay() (local) para corresponder ao dia real da barbearia
-            prisma.businessHour.findUnique({ where: { tenantId_dayOfWeek: { tenantId: data.tenantId, dayOfWeek: startTime.getDay() } } }),
+            prisma.businessHour.findUnique({ where: { tenantId_dayOfWeek: { tenantId: data.tenantId, dayOfWeek: startTime.getUTCDay() } } }),
         ]);
 
         if (!service) throw new AppError('Serviço não encontrado ou inativo.', 404);
         if (!businessHour || !businessHour.open || !businessHour.openTime || !businessHour.closeTime)
             throw new AppError('A barbearia não funciona neste dia.', 400);
 
-        // BUG-01: Usar getHours/getMinutes (local) para comparar com openTime/closeTime que são strings locais
-        const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
+        const startMinutes = startTime.getUTCHours() * 60 + startTime.getUTCMinutes();
         const openMinutes = timeToMinutes(businessHour.openTime);
         const closeMinutes = timeToMinutes(businessHour.closeTime);
         const endMinutes = startMinutes + service.durationMin;
@@ -85,17 +83,21 @@ export class AppointmentService {
         return appointment;
     }
 
-    async listByProfessional(tenantId: string, professionalId: string, date: string, paginationQuery: Record<string, any> = {}) {
+    async listByDay(tenantId: string, date: string, professionalId?: string, paginationQuery: Record<string, any> = {}) {
         const params = getPaginationParams(paginationQuery);
-        // BUG-13: Usar horário local (sem Z forçando UTC) para corresponder ao dia real
-        const start = new Date(`${date}T00:00:00.000`);
-        const end = new Date(`${date}T23:59:59.999`);
-        const where = { tenantId, professionalId, startTime: { gte: start, lte: end } };
+        // Usar Z para consistência com a convenção local-as-UTC do sistema
+        const start = new Date(`${date}T00:00:00.000Z`);
+        const end = new Date(`${date}T23:59:59.999Z`);
+        
+        const where: any = { tenantId, startTime: { gte: start, lte: end } };
+        if (professionalId) {
+            where.professionalId = professionalId;
+        }
 
         const [data, total] = await Promise.all([
             prisma.appointment.findMany({
                 where,
-                include: { client: { select: { name: true, phone: true } }, service: true },
+                include: { client: { select: { name: true, phone: true } }, service: true, professional: { select: { name: true, id: true } } },
                 orderBy: { startTime: 'asc' },
                 skip: params.skip,
                 take: params.limit,

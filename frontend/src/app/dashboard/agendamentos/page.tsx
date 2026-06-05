@@ -130,7 +130,7 @@ export default function AgendamentosPage() {
         clientId: formClientId,
         serviceId: formServiceId,
         professionalId: formProfessionalId,
-        startTime: `${selectedDate}T${formStartTime}:00`,
+        startTime: `${selectedDate}T${formStartTime}:00.000Z`,
       };
       await appointmentsService.create(data);
       toastManager.add({ title: "Agendamento criado!", type: "success" });
@@ -148,10 +148,23 @@ export default function AgendamentosPage() {
     }
   };
 
-  const handleComplete = async (id: string) => {
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string>("PIX");
+
+  const openCompleteModal = (id: string) => {
+    setCompletingId(id);
+    setPaymentMethod("PIX");
+    setIsCompleteModalOpen(true);
+  };
+
+  const handleComplete = async () => {
+    if (!completingId || !paymentMethod) return;
     try {
-      await appointmentsService.complete(id);
+      await appointmentsService.complete(completingId, paymentMethod);
       toastManager.add({ title: "Agendamento concluído!", type: "success" });
+      setIsCompleteModalOpen(false);
+      setCompletingId(null);
       loadAppointments();
     } catch (error) {
       toastManager.add({
@@ -188,10 +201,11 @@ export default function AgendamentosPage() {
     c.name.toLowerCase().includes(searchClient.toLowerCase())
   );
 
-  const statusConfig = {
-    PENDING: { label: "Pendente", icon: Clock, variant: "secondary" as const },
-    COMPLETED: { label: "Concluído", icon: CheckCircle2, variant: "default" as const },
-    CANCELED: { label: "Cancelado", icon: XCircle, variant: "destructive" as const },
+  const statusConfig: Record<string, { label: string; icon: any; variant: "default" | "secondary" | "destructive" }> = {
+    PENDING: { label: "Pendente", icon: Clock, variant: "secondary" },
+    COMPLETED: { label: "Concluído", icon: CheckCircle2, variant: "default" },
+    CANCELED: { label: "Cancelado", icon: XCircle, variant: "destructive" },
+    SCHEDULED: { label: "Agendado", icon: Clock, variant: "secondary" },
   };
 
   const freeSlots = availableSlots.filter((s) => s.available);
@@ -299,19 +313,19 @@ export default function AgendamentosPage() {
                       <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto pr-1">
                         {availableSlots.map((slot) => (
                           <button
-                            key={slot.time}
+                            key={slot.startTime}
                             type="button"
                             disabled={!slot.available}
-                            onClick={() => setFormStartTime(slot.time)}
+                            onClick={() => setFormStartTime(slot.startTime)}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                              formStartTime === slot.time
+                              formStartTime === slot.startTime
                                 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-105"
                                 : slot.available
                                   ? "border border-border hover:border-primary/40 hover:bg-primary/5 text-foreground"
                                   : "border border-border/50 text-muted-foreground/40 line-through cursor-not-allowed"
                             }`}
                           >
-                            {slot.time}
+                            {slot.startTime}
                           </button>
                         ))}
                       </div>
@@ -428,7 +442,7 @@ export default function AgendamentosPage() {
                 new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
             )
             .map((apt) => {
-              const status = statusConfig[apt.status as keyof typeof statusConfig];
+              const status = statusConfig[apt.status] || { label: apt.status, icon: Clock, variant: "secondary" };
               const StatusIcon = status.icon;
 
               return (
@@ -473,7 +487,7 @@ export default function AgendamentosPage() {
                             <Button
                               variant="ghost"
                               size="icon-sm"
-                              onClick={() => handleComplete(apt.id)}
+                              onClick={() => openCompleteModal(apt.id)}
                               className="text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10"
                             >
                               <CheckCircle2 className="size-4" />
@@ -496,6 +510,41 @@ export default function AgendamentosPage() {
             })}
         </div>
       )}
+
+      {/* Payment Method Modal */}
+      <Dialog open={isCompleteModalOpen} onOpenChange={setIsCompleteModalOpen}>
+        <DialogPopup className="sm:max-w-md">
+          <DialogTitle>Concluir Agendamento</DialogTitle>
+          <DialogDescription>
+            Confirme como o cliente realizou o pagamento.
+          </DialogDescription>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Forma de Pagamento</label>
+              <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v || "PIX")}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectPopup>
+                  <SelectItem value="PIX">PIX</SelectItem>
+                  <SelectItem value="CASH">Dinheiro</SelectItem>
+                  <SelectItem value="CARD_DEBIT">Cartão de Débito</SelectItem>
+                  <SelectItem value="CARD_CREDIT">Cartão de Crédito</SelectItem>
+                </SelectPopup>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <DialogClose render={<Button variant="outline">Cancelar</Button>} />
+              <Button
+                onClick={handleComplete}
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold border-emerald-400/20"
+              >
+                Confirmar
+              </Button>
+            </div>
+          </div>
+        </DialogPopup>
+      </Dialog>
     </div>
   );
 }

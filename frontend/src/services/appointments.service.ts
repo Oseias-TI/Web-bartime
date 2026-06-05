@@ -24,7 +24,8 @@ export interface CreateAppointmentData {
 }
 
 export interface TimeSlot {
-  time: string;
+  startTime: string;
+  endTime: string;
   available: boolean;
 }
 
@@ -46,10 +47,12 @@ export const appointmentsService = {
   cancel: (id: string) =>
     api.patch<Appointment>(`/appointments/${id}/cancel`),
 
-  getAvailability: (date: string, professionalId: string, serviceId: string) =>
-    api.get<TimeSlot[]>("/appointments/availability", {
+  getAvailability: async (date: string, professionalId: string, serviceId: string) => {
+    const res = await api.get<{ slots: TimeSlot[] }>("/appointments/availability", {
       date,
       professionalId,
       serviceId,
-    }),
+    });
+    return res.slots;
+  },
 };

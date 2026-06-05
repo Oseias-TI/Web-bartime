@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { localNowAsUTC } from '../../../shared/utils/timezone';
 
 export const CreateAppointmentSchema = z.object({
     clientId: z.string().uuid(),
@@ -7,7 +8,9 @@ export const CreateAppointmentSchema = z.object({
     startTime: z
         .string()
         .datetime()
-        .refine(val => new Date(val) > new Date(), { message: 'O agendamento deve ser para uma data futura.' }),
+        .refine(val => new Date(val).getTime() > localNowAsUTC(), {
+            message: 'O agendamento deve ser para uma data futura.',
+        }),
 });
 
 export type CreateAppointmentInput = z.infer<typeof CreateAppointmentSchema>;

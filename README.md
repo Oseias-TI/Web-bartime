@@ -37,10 +37,23 @@ O repositório está dividido em duas partes principais:
 - **Node.js & TypeScript**
 - **Express.js** (Framework web)
 - **Prisma ORM** (Gestão do banco de dados relacional)
+- **Redis** (Cache de listagens e escalabilidade)
 - **Stripe** (Integração de pagamentos)
 - **AWS S3 & Multer** (Upload de arquivos)
 - **Nodemailer** (Envio de e-mails)
-- **Docker & Docker Compose** (Containerização para facilitar o ambiente de desenvolvimento)
+- **Docker & Docker Compose** (Containerização completa)
+- **ELK Stack (Elasticsearch & Kibana)** (Agregação de logs e rastreamento via `TraceID`)
+- **Prometheus & Grafana** (Métricas de aplicação, latência e throughput)
+- **Jest & Supertest** (Testes unitários e de integração E2E com padrão AAA)
+
+## 🏗️ Arquitetura, Qualidade e Performance (Tech Forge)
+
+O projeto adota uma arquitetura de Monolito Modularizada, priorizando o **Clean Code** e **SOLID**:
+- **Padrões de Testes:** Utilização de `Factories`, Isolamento de BD e padronização AAA (Arrange, Act, Assert).
+- **Cobertura de Testes:** Implementação de testes Unitários e Integrados focados nas regras de negócio e estabilidade da API (ex: `Client CRUD`).
+- **Performance:** Estratégia de Cache com **Redis** para listagens complexas visando redução de Throughput de banco de dados e ganho de SLA (< 200ms por request).
+- **Observabilidade:** Todas as requisições geram um `TraceID` único (UUID) que perpassa os logs no **Kibana**, facilitando troubleshooting.
+- **Métricas (SLA):** Rota `/metrics` instrumentada pelo `prom-client` para rastrear latência e requisições/s. Dashboards no Grafana completam o ecossistema.
 
 ## ⚙️ Como Executar o Projeto
 

@@ -92,10 +92,17 @@ export default function FinanceiroPage() {
 
   const loadData = useCallback(async () => {
     try {
+      const [year, month] = monthFilter.split("-");
+      const lastDay = new Date(Number(year), Number(month), 0).getDate();
+      const start = `${monthFilter}-01`;
+      const end = `${monthFilter}-${lastDay.toString().padStart(2, "0")}`;
+
+      const params = { start, end };
+
       const [trans, sum, flow] = await Promise.all([
-        financialService.listTransactions({ month: monthFilter }),
-        financialService.getSummary({ month: monthFilter }),
-        financialService.getCashFlow({ month: monthFilter }),
+        financialService.listTransactions(params),
+        financialService.getSummary(params),
+        financialService.getCashFlow(params),
       ]);
       setTransactions(trans);
       setSummary(sum);
@@ -371,20 +378,22 @@ export default function FinanceiroPage() {
             <CardTitle className="text-base font-semibold">Fluxo de Caixa Mensal</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="dia" stroke="#a8a29e" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#a8a29e" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
-                <Tooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                  contentStyle={{ backgroundColor: "#1c1917", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}
-                />
-                <Legend iconType="circle" />
-                <Bar dataKey="entradas" name="Entradas" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="saidas" name="Saídas" fill="#ef4444" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="w-full h-[300px] min-w-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="dia" stroke="#a8a29e" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#a8a29e" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                    contentStyle={{ backgroundColor: "#1c1917", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}
+                  />
+                  <Legend iconType="circle" />
+                  <Bar dataKey="entradas" name="Entradas" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="saidas" name="Saídas" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </CardContent>
         </Card>
 

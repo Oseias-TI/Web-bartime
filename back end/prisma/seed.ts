@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('🌱 Iniciando criação de dados fakes...');
 
-    const hashedPassword = await bcrypt.hash('Senha123!', 10);
+    const hashedPassword = await bcrypt.hash('Oseias123!', 10);
 
     const randomId = Math.floor(Math.random() * 99999);
     
@@ -18,8 +18,8 @@ async function main() {
             subscriptionStatus: 'ACTIVE',
             professionals: {
                 create: {
-                    name: 'Admin Supremo',
-                    email: `admin.fake${randomId}@teste.com`,
+                    name: 'Oséias Admin',
+                    email: 'oseias@barberflow.com',
                     password: hashedPassword,
                     role: 'ADMIN'
                 }

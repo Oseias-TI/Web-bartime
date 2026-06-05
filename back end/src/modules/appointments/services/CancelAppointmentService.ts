@@ -1,5 +1,6 @@
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
+import { localNowAsUTC } from '../../../shared/utils/timezone';
 
 interface CancelInput {
     appointmentId: string;
@@ -16,7 +17,7 @@ export class CancelAppointmentService {
         if (appointment.status === 'COMPLETED') throw new AppError('Não é possível cancelar um agendamento já concluído.', 400);
         if (appointment.status === 'CANCELED') throw new AppError('Este agendamento já foi cancelado.', 400);
         if (userRole === 'BARBER' && appointment.professionalId !== userId) throw new AppError('Você não tem permissão para cancelar este agendamento.', 403);
-        if (new Date(appointment.startTime) <= new Date()) throw new AppError('Não é possível cancelar um agendamento que já iniciou.', 400);
+        if (new Date(appointment.startTime).getTime() <= localNowAsUTC()) throw new AppError('Não é possível cancelar um agendamento que já iniciou.', 400);
 
         // BUG-12: Usar transação para cancelar agendamento e comissões PENDING associadas atomicamente
         return prisma.$transaction(async (tx) => {

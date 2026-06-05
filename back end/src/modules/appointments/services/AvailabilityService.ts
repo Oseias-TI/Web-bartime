@@ -1,5 +1,6 @@
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
+import { localNowAsUTC, localDateString } from '../../../shared/utils/timezone';
 
 interface AvailabilityInput {
     tenantId: string;
@@ -26,11 +27,10 @@ const SLOT_INTERVAL_MIN = 15;
 
 export class AvailabilityService {
     async getSlots({ tenantId, professionalId, serviceId, date }: AvailabilityInput): Promise<TimeSlot[]> {
-        const requestedDate = new Date(`${date}T00:00:00.000Z`);
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
-        if (requestedDate < today) throw new AppError('Não é possível consultar datas passadas.', 400);
+        // Comparar com data local do servidor (não UTC) para evitar bloquear consultas à noite
+        if (date < localDateString()) throw new AppError('Não é possível consultar datas passadas.', 400);
 
+        const requestedDate = new Date(`${date}T00:00:00.000Z`);
         const dayOfWeek = requestedDate.getUTCDay();
 
         const [businessHour, service, existingAppointments] = await Promise.all([
@@ -53,6 +53,9 @@ export class AvailabilityService {
         const slotIntervalMs = SLOT_INTERVAL_MIN * 60_000;
         let cursor = openTime.getTime();
 
+        // Usar o "agora" na mesma convenção local-as-UTC para marcar slots passados
+        const nowLocalAsUTC = localNowAsUTC();
+
         while (cursor + serviceDurationMs <= closeTime.getTime()) {
             const slotStart = new Date(cursor);
             const slotEnd = new Date(cursor + serviceDurationMs);
@@ -61,7 +64,7 @@ export class AvailabilityService {
                 const apptEnd = new Date(appt.endTime).getTime();
                 return slotStart.getTime() < apptEnd && slotEnd.getTime() > apptStart;
             });
-            slots.push({ startTime: toTimeString(slotStart), endTime: toTimeString(slotEnd), available: !hasConflict && slotStart.getTime() > Date.now() });
+            slots.push({ startTime: toTimeString(slotStart), endTime: toTimeString(slotEnd), available: !hasConflict && slotStart.getTime() > nowLocalAsUTC });
             cursor += slotIntervalMs;
         }
 

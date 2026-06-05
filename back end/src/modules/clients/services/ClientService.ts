@@ -1,4 +1,5 @@
 import { prisma } from '../../../lib/prisma';
+import { redisClient } from '../../../lib/redis';
 import { AppError } from '../../../shared/errors/AppError';
 import { UpdateClientInput } from '../dtos/UpdateClientSchema';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
@@ -18,11 +19,22 @@ export class ClientService {
             where: { tenantId_phone: { tenantId: data.tenantId, phone: data.phone } },
         });
         if (exists) throw new AppError('Telefone já cadastrado para outro cliente.', 409);
-        return prisma.client.create({ data });
+        
+        const client = await prisma.client.create({ data });
+        // Invalidate cache
+        await redisClient.del(`clients:list:${data.tenantId}`);
+        return client;
     }
 
     async listAll(tenantId: string, search?: string, paginationQuery: Record<string, any> = {}) {
         const params = getPaginationParams(paginationQuery);
+        const cacheKey = `clients:list:${tenantId}:${search || 'all'}:${params.page}:${params.limit}`;
+
+        if (redisClient.isReady) {
+            const cached = await redisClient.get(cacheKey);
+            if (cached) return JSON.parse(cached);
+        }
+
         const where = {
             tenantId,
             ...(search
@@ -41,7 +53,13 @@ export class ClientService {
             prisma.client.count({ where }),
         ]);
 
-        return buildPaginatedResult(data, total, params);
+        const result = buildPaginatedResult(data, total, params);
+        
+        if (redisClient.isReady) {
+            await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(result)); // Cache for 5 minutes
+        }
+
+        return result;
     }
 
     async getClientProfile(tenantId: string, clientId: string) {
@@ -135,7 +153,15 @@ export class ClientService {
             if (conflict) throw new AppError('Este telefone já pertence a outro cliente.', 409);
         }
 
-        return prisma.client.update({ where: { id: clientId }, data });
+        const updated = await prisma.client.update({ where: { id: clientId }, data });
+        
+        // Invalidate list cache and possibly profile cache if implemented
+        if (redisClient.isReady) {
+            const keys = await redisClient.keys(`clients:list:${tenantId}*`);
+            if (keys.length > 0) await redisClient.del(keys);
+        }
+
+        return updated;
     }
 
     async redeemPoints(tenantId: string, clientId: string, points: number) {

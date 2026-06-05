@@ -70,8 +70,8 @@ export class PublicBookingService {
         // Filtrar horários ocupados (simplificado: não verifica a duração inteira, apenas o slot de início)
         // O ideal é reusar o AvailabilityService, mas sem req.user
         
-        const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
-        const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+        const startOfDay = new Date(`${date}T00:00:00.000Z`);
+        const endOfDay = new Date(`${date}T23:59:59.999Z`);
 
         const appointments = await prisma.appointment.findMany({
             where: {

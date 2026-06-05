@@ -27,9 +27,9 @@ export class AppointmentController {
     });
 
     listByDay = asyncHandler(async (req: Request, res: Response) => {
-        const { professionalId, date } = req.query as { professionalId: string; date: string };
-        if (!professionalId || !date) return res.status(400).json({ error: 'professionalId e date são obrigatórios.' });
-        const result = await new AppointmentService().listByProfessional(req.user.tenantId, professionalId, date, req.query);
+        const { professionalId, date } = req.query as { professionalId?: string; date: string };
+        if (!date) return res.status(400).json({ error: 'A data é obrigatória.' });
+        const result = await new AppointmentService().listByDay(req.user.tenantId, date, professionalId, req.query);
         return res.json(result);
     });
 }
