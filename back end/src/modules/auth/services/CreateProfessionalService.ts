@@ -6,7 +6,11 @@ import { z } from 'zod';
 export const CreateProfessionalSchema = z.object({
     name: z.string().min(3),
     email: z.string().email(),
-    password: z.string().min(8),
+    password: z
+        .string()
+        .min(8)
+        .regex(/[A-Z]/, { message: 'Senha deve ter ao menos uma letra maiúscula.' })
+        .regex(/[0-9]/, { message: 'Senha deve ter ao menos um número.' }),
     role: z.enum(['BARBER', 'RECEPTIONIST']),
     commissionRate: z.number().min(0).max(100).default(50),
 });

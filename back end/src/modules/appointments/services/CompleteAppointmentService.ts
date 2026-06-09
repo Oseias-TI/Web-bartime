@@ -24,8 +24,9 @@ export class CompleteAppointmentService {
             const commission = await tx.commission.create({
                 data: { tenantId: appointment.tenantId, appointmentId, professionalId: appointment.professionalId, amount: commissionAmount, status: 'PENDING' },
             });
+            // BUG-15: Usar nome do serviço como categoria ao invés de 'HAIRCUT' fixo
             await tx.transaction.create({
-                data: { tenantId: appointment.tenantId, appointmentId, type: 'INCOME', category: 'HAIRCUT', paymentMethod, amount: servicePrice, description: `${appointment.service.name} — ${appointment.professional.name}` },
+                data: { tenantId: appointment.tenantId, appointmentId, type: 'INCOME', category: appointment.service.name, paymentMethod, amount: servicePrice, description: `${appointment.service.name} — ${appointment.professional.name}` },
             });
             await tx.client.update({ where: { id: appointment.clientId }, data: { loyaltyPoints: { increment: 1 } } });
             return { appointment: updated, commission, revenue: servicePrice };

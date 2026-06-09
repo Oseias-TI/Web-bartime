@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import client from 'prom-client';
 
 // Initialize default metrics
-client.collectDefaultMetrics({ prefix: 'barberflow_' });
+client.collectDefaultMetrics({ prefix: 'bartime_' });
 
 // Create a custom histogram for HTTP response duration
 export const httpRequestDurationMicroseconds = new client.Histogram({
-  name: 'barberflow_http_request_duration_ms',
+  name: 'bartime_http_request_duration_ms',
   help: 'Duration of HTTP requests in ms',
   labelNames: ['method', 'route', 'code'],
   buckets: [50, 100, 200, 300, 400, 500, 1000, 2000, 5000] // buckets for response time

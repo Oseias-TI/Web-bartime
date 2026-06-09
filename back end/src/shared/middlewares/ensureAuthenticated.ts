@@ -10,6 +10,11 @@ export function ensureAuthenticated(req: Request, res: Response, next: NextFunct
     try {
         const decoded = verify(token, process.env.JWT_SECRET as string);
         const { sub, tenantId, role } = decoded as any;
+        
+        if (role === 'CLIENT') {
+            return res.status(403).json({ error: 'Acesso negado para perfil de cliente nesta rota.' });
+        }
+
         req.user = { id: sub, tenantId, role };
         return next();
     } catch {

@@ -1,15 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/components/ui/toast";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -22,8 +15,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "BarberFlow — Gestão de Barbearia",
-    template: "%s | BarberFlow",
+    default: "Bartime — Gestão de Barbearia",
+    template: "%s | Bartime",
   },
   description:
     "Plataforma completa para gestão de barbearias. Agendamentos, clientes, financeiro, relatórios e muito mais.",
@@ -38,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen antialiased">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className="min-h-screen antialiased" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

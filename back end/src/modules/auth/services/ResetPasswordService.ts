@@ -1,11 +1,15 @@
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 
 export class ResetPasswordService {
     async execute(token: string, newPassword: string) {
+        // BUG-16: Hashear o token recebido para comparar com o hash armazenado
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
         const resetToken = await prisma.passwordResetToken.findUnique({
-            where: { token },
+            where: { token: hashedToken },
             include: { professional: true },
         });
 
@@ -16,7 +20,7 @@ export class ResetPasswordService {
 
         await prisma.$transaction(async tx => {
             await tx.professional.update({ where: { id: resetToken.professionalId }, data: { password: passwordHash } });
-            await tx.passwordResetToken.update({ where: { token }, data: { used: true } });
+            await tx.passwordResetToken.update({ where: { token: hashedToken }, data: { used: true } });
             await tx.refreshToken.deleteMany({ where: { professionalId: resetToken.professionalId } });
         });
 

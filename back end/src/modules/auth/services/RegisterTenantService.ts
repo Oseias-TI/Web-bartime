@@ -28,7 +28,14 @@ export class RegisterTenantService {
 
         const { tenant, admin } = await prisma.$transaction(async tx => {
             const tenant = await tx.tenant.create({
-                data: { name: tenantName, slug, cnpj, subscriptionStatus: 'TRIAL' },
+                data: {
+                    name: tenantName,
+                    slug,
+                    cnpj,
+                    subscriptionStatus: 'TRIAL',
+                    // BUG-08: Definir data de expiração do trial (14 dias)
+                    trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+                },
             });
             const admin = await tx.professional.create({
                 data: {
@@ -40,6 +47,20 @@ export class RegisterTenantService {
                     emailVerified: false,
                 },
             });
+
+            // Criar horários de funcionamento padrão (Seg a Sex, 09:00 as 18:00)
+            const defaultBusinessHours = Array.from({ length: 7 }).map((_, i) => ({
+                tenantId: tenant.id,
+                dayOfWeek: i,
+                open: i > 0 && i < 6,
+                openTime: i > 0 && i < 6 ? "09:00" : null,
+                closeTime: i > 0 && i < 6 ? "18:00" : null,
+            }));
+
+            await tx.businessHour.createMany({
+                data: defaultBusinessHours,
+            });
+
             return { tenant, admin };
         });
 
@@ -61,6 +82,7 @@ export class RegisterTenantService {
                 id: tenant.id, 
                 name: tenant.name,
                 cnpj: tenant.cnpj,
+                slug: tenant.slug,
                 logoUrl: tenant.logoUrl,
                 subscriptionStatus: tenant.subscriptionStatus
             },

@@ -37,7 +37,7 @@ export class ExportService {
         ]);
 
         const workbook = new ExcelJS.Workbook();
-        workbook.creator = 'BarberFlow';
+        workbook.creator = 'Bartime';
         workbook.created = new Date();
 
         // ── Aba 1: Atendimentos ─────────────────────────────────────────────
@@ -59,8 +59,8 @@ export class ExportService {
 
         for (const appt of appointments) {
             sheetAppointments.addRow({
-                date: new Date(appt.startTime).toLocaleDateString('pt-BR'),
-                time: new Date(appt.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                date: new Date(appt.startTime).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+                time: new Date(appt.startTime).toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' }),
                 client: appt.client.name,
                 phone: appt.client.phone,
                 service: appt.service.name,
@@ -165,7 +165,7 @@ export class ExportService {
         doc.pipe(res);
 
         // Cabeçalho
-        doc.fontSize(20).font('Helvetica-Bold').text('BarberFlow', { align: 'center' });
+        doc.fontSize(20).font('Helvetica-Bold').text('Bartime', { align: 'center' });
         doc.fontSize(14).font('Helvetica').text(tenant?.name ?? '', { align: 'center' });
         doc.fontSize(10).fillColor('#6b7280').text(
             `Período: ${start.toLocaleDateString('pt-BR')} a ${end.toLocaleDateString('pt-BR')}`,
@@ -208,7 +208,7 @@ export class ExportService {
 
         doc.moveDown(2);
         doc.fontSize(9).fillColor('#9ca3af').text(
-            `Gerado em ${new Date().toLocaleString('pt-BR')} — BarberFlow`,
+            `Gerado em ${new Date().toLocaleString('pt-BR')} — Bartime`,
             { align: 'center' }
         );
 

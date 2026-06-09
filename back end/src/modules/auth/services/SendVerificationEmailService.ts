@@ -29,7 +29,7 @@ export class SendVerificationEmailService {
 
         await sendMail({
             to: professional.email,
-            subject: 'BarberFlow — Confirme seu e-mail',
+            subject: 'Bartime — Confirme seu e-mail',
             html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
           <h2>Olá, ${professional.name}!</h2>

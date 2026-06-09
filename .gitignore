@@ -5,9 +5,9 @@ build/
 .env
 .env.*
 !.env.example
-barberflow_pgdata/
-barberflow_pgadmin/
-barberflow_backups/
+bartime_pgdata/
+bartime_pgadmin/
+bartime_backups/
 postgres-data/
 *.log
 .DS_Store

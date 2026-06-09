@@ -14,12 +14,13 @@ async function main() {
     const tenant = await prisma.tenant.create({
         data: {
             name: `Barbearia Vintage Fake ${randomId}`,
+            slug: `barbearia-vintage-fake-${randomId}`,
             cnpj: `112223330001${String(randomId).slice(0, 2).padStart(2, '0')}`,
             subscriptionStatus: 'ACTIVE',
             professionals: {
                 create: {
                     name: 'Oséias Admin',
-                    email: 'oseias@barberflow.com',
+                    email: 'oseias@bartime.com',
                     password: hashedPassword,
                     role: 'ADMIN'
                 }
@@ -91,7 +92,7 @@ async function main() {
             serviceId: service2.id,
             startTime: new Date(today.setHours(14, 0, 0, 0)),
             endTime: new Date(today.setHours(14, 30, 0, 0)),
-            status: 'SCHEDULED'
+            status: 'PENDING'
         }
     });
     console.log(`✅ Agendamentos fakes gerados!`);

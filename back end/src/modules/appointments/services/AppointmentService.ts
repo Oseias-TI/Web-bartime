@@ -3,6 +3,7 @@ import { AppError } from '../../../shared/errors/AppError';
 import { CreateAppointmentInput } from '../dtos/CreateAppointmentSchema';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
 import { sendMail } from '../../../shared/utils/mailer';
+import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
 
 interface CreateAppointmentData extends CreateAppointmentInput {
     tenantId: string;
@@ -55,13 +56,29 @@ export class AppointmentService {
             });
         });
 
+        // Add to Google Calendar asynchronously
+        googleCalendarService.createEvent({
+            summary: `Agendamento: ${appointment.client.name} - ${appointment.service.name}`,
+            description: `Cliente: ${appointment.client.name}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,
+            startTime: startTime,
+            endTime: endTime,
+            professionalEmail: appointment.professional.email || undefined
+        }).then(eventId => {
+            if (eventId) {
+                prisma.appointment.update({
+                    where: { id: appointment.id },
+                    data: { googleEventId: eventId }
+                }).catch(console.error);
+            }
+        });
+
         if (appointment.professional.email) {
-            const dateStr = startTime.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-            const timeStr = startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = startTime.toLocaleDateString('pt-BR', { timeZone: 'UTC', weekday: 'long', day: '2-digit', month: 'long' });
+            const timeStr = startTime.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
 
             sendMail({
                 to: appointment.professional.email,
-                subject: 'BarberFlow — Novo Agendamento Recebido!',
+                subject: 'Bartime — Novo Agendamento Recebido!',
                 html: `
                   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
                     <h2>Olá, ${appointment.professional.name}!</h2>

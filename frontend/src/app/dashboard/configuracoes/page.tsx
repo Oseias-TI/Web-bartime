@@ -37,7 +37,9 @@ const daysOfWeek = [
 
 const profileSchema = z.object({
   name: z.string().min(2, "Nome muito curto"),
-  cnpj: z.string().min(14, "CNPJ inválido"),
+  cnpj: z.string().refine((val) => val.replace(/\D/g, "").length === 14, {
+    message: "CNPJ deve ter 14 números",
+  }),
 });
 
 const passwordSchema = z
@@ -159,7 +161,11 @@ export default function ConfiguracoesPage() {
 
   const onProfileSave = async (data: any) => {
     try {
-      const updated = await tenantService.update(data);
+      const payload = {
+        ...data,
+        cnpj: data.cnpj.replace(/\D/g, ""),
+      };
+      const updated = await tenantService.update(payload);
       updateTenant(updated);
       toastManager.add({ title: "Perfil atualizado!", type: "success" });
     } catch {
@@ -391,6 +397,38 @@ export default function ConfiguracoesPage() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">CNPJ</label>
                       <Input {...registerProfile("cnpj")} />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t mt-4">
+                    <h3 className="text-sm font-medium mb-2">Página de Agendamento (Área do Cliente)</h3>
+                    <p className="text-xs text-muted-foreground mb-3">Compartilhe este link com seus clientes para que eles possam agendar horários sozinhos.</p>
+                    <div className="flex items-center gap-2">
+                      <Input 
+                        readOnly 
+                        value={tenant?.slug ? `${typeof window !== 'undefined' ? window.location.origin : ''}/book/${tenant.slug}` : 'Gerando link...'} 
+                        className="bg-muted/50 text-muted-foreground font-mono text-sm"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        onClick={() => {
+                          const url = `${window.location.origin}/book/${tenant?.slug}`;
+                          navigator.clipboard.writeText(url);
+                          toastManager.add({ title: "Link copiado!", type: "success" });
+                        }}
+                      >
+                        Copiar
+                      </Button>
+                      <Button 
+                        type="button"
+                        variant="default"
+                        onClick={() => window.open(`/book/${tenant?.slug}`, "_blank")}
+                        disabled={!tenant?.slug}
+                      >
+                        <ExternalLink className="size-4 mr-2" />
+                        Abrir
+                      </Button>
                     </div>
                   </div>
 

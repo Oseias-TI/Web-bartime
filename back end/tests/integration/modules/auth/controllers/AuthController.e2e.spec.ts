@@ -47,6 +47,7 @@ jest.mock('../../../../../src/shared/middlewares/rateLimiter', () => ({
     globalLimiter: (req: any, res: any, next: any) => next(),
     authLimiter: (req: any, res: any, next: any) => next(),
     registerLimiter: (req: any, res: any, next: any) => next(),
+    publicBookingLimiter: (req: any, res: any, next: any) => next(),
 }));
 
 import { app } from '../../../../../src/app';

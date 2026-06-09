@@ -4,7 +4,7 @@ import { ensureRole } from '../shared/middlewares/ensureRole';
 import { ensureSuperAdmin } from '../shared/middlewares/ensureSuperAdmin';
 import { checkSubscription } from '../shared/middlewares/checkSubscription';
 import { auditLog } from '../shared/middlewares/auditLogger';
-import { globalLimiter, authLimiter, registerLimiter } from '../shared/middlewares/rateLimiter';
+import { globalLimiter, authLimiter, registerLimiter, publicBookingLimiter } from '../shared/middlewares/rateLimiter';
 import { uploadConfig } from '../config/upload';
 
 import { AuthController } from '../modules/auth/controllers/AuthController';
@@ -23,6 +23,8 @@ import { TenantController } from '../modules/auth/tenant/controllers/TenantContr
 import { AuditController } from '../modules/audit/controllers/AuditController';
 import { SuperAdminController } from '../modules/superAdmin/controllers/SuperAdminController';
 import { PublicBookingController } from '../modules/appointments/controllers/PublicBookingController';
+import { ClientAuthController } from '../modules/clients/controllers/ClientAuthController';
+import { ensureClientAuthenticated } from '../shared/middlewares/ensureClientAuthenticated';
 
 const routes = Router();
 
@@ -49,6 +51,7 @@ routes.use(globalLimiter);
 //  ROTAS PÚBLICAS
 // ═══════════════════════════════════════════════
 const publicBooking = new PublicBookingController();
+const clientAuth = new ClientAuthController();
 
 routes.post('/auth/register', registerLimiter, auth.register);
 routes.post('/auth/business', authLimiter, auth.loginBusiness);
@@ -58,11 +61,22 @@ routes.post('/auth/reset-password', auth.resetPassword);
 routes.get('/auth/verify-email', auth.verifyEmail);
 
 // Agendamento Público
+routes.get('/public/tenants', publicBooking.getAllTenants);
 routes.get('/public/tenant/:slug', publicBooking.getTenant);
 routes.get('/public/tenant/:slug/services', publicBooking.getServices);
 routes.get('/public/tenant/:slug/professionals', publicBooking.getProfessionals);
 routes.get('/public/tenant/:slug/availability', publicBooking.getAvailability);
-routes.post('/public/tenant/:slug/appointments', publicBooking.createAppointment);
+routes.post('/public/tenant/:slug/appointments', publicBookingLimiter, publicBooking.createAppointment);
+
+// Client Auth Público
+routes.get('/public/client/tenants', clientAuth.findTenants);
+routes.post('/public/tenant/:slug/client-auth/login', authLimiter, clientAuth.login);
+routes.post('/public/tenant/:slug/client-auth/register', authLimiter, clientAuth.register);
+routes.post('/public/tenant/:slug/client-auth/setup', authLimiter, clientAuth.setupPassword);
+
+// Dashboard do Cliente
+routes.get('/public/tenant/:slug/client/appointments', ensureClientAuthenticated, clients.listClientAppointments);
+
 
 // ═══════════════════════════════════════════════
 //  PROTEGIDAS — sem checkSubscription

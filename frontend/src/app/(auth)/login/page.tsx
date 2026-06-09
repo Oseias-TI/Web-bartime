@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Sparkles, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Scissors, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,15 +53,15 @@ export default function LoginPage() {
 
   return (
     <div className="animate-fade-in">
-      <div className="rounded-2xl border border-white/5 bg-stone-900/80 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
+      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/20">
-            <Sparkles className="size-7 text-stone-900" />
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
+            <Scissors className="size-7 text-black" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white">BarberFlow</h1>
-            <p className="text-sm text-stone-400 mt-1">
+            <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-playfair)]">Bartime</h1>
+            <p className="text-sm text-neutral-400 mt-1">
               Acesse sua conta para continuar
             </p>
           </div>
@@ -69,14 +69,14 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-stone-300">
+            <label htmlFor="email" className="text-sm font-medium text-neutral-300">
               Email
             </label>
             <Input
               id="email"
               type="email"
               placeholder="seu@email.com"
-              className="h-11 bg-stone-800/50 border-white/5 text-white placeholder:text-stone-500 focus:border-amber-500/50 focus:ring-amber-500/20"
+              className="h-11 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-white focus:ring-white/20"
               {...register("email")}
             />
             {errors.email && (
@@ -87,7 +87,7 @@ export default function LoginPage() {
           <div className="space-y-2">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-stone-300"
+              className="text-sm font-medium text-neutral-300"
             >
               Senha
             </label>
@@ -96,13 +96,13 @@ export default function LoginPage() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                className="h-11 bg-stone-800/50 border-white/5 text-white placeholder:text-stone-500 focus:border-amber-500/50 focus:ring-amber-500/20 pr-11"
+                className="h-11 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-white focus:ring-white/20 pr-11"
                 {...register("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-300 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-300 transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="size-4" />
@@ -119,7 +119,7 @@ export default function LoginPage() {
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-xs text-amber-500 hover:text-amber-400 transition-colors"
+              className="text-xs text-white hover:text-neutral-300 underline-offset-4 hover:underline transition-colors"
             >
               Esqueceu a senha?
             </Link>
@@ -128,7 +128,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-11 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-900 font-semibold shadow-lg shadow-amber-500/20 border-amber-400/20 transition-all duration-200"
+            className="w-full h-11 bg-white hover:!bg-black hover:!text-white text-black font-semibold shadow-lg shadow-black/15 transition-all duration-200"
           >
             {isSubmitting ? (
               <Loader2 className="size-4 animate-spin" />
@@ -139,11 +139,11 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-stone-400">
+          <p className="text-sm text-neutral-400">
             Não tem uma conta?{" "}
             <Link
               href="/register"
-              className="text-amber-500 hover:text-amber-400 font-medium transition-colors"
+              className="text-white hover:text-neutral-300 underline-offset-4 hover:underline font-medium transition-colors"
             >
               Cadastre sua barbearia
             </Link>
@@ -151,8 +151,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <p className="text-center text-xs text-stone-500 mt-6">
-        © 2026 BarberFlow. Todos os direitos reservados.
+      <p className="text-center text-xs text-neutral-500 mt-6">
+        © 2026 Bartime. Todos os direitos reservados.
       </p>
     </div>
   );

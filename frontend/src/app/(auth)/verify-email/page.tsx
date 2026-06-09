@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Sparkles,
+  Scissors,
   CheckCircle2,
   XCircle,
   Loader2,
@@ -54,14 +54,14 @@ function VerifyEmailContent() {
 
   return (
     <div className="animate-fade-in">
-      <div className="rounded-2xl border border-white/5 bg-stone-900/80 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
+      <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/20">
-            <Sparkles className="size-7 text-stone-900" />
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
+            <Scissors className="size-7 text-black" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white">Verificação de Email</h1>
+            <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-playfair)]">Verificação de Email</h1>
           </div>
         </div>
 
@@ -69,13 +69,13 @@ function VerifyEmailContent() {
         {status === "loading" && (
           <div className="flex flex-col items-center text-center space-y-4 py-8">
             <div className="flex size-16 items-center justify-center">
-              <Loader2 className="size-10 text-amber-500 animate-spin" />
+              <Loader2 className="size-10 text-black animate-spin" />
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-stone-300 font-medium">
+              <p className="text-sm text-neutral-300 font-medium">
                 Verificando seu email...
               </p>
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-neutral-500">
                 Aguarde enquanto confirmamos seu endereço de email.
               </p>
             </div>
@@ -86,14 +86,14 @@ function VerifyEmailContent() {
         {status === "success" && (
           <div className="space-y-6">
             <div className="flex flex-col items-center text-center space-y-4 py-4">
-              <div className="flex size-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                <CheckCircle2 className="size-8 text-emerald-500" />
+              <div className="flex size-16 items-center justify-center rounded-full bg-[#5cb97a]/10 border border-[#5cb97a]/20">
+                <CheckCircle2 className="size-8 text-[#5cb97a]" />
               </div>
               <div className="space-y-2">
                 <p className="text-lg font-semibold text-white">
                   Email Verificado!
                 </p>
-                <p className="text-sm text-stone-400 max-w-xs">
+                <p className="text-sm text-neutral-400 max-w-xs">
                   Seu endereço de email foi confirmado com sucesso. Agora você tem
                   acesso completo à plataforma.
                 </p>
@@ -104,7 +104,7 @@ function VerifyEmailContent() {
               href={isAuthenticated ? "/" : "/login"}
               className="block"
             >
-              <Button className="w-full h-11 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-900 font-semibold shadow-lg shadow-amber-500/20">
+              <Button className="w-full h-11 bg-white hover:!bg-black hover:!text-white text-black font-semibold shadow-lg shadow-black/15">
                 {isAuthenticated ? "Ir para o Dashboard" : "Ir para o Login"}
                 <ArrowRight className="size-4 ml-2" />
               </Button>
@@ -123,7 +123,7 @@ function VerifyEmailContent() {
                 <p className="text-lg font-semibold text-white">
                   Falha na Verificação
                 </p>
-                <p className="text-sm text-stone-400 max-w-xs">
+                <p className="text-sm text-neutral-400 max-w-xs">
                   {errorMessage}
                 </p>
               </div>
@@ -148,7 +148,7 @@ function VerifyEmailContent() {
                       });
                     }
                   }}
-                  className="w-full h-11 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-900 font-semibold"
+                  className="w-full h-11 bg-white hover:!bg-black hover:!text-white text-black font-semibold"
                 >
                   <RefreshCw className="size-4 mr-2" />
                   Reenviar Email de Verificação
@@ -157,7 +157,7 @@ function VerifyEmailContent() {
               <Link href={isAuthenticated ? "/" : "/login"} className="block">
                 <Button
                   variant="outline"
-                  className="w-full border-white/5 text-stone-300 hover:bg-stone-800"
+                  className="w-full border-white/10 text-neutral-300 hover:bg-[#2a1f12]"
                 >
                   {isAuthenticated ? "Voltar ao Dashboard" : "Ir para o Login"}
                 </Button>
@@ -167,8 +167,8 @@ function VerifyEmailContent() {
         )}
       </div>
 
-      <p className="text-center text-xs text-stone-500 mt-6">
-        © 2026 BarberFlow. Todos os direitos reservados.
+      <p className="text-center text-xs text-neutral-500 mt-6">
+        © 2026 Bartime. Todos os direitos reservados.
       </p>
     </div>
   );
@@ -179,10 +179,10 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <div className="animate-fade-in">
-          <div className="rounded-2xl border border-white/5 bg-stone-900/80 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
             <div className="flex flex-col items-center text-center space-y-4 py-8">
-              <Loader2 className="size-10 text-amber-500 animate-spin" />
-              <p className="text-sm text-stone-400">Carregando...</p>
+              <Loader2 className="size-10 text-black animate-spin" />
+              <p className="text-sm text-neutral-400">Carregando...</p>
             </div>
           </div>
         </div>

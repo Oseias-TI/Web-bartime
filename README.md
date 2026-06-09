@@ -1,4 +1,4 @@
-# BarberFlow
+# Bartime
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
@@ -7,7 +7,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-**BarberFlow** é uma plataforma completa (Full-Stack) para o gerenciamento de barbearias. Este repositório contém tanto o código do Frontend quanto do Backend da aplicação.
+**Bartime** é uma plataforma completa (Full-Stack) para o gerenciamento de barbearias. Este repositório contém tanto o código do Frontend quanto do Backend da aplicação.
 
 ## 📦 Estrutura do Projeto
 

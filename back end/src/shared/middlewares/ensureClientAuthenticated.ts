@@ -1,0 +1,23 @@
+import { Request, Response, NextFunction } from 'express';
+import { verify } from 'jsonwebtoken';
+
+export function ensureClientAuthenticated(req: Request, res: Response, next: NextFunction) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'Token não fornecido.' });
+
+    const [, token] = authHeader.split(' ');
+
+    try {
+        const decoded = verify(token, process.env.JWT_SECRET as string);
+        const { sub, tenantId, role } = decoded as any;
+        
+        if (role !== 'CLIENT') {
+            return res.status(403).json({ error: 'Esta rota é exclusiva para clientes.' });
+        }
+
+        req.user = { id: sub, tenantId, role };
+        return next();
+    } catch {
+        return res.status(401).json({ error: 'Token inválido.' });
+    }
+}

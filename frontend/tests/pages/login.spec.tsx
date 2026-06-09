@@ -22,9 +22,9 @@ jest.mock('@/contexts/AuthContext', () => ({
 }));
 
 describe('Login Page', () => {
-  it('deve renderizar o título BarberFlow', () => {
+  it('deve renderizar o título Bartime', () => {
     render(<LoginPage />);
-    expect(screen.getByText('BarberFlow')).toBeInTheDocument();
+    expect(screen.getByText('Bartime')).toBeInTheDocument();
   });
 
   it('deve mostrar erros de validação se submetido em branco', async () => {

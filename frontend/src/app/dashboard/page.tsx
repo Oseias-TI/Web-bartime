@@ -11,7 +11,7 @@ import {
   XCircle,
   ArrowUpRight,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, subDays, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   AreaChart,
@@ -43,28 +43,57 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const today = format(new Date(), "yyyy-MM-dd");
+  const monthStart = format(startOfMonth(new Date()), "yyyy-MM-dd");
+  const weekAgo = format(subDays(new Date(), 6), "yyyy-MM-dd");
+
+  const [chartData, setChartData] = useState<{ day: string; receita: number }[]>([
+    { day: "Seg", receita: 0 },
+    { day: "Ter", receita: 0 },
+    { day: "Qua", receita: 0 },
+    { day: "Qui", receita: 0 },
+    { day: "Sex", receita: 0 },
+    { day: "Sáb", receita: 0 },
+    { day: "Dom", receita: 0 },
+  ]);
 
   const loadData = useCallback(async () => {
     try {
-      const [appts, fin] = await Promise.all([
+      const [appts, fin, cashFlow] = await Promise.all([
         appointmentsService.listByDay(today),
-        financialService.getSummary(),
+        financialService.getSummary({ start: monthStart, end: today }),
+        financialService.getCashFlow({ start: weekAgo, end: today })
       ]);
       setAppointments(appts);
       setSummary(fin);
-    } catch {
-      // Dados de demonstração caso a API não esteja rodando
+
+      // Map cash flow to chart data
+      const newChartData = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = subDays(new Date(), i);
+        const dateStr = format(d, "yyyy-MM-dd");
+        const dayName = format(d, "EE", { locale: ptBR }); // "seg", "ter"
+        
+        const flow = cashFlow.find(c => c.date === dateStr);
+        newChartData.push({
+          day: dayName.charAt(0).toUpperCase() + dayName.slice(1),
+          receita: flow ? flow.income : 0
+        });
+      }
+      setChartData(newChartData);
+
+    } catch (err) {
+      console.error(err);
       setAppointments([]);
       setSummary({
-        totalIncome: 4850,
-        totalExpense: 1200,
-        netProfit: 3650,
-        pendingCommissions: 890,
+        totalIncome: 0,
+        totalExpense: 0,
+        netProfit: 0,
+        pendingCommissions: 0,
       });
     } finally {
       setIsLoading(false);
     }
-  }, [today]);
+  }, [today, monthStart, weekAgo]);
 
   useEffect(() => {
     loadData();
@@ -91,7 +120,6 @@ export default function DashboardPage() {
     {
       title: "Receita do Mês",
       value: `R$ ${(summary?.totalIncome || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
-      change: "+12% vs mês anterior",
       icon: DollarSign,
       color: "text-emerald-500",
     },
@@ -109,16 +137,7 @@ export default function DashboardPage() {
     },
   ];
 
-  // Dados mock para gráfico (quando a API não tem dados)
-  const chartData = [
-    { day: "Seg", receita: 620 },
-    { day: "Ter", receita: 890 },
-    { day: "Qua", receita: 750 },
-    { day: "Qui", receita: 1100 },
-    { day: "Sex", receita: 1350 },
-    { day: "Sáb", receita: 1680 },
-    { day: "Dom", receita: 460 },
-  ];
+
 
   if (isLoading) {
     return (
@@ -262,7 +281,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex flex-col items-center text-center min-w-[50px]">
                     <span className="text-xs text-muted-foreground">
-                      {format(new Date(apt.startTime), "HH:mm")}
+                      {apt.startTime.substring(11, 16)}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">

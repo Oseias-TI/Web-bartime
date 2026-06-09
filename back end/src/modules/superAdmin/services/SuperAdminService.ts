@@ -1,6 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
+import { SubscriptionStatus } from '@prisma/client';
 
 export class SuperAdminService {
     async listTenants(paginationQuery: Record<string, any>, search?: string) {
@@ -106,12 +107,12 @@ export class SuperAdminService {
         const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
-        const validStatuses = ['ACTIVE', 'TRIAL', 'PAST_DUE', 'CANCELED', 'UNPAID'];
-        if (!validStatuses.includes(status)) throw new AppError('Status inválido.', 400);
+        const validStatuses = Object.values(SubscriptionStatus);
+        if (!validStatuses.includes(status as SubscriptionStatus)) throw new AppError('Status inválido.', 400);
 
         return prisma.tenant.update({
             where: { id: tenantId },
-            data: { subscriptionStatus: status },
+            data: { subscriptionStatus: status as SubscriptionStatus },
             select: { id: true, name: true, subscriptionStatus: true },
         });
     }

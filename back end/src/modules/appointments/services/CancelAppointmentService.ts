@@ -1,6 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { localNowAsUTC } from '../../../shared/utils/timezone';
+import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
 
 interface CancelInput {
     appointmentId: string;
@@ -20,7 +21,7 @@ export class CancelAppointmentService {
         if (new Date(appointment.startTime).getTime() <= localNowAsUTC()) throw new AppError('Não é possível cancelar um agendamento que já iniciou.', 400);
 
         // BUG-12: Usar transação para cancelar agendamento e comissões PENDING associadas atomicamente
-        return prisma.$transaction(async (tx) => {
+        const updatedAppointment = await prisma.$transaction(async (tx) => {
             // Cancela comissões PENDING vinculadas ao agendamento (evita comissões órfãs)
             await tx.commission.updateMany({
                 where: { appointmentId, status: 'PENDING' },
@@ -33,5 +34,11 @@ export class CancelAppointmentService {
                 include: { client: { select: { name: true, phone: true } }, service: { select: { name: true } }, professional: { select: { name: true } } },
             });
         });
+
+        if (appointment.googleEventId) {
+            googleCalendarService.deleteEvent(appointment.googleEventId).catch(console.error);
+        }
+
+        return updatedAppointment;
     }
 }

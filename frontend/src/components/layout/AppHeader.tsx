@@ -34,7 +34,7 @@ export function AppHeader() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">BarberFlow</BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard">Bartime</BreadcrumbLink>
           </BreadcrumbItem>
           {pathname !== "/dashboard" && (
             <>

@@ -4,7 +4,7 @@ import { ElasticsearchTransport } from 'winston-elasticsearch';
 const esTransportOpts = {
   level: 'info',
   clientOpts: { node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200' },
-  indexPrefix: 'barberflow-logs'
+  indexPrefix: 'bartime-logs'
 };
 
 const logger = winston.createLogger({

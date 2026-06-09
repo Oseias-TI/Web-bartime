@@ -58,6 +58,7 @@ jest.mock('../../../../../src/shared/middlewares/rateLimiter', () => ({
     authLimiter: (req: any, res: any, next: any) => next(),
     registerLimiter: (req: any, res: any, next: any) => next(),
     publicLimiter: (req: any, res: any, next: any) => next(),
+    publicBookingLimiter: (req: any, res: any, next: any) => next(),
 }));
 
 import { app } from '../../../../../src/app';
@@ -88,7 +89,7 @@ describe('AppointmentController (Integration)', () => {
             clientId: uuidv4(),
             professionalId: uuidv4(),
             serviceId: uuidv4(),
-            startTime: new Date('2026-06-05T14:00:00.000Z').toISOString(),
+            startTime: new Date('2030-06-05T14:00:00.000Z').toISOString(),
         };
 
         (prisma.service.findFirst as jest.Mock).mockResolvedValue({ id: data.serviceId, durationMin: 30 });
@@ -125,7 +126,7 @@ describe('AppointmentController (Integration)', () => {
             clientId: uuidv4(),
             professionalId: uuidv4(),
             serviceId: uuidv4(),
-            startTime: new Date('2026-06-05T14:00:00.000Z').toISOString(),
+            startTime: new Date('2030-06-05T14:00:00.000Z').toISOString(),
         };
 
         (prisma.service.findFirst as jest.Mock).mockResolvedValue({ id: data.serviceId, durationMin: 30 });

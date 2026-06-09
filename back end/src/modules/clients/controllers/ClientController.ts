@@ -45,4 +45,10 @@ export class ClientController {
         const result = await new ClientService().redeemPoints(req.user.tenantId, req.params.id, points);
         return res.json(result);
     });
+
+    listClientAppointments = asyncHandler(async (req: Request, res: Response) => {
+        // req.user has { id: clientId, tenantId } because of ensureClientAuthenticated
+        const result = await new ClientService().getClientAppointments(req.user.tenantId, req.user.id);
+        return res.json(result);
+    });
 }

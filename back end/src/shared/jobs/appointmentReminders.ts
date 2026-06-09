@@ -1,8 +1,9 @@
 import cron from 'node-cron';
 import { prisma } from '../../lib/prisma';
 import { sendMail } from '../utils/mailer';
+import { ReminderType } from '@prisma/client';
 
-async function sendReminder(hoursBeforeLabel: string, hoursBeforeMs: number) {
+async function sendReminder(hoursBeforeLabel: ReminderType, hoursBeforeMs: number) {
     const now = new Date();
     const windowStart = new Date(now.getTime() + hoursBeforeMs);
     const windowEnd = new Date(windowStart.getTime() + 5 * 60 * 1000); // janela de 5 min
@@ -24,13 +25,13 @@ async function sendReminder(hoursBeforeLabel: string, hoursBeforeMs: number) {
         if (!appointment.client.email) continue;
 
         const startTime = new Date(appointment.startTime);
-        const dateStr = startTime.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-        const timeStr = startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        const dateStr = startTime.toLocaleDateString('pt-BR', { timeZone: 'UTC', weekday: 'long', day: '2-digit', month: 'long' });
+        const timeStr = startTime.toLocaleTimeString('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
 
         try {
             await sendMail({
                 to: appointment.client.email,
-                subject: `BarberFlow — Lembrete: seu agendamento é ${hoursBeforeLabel === 'EMAIL_24H' ? 'amanhã' : 'em 1 hora'}`,
+                subject: `Bartime — Lembrete: seu agendamento é ${hoursBeforeLabel === ReminderType.EMAIL_24H ? 'amanhã' : 'em 1 hora'}`,
                 html: `
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
             <h2>Olá, ${appointment.client.name}!</h2>
@@ -60,13 +61,13 @@ async function sendReminder(hoursBeforeLabel: string, hoursBeforeMs: number) {
 export function startReminderJobs() {
     // Roda a cada 5 minutos — verifica agendamentos em 24h
     cron.schedule('*/5 * * * *', () => {
-        sendReminder('EMAIL_24H', 24 * 60 * 60 * 1000).catch(console.error);
+        sendReminder(ReminderType.EMAIL_24H, 24 * 60 * 60 * 1000).catch(console.error);
     });
 
     // Roda a cada 5 minutos — verifica agendamentos em 1h
     cron.schedule('*/5 * * * *', () => {
-        sendReminder('EMAIL_1H', 60 * 60 * 1000).catch(console.error);
+        sendReminder(ReminderType.EMAIL_1H, 60 * 60 * 1000).catch(console.error);
     });
 
     console.log('[Jobs] Lembretes de agendamento iniciados.');
-}
+}

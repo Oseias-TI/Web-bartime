@@ -26,7 +26,7 @@ interface SendMailOptions {
 
 export async function sendMail({ to, subject, html }: SendMailOptions) {
     await transporter.sendMail({
-        from: process.env.SMTP_FROM ?? 'BarberFlow <noreply@barberflow.com>',
+        from: process.env.SMTP_FROM ?? 'Bartime <noreply@bartime.com>',
         to,
         subject,
         html,

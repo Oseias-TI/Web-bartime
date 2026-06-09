@@ -7,7 +7,7 @@ import { connectRedis } from './lib/redis';
 const PORT = Number(process.env.PORT) || 3333;
 
 const server = app.listen(PORT, '0.0.0.0', async () => {
-    console.log(`🚀 BarberFlow rodando na porta ${PORT}`);
+    console.log(`🚀 Bartime rodando na porta ${PORT}`);
 
     // Conecta ao Redis
     await connectRedis();

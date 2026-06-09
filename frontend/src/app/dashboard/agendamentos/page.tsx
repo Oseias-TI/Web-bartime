@@ -114,7 +114,7 @@ export default function AgendamentosPage() {
   };
 
   const changeDate = (days: number) => {
-    const d = new Date(selectedDate);
+    const d = new Date(selectedDate + "T12:00:00");
     d.setDate(d.getDate() + days);
     setSelectedDate(format(d, "yyyy-MM-dd"));
   };
@@ -382,13 +382,28 @@ export default function AgendamentosPage() {
           <Button variant="ghost" size="icon-sm" onClick={() => changeDate(-1)}>
             <ChevronLeft className="size-4" />
           </Button>
-          <div className="flex items-center gap-2 px-3">
+          <div className="flex items-center gap-2 px-3 relative overflow-hidden group">
             <CalendarDays className="size-4 text-primary" />
-            <span className="text-sm font-medium min-w-[180px] text-center">
+            <span className="text-sm font-medium min-w-[180px] text-center group-hover:text-primary transition-colors">
               {format(new Date(selectedDate + "T12:00:00"), "EEEE, dd/MM/yyyy", {
                 locale: ptBR,
               })}
             </span>
+            <input
+              type="date"
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              value={selectedDate}
+              onClick={(e) => {
+                try {
+                  if ('showPicker' in HTMLInputElement.prototype) {
+                    e.currentTarget.showPicker();
+                  }
+                } catch (err) {}
+              }}
+              onChange={(e) => {
+                if (e.target.value) setSelectedDate(e.target.value);
+              }}
+            />
           </div>
           <Button variant="ghost" size="icon-sm" onClick={() => changeDate(1)}>
             <ChevronRight className="size-4" />
@@ -456,10 +471,10 @@ export default function AgendamentosPage() {
                       <div className="flex items-center gap-3 min-w-[100px]">
                         <div className="text-center">
                           <p className="text-lg font-bold text-primary">
-                            {format(new Date(apt.startTime), "HH:mm")}
+                            {apt.startTime.substring(11, 16)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {format(new Date(apt.endTime), "HH:mm")}
+                            {apt.endTime.substring(11, 16)}
                           </p>
                         </div>
                         <div className="h-10 w-px bg-border" />

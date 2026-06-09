@@ -18,6 +18,7 @@ export interface Professional {
 interface Tenant {
   id: string;
   name: string;
+  slug: string;
   cnpj: string;
   logoUrl: string | null;
   subscriptionStatus: string;
@@ -61,9 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadStoredAuth = useCallback(() => {
     try {
-      const storedToken = localStorage.getItem("@barberflow:token");
-      const storedProfessional = localStorage.getItem("@barberflow:professional");
-      const storedTenant = localStorage.getItem("@barberflow:tenant");
+      const storedToken = localStorage.getItem("@Bartime:token");
+      const storedProfessional = localStorage.getItem("@Bartime:professional");
+      const storedTenant = localStorage.getItem("@Bartime:tenant");
 
       if (storedToken && storedProfessional && storedTenant) {
         api.setToken(storedToken);
@@ -71,10 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setTenant(JSON.parse(storedTenant));
       }
     } catch {
-      localStorage.removeItem("@barberflow:token");
-      localStorage.removeItem("@barberflow:refreshToken");
-      localStorage.removeItem("@barberflow:professional");
-      localStorage.removeItem("@barberflow:tenant");
+      localStorage.removeItem("@Bartime:token");
+      localStorage.removeItem("@Bartime:refreshToken");
+      localStorage.removeItem("@Bartime:professional");
+      localStorage.removeItem("@Bartime:tenant");
     } finally {
       setIsLoading(false);
     }
@@ -94,38 +95,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfessional(response.professional);
     setTenant(response.tenant);
 
-    localStorage.setItem("@barberflow:token", response.token);
-    localStorage.setItem("@barberflow:refreshToken", response.refreshToken);
-    localStorage.setItem("@barberflow:professional", JSON.stringify(response.professional));
-    localStorage.setItem("@barberflow:tenant", JSON.stringify(response.tenant));
+    localStorage.setItem("@Bartime:token", response.token);
+    localStorage.setItem("@Bartime:refreshToken", response.refreshToken);
+    localStorage.setItem("@Bartime:professional", JSON.stringify(response.professional));
+    localStorage.setItem("@Bartime:tenant", JSON.stringify(response.tenant));
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {
-    const response = await api.post<AuthResponse>("/auth/register", data);
+    // BUG-05: Backend espera 'adminName', não 'name'
+    const response = await api.post<AuthResponse>("/auth/register", {
+      adminName: data.name,
+      email: data.email,
+      password: data.password,
+      tenantName: data.tenantName,
+      cnpj: data.cnpj,
+    });
 
     api.setToken(response.token);
     setProfessional(response.professional);
     setTenant(response.tenant);
 
-    localStorage.setItem("@barberflow:token", response.token);
-    localStorage.setItem("@barberflow:refreshToken", response.refreshToken);
-    localStorage.setItem("@barberflow:professional", JSON.stringify(response.professional));
-    localStorage.setItem("@barberflow:tenant", JSON.stringify(response.tenant));
+    localStorage.setItem("@Bartime:token", response.token);
+    localStorage.setItem("@Bartime:refreshToken", response.refreshToken);
+    localStorage.setItem("@Bartime:professional", JSON.stringify(response.professional));
+    localStorage.setItem("@Bartime:tenant", JSON.stringify(response.tenant));
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      await api.post("/auth/logout");
+      // BUG-07: Enviar refreshToken no body para que o backend possa revogá-lo
+      const refreshToken = localStorage.getItem("@Bartime:refreshToken");
+      if (refreshToken) {
+        await api.post("/auth/logout", { refreshToken });
+      }
     } catch {
       // ignore errors on logout
     } finally {
       api.setToken(null);
       setProfessional(null);
       setTenant(null);
-      localStorage.removeItem("@barberflow:token");
-      localStorage.removeItem("@barberflow:refreshToken");
-      localStorage.removeItem("@barberflow:professional");
-      localStorage.removeItem("@barberflow:tenant");
+      localStorage.removeItem("@Bartime:token");
+      localStorage.removeItem("@Bartime:refreshToken");
+      localStorage.removeItem("@Bartime:professional");
+      localStorage.removeItem("@Bartime:tenant");
     }
   }, []);
 
@@ -133,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfessional((prev) => {
       if (!prev) return prev;
       const updated = { ...prev, ...data };
-      localStorage.setItem("@barberflow:professional", JSON.stringify(updated));
+      localStorage.setItem("@Bartime:professional", JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -142,7 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTenant((prev) => {
       if (!prev) return prev;
       const updated = { ...prev, ...data };
-      localStorage.setItem("@barberflow:tenant", JSON.stringify(updated));
+      localStorage.setItem("@Bartime:tenant", JSON.stringify(updated));
       return updated;
     });
   }, []);

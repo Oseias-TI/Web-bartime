@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, CreditCard, Sparkles, AlertTriangle } from "lucide-react";
+import { CheckCircle2, CreditCard, Scissors, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { toastManager } from "@/components/ui/toast";
 
@@ -55,7 +55,7 @@ export default function PlanosPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Assinatura & Planos</h1>
         <p className="text-muted-foreground mt-2">
-          Gerencie o acesso da sua barbearia ao BarberFlow.
+          Gerencie o acesso da sua barbearia ao Bartime.
         </p>
       </div>
 
@@ -70,7 +70,7 @@ export default function PlanosPage() {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                 {isPro ? (
-                  <Sparkles className="w-6 h-6 text-primary" />
+                  <Scissors className="w-6 h-6 text-primary" />
                 ) : isTrial ? (
                   <ClockIcon className="w-6 h-6 text-yellow-500" />
                 ) : (
@@ -80,7 +80,7 @@ export default function PlanosPage() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Plano Atual</p>
                 <p className="text-lg font-bold">
-                  {isPro ? "BarberFlow PRO" : isTrial ? "Período de Teste" : "Conta Suspensa"}
+                  {isPro ? "Bartime PRO" : isTrial ? "Período de Teste" : "Conta Suspensa"}
                 </p>
               </div>
             </div>

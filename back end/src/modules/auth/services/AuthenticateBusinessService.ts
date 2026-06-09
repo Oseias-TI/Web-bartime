@@ -48,6 +48,7 @@ export class AuthenticateBusinessService {
                 id: tenant.id,
                 name: tenant.name,
                 cnpj: tenant.cnpj,
+                slug: tenant.slug,
                 logoUrl: tenant.logoUrl,
                 subscriptionStatus: tenant.subscriptionStatus
             }

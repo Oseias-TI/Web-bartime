@@ -12,7 +12,6 @@ import {
   Settings,
   LayoutDashboard,
   LogOut,
-  Sparkles,
   ShieldAlert,
   CreditCard,
 } from "lucide-react";
@@ -113,12 +112,12 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="gap-3" tooltip="BarberFlow">
+            <SidebarMenuButton size="lg" className="gap-3" tooltip="Bartime">
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <Sparkles className="size-4" />
+                <Scissors className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold text-sm">BarberFlow</span>
+                <span className="font-semibold text-sm">Bartime</span>
                 <span className="text-xs text-muted-foreground truncate max-w-[140px]">
                   {tenant?.name || "Barbearia"}
                 </span>

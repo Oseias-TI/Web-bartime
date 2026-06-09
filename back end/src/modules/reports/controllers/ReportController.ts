@@ -16,8 +16,9 @@ export class ReportController {
         const start = req.query.start ? new Date(`${req.query.start}T00:00:00.000Z`) : startOfMonth;
         const end = req.query.end ? new Date(`${req.query.end}T23:59:59.999Z`) : now;
 
-        const [totalAppointments, canceledAppointments, revenue, pendingCommissions, topProfessionalsData, newClients, appointmentsByPayment, topServicesData] =
+        const [totalAllAppointments, completedAppointments, canceledAppointments, revenue, pendingCommissions, topProfessionalsData, newClients, appointmentsByPayment, topServicesData] =
             await Promise.all([
+                prisma.appointment.count({ where: { tenantId, startTime: { gte: start, lte: end } } }),
                 prisma.appointment.count({ where: { tenantId, status: 'COMPLETED', startTime: { gte: start, lte: end } } }),
                 prisma.appointment.count({ where: { tenantId, status: 'CANCELED', startTime: { gte: start, lte: end } } }),
                 prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end } }, _sum: { amount: true } }),
@@ -37,7 +38,7 @@ export class ReportController {
 
         const totalRevenue = Number(revenue._sum.amount ?? 0);
         const totalPending = Number(pendingCommissions._sum.amount ?? 0);
-        const totalAll = totalAppointments + canceledAppointments;
+        const totalAll = totalAllAppointments;
         
         const topServices = topServicesData.map(s => {
             const info = serviceInfos.find(si => si.id === s.serviceId);
@@ -58,14 +59,14 @@ export class ReportController {
         return res.json({
             period: { start, end },
             totalAppointments: totalAll,
-            completedAppointments: totalAppointments,
+            completedAppointments: completedAppointments,
             canceledAppointments,
             cancellationRate: totalAll > 0 ? Number(((canceledAppointments / totalAll) * 100).toFixed(1)) : 0,
             totalRevenue,
             pendingCommissions: totalPending,
             netProfit: totalRevenue - totalPending,
             newClients,
-            averageTicket: totalAppointments > 0 ? Number((totalRevenue / totalAppointments).toFixed(2)) : 0,
+            averageTicket: completedAppointments > 0 ? Number((totalRevenue / completedAppointments).toFixed(2)) : 0,
             topServices,
             topProfessionals,
             appointmentsByPayment: appointmentsByPayment.map(a => ({ method: a.paymentMethod ?? 'N/A', count: a._count.paymentMethod })),

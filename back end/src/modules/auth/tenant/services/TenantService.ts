@@ -10,6 +10,7 @@ export class TenantService {
                 id: true,
                 name: true,
                 cnpj: true,
+                slug: true,
                 logoUrl: true,
                 subscriptionStatus: true,
                 currentPeriodEnd: true,
@@ -32,6 +33,7 @@ export class TenantService {
                 id: true,
                 name: true,
                 cnpj: true,
+                slug: true,
                 logoUrl: true,
                 subscriptionStatus: true,
             },
@@ -45,7 +47,7 @@ export class TenantService {
         return prisma.tenant.update({
             where: { id: tenantId },
             data: { logoUrl },
-            select: { id: true, name: true, logoUrl: true },
+            select: { id: true, name: true, slug: true, logoUrl: true },
         });
     }
 }

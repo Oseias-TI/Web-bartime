@@ -1,13 +1,15 @@
 import Stripe from 'stripe';
 import { prisma } from '../../../lib/prisma';
 import { stripe } from '../../../shared/utils/stripe';
+import { SubscriptionStatus } from '@prisma/client';
 
-function mapStripeStatus(stripeStatus: string): string {
-    const map: Record<string, string> = {
-        active: 'ACTIVE', trialing: 'ACTIVE', past_due: 'PAST_DUE', canceled: 'CANCELED',
-        unpaid: 'UNPAID', incomplete: 'PAST_DUE', incomplete_expired: 'CANCELED', paused: 'PAST_DUE',
+// BUG-17: Tipado com o enum SubscriptionStatus do Prisma
+function mapStripeStatus(stripeStatus: string): SubscriptionStatus {
+    const map: Record<string, SubscriptionStatus> = {
+        active: SubscriptionStatus.ACTIVE, trialing: SubscriptionStatus.ACTIVE, past_due: SubscriptionStatus.PAST_DUE, canceled: SubscriptionStatus.CANCELED,
+        unpaid: SubscriptionStatus.UNPAID, incomplete: SubscriptionStatus.PAST_DUE, incomplete_expired: SubscriptionStatus.CANCELED, paused: SubscriptionStatus.PAST_DUE,
     };
-    return map[stripeStatus] ?? 'PAST_DUE';
+    return map[stripeStatus] ?? SubscriptionStatus.PAST_DUE;
 }
 
 export class StripeWebhookService {

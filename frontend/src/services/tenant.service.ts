@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 export interface Tenant {
   id: string;
   name: string;
+  slug: string;
   cnpj: string;
   logoUrl: string | null;
   subscriptionStatus: string;

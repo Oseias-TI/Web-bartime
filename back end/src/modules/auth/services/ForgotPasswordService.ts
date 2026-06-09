@@ -15,18 +15,21 @@ export class ForgotPasswordService {
         });
 
         const rawToken = crypto.randomBytes(32).toString('hex');
+        // BUG-16: Hashear o token antes de salvar no banco
+        const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
         const expiresAt = new Date();
         expiresAt.setMinutes(expiresAt.getMinutes() + RESET_TOKEN_EXPIRES_MINUTES);
 
         await prisma.passwordResetToken.create({
-            data: { token: rawToken, professionalId: professional.id, expiresAt },
+            data: { token: hashedToken, professionalId: professional.id, expiresAt },
         });
 
+        // O rawToken (não hasheado) é enviado por e-mail
         const resetUrl = `${process.env.APP_URL}/reset-password?token=${rawToken}`;
 
         await sendMail({
             to: professional.email,
-            subject: 'BarberFlow — Redefinição de senha',
+            subject: 'Bartime — Redefinição de senha',
             html: `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
           <h2>Olá, ${professional.name}!</h2>

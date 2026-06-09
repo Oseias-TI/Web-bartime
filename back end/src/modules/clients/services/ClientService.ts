@@ -175,4 +175,20 @@ export class ClientService {
 
         return { message: `${rewards} benefício(s) resgatado(s) com sucesso!`, pointsUsed: points, pointsRemaining: updated.loyaltyPoints, rewards };
     }
+
+    async getClientAppointments(tenantId: string, clientId: string) {
+        const client = await prisma.client.findFirst({ where: { id: clientId, tenantId } });
+        if (!client) throw new AppError('Cliente não encontrado.', 404);
+
+        const appointments = await prisma.appointment.findMany({
+            where: { tenantId, clientId },
+            include: {
+                service: { select: { id: true, name: true, price: true, durationMin: true } },
+                professional: { select: { id: true, name: true, avatarUrl: true } },
+            },
+            orderBy: { startTime: 'desc' },
+        });
+
+        return appointments;
+    }
 }

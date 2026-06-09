@@ -1,5 +1,5 @@
 /**
- * Utilitário de timezone para o BarberFlow.
+ * Utilitário de timezone para o Bartime.
  *
  * O sistema todo opera na convenção "hora local = UTC":
  *   - Os horários de funcionamento (businessHours) são salvos como strings "09:00", "18:00"
