@@ -122,9 +122,7 @@ export default function AuthenticatedClientPage() {
     setIsSaving(true);
     setError("");
     try {
-      const [hours, minutes] = selectedTime!.split(":").map(Number);
-      const appointmentDate = new Date(selectedDate);
-      appointmentDate.setHours(hours, minutes, 0, 0);
+      const dateStr = format(selectedDate, "yyyy-MM-dd");
 
       await clientApi.post(`/public/tenant/${slug}/appointments`, {
         serviceId: selectedService!.id,
@@ -132,7 +130,7 @@ export default function AuthenticatedClientPage() {
         clientName: clientInfo.name,
         clientPhone: clientInfo.phone,
         clientEmail: clientInfo.email,
-        startTime: appointmentDate.toISOString()
+        startTime: `${dateStr}T${selectedTime}:00.000Z`
       });
       
       setStep(5); // Success step
@@ -169,8 +167,8 @@ export default function AuthenticatedClientPage() {
     );
   }
 
-  const upcoming = appointments.filter(a => new Date(a.startTime) >= new Date() && a.status !== 'CANCELED');
-  const past = appointments.filter(a => new Date(a.startTime) < new Date() || a.status === 'CANCELED');
+  const upcoming = appointments.filter(a => new Date(a.startTime) >= new Date() && a.status !== 'CANCELED' && a.status !== 'COMPLETED');
+  const past = appointments.filter(a => new Date(a.startTime) < new Date() || a.status === 'CANCELED' || a.status === 'COMPLETED');
   const nextDays = Array.from({ length: 7 }).map((_, i) => addDays(new Date(), i));
 
   return (
@@ -445,20 +443,30 @@ export default function AuthenticatedClientPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 gap-3">
-                    {availableSlots.map(time => (
-                      <button
-                        key={time}
-                        onClick={() => setSelectedTime(time)}
-                        className={cn(
-                          "py-3 rounded-xl font-medium text-sm transition-all border",
-                          selectedTime === time
-                            ? "bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]"
-                            : "bg-white dark:bg-zinc-900 hover:border-primary active:scale-95"
-                        )}
-                      >
-                        {time}
-                      </button>
-                    ))}
+                    {availableSlots.map(time => {
+                      const [h, m] = time.split(':').map(Number);
+                      const slotTime = new Date(selectedDate);
+                      slotTime.setHours(h, m, 0, 0);
+                      const isPast = slotTime < new Date();
+
+                      return (
+                        <button
+                          key={time}
+                          disabled={isPast}
+                          onClick={() => setSelectedTime(time)}
+                          className={cn(
+                            "py-3 rounded-xl font-medium text-sm transition-all border",
+                            isPast
+                              ? "bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed opacity-60 dark:bg-zinc-800/50 dark:text-zinc-600 dark:border-zinc-800"
+                              : selectedTime === time
+                                ? "bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]"
+                                : "bg-white dark:bg-zinc-900 hover:border-primary active:scale-95"
+                          )}
+                        >
+                          {time}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 

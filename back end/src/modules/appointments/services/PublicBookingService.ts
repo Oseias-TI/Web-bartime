@@ -104,7 +104,7 @@ export class PublicBookingService {
         return availableSlots;
     }
 
-    async createAppointment(data: { slug: string, serviceId: string, professionalId?: string, clientName: string, clientPhone: string, clientEmail: string, startTime: string }) {
+    async createAppointment(data: { slug: string, serviceId: string, professionalId?: string, clientName: string, clientPhone: string, clientEmail?: string | null, startTime: string }) {
         const tenant = await this.getTenantBySlug(data.slug);
         const service = await prisma.service.findUnique({ where: { id: data.serviceId } });
         if (!service) throw new AppError('Serviço não encontrado', 404);
@@ -122,7 +122,7 @@ export class PublicBookingService {
                 tenantId: tenant.id, 
                 OR: [
                     { phone: data.clientPhone },
-                    { email: data.clientEmail }
+                    ...(data.clientEmail ? [{ email: data.clientEmail }] : [])
                 ]
             }
         });
@@ -133,10 +133,10 @@ export class PublicBookingService {
                     tenantId: tenant.id,
                     name: data.clientName,
                     phone: data.clientPhone,
-                    email: data.clientEmail
+                    email: data.clientEmail || null
                 }
             });
-        } else if (!client.email) {
+        } else if (data.clientEmail && !client.email) {
             // Se o cliente existe mas não tinha email, atualiza
             client = await prisma.client.update({
                 where: { id: client.id },
@@ -181,10 +181,11 @@ export class PublicBookingService {
         // Add to Google Calendar asynchronously
         googleCalendarService.createEvent({
             summary: `Agendamento Web: ${appointment.client.name} - ${appointment.service.name}`,
-            description: `Cliente: ${appointment.client.name}\nEmail: ${data.clientEmail}\nTelefone: ${data.clientPhone}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,
+            description: `Cliente: ${appointment.client.name}\nEmail: ${data.clientEmail || 'N/A'}\nTelefone: ${data.clientPhone}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,
             startTime: startDate,
             endTime: endDate,
-            professionalEmail: appointment.professional.email || undefined
+            professionalEmail: appointment.professional.email || undefined,
+            clientEmail: data.clientEmail || undefined
         }).then(eventId => {
             if (eventId) {
                 prisma.appointment.update({

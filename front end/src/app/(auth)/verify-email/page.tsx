@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, updateProfessional } = useAuth();
   const token = searchParams.get("token");
 
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -36,6 +36,9 @@ function VerifyEmailContent() {
       try {
         await api.get("/auth/verify-email", { token });
         setStatus("success");
+        if (isAuthenticated) {
+          updateProfessional({ emailVerified: true });
+        }
         toastManager.add({
           title: "Email verificado!",
           description: "Sua conta foi verificada com sucesso.",

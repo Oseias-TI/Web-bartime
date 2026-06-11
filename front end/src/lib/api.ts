@@ -123,7 +123,15 @@ class ApiClient {
         message: "Erro de conexão com o servidor",
         statusCode: response.status,
       }));
-      throw new ApiError(errorData.message || "Erro desconhecido", errorData.statusCode || response.status);
+
+      // Redirecionar para a página de planos se a assinatura/teste expirou
+      if (response.status === 403 && errorData.action === "subscribe") {
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/dashboard/planos")) {
+          window.location.href = "/dashboard/planos";
+        }
+      }
+
+      throw new ApiError(errorData.error || errorData.message || "Erro desconhecido", errorData.statusCode || response.status);
     }
     
     if (response.status === 204) {

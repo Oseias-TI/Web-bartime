@@ -33,6 +33,7 @@ export class GoogleCalendarService {
         startTime: Date;
         endTime: Date;
         professionalEmail?: string;
+        clientEmail?: string;
     }): Promise<string | null> {
         if (!this.calendar) {
             console.error('[GoogleCalendarService] Serviço não inicializado.');
@@ -44,16 +45,27 @@ export class GoogleCalendarService {
                 summary: data.summary,
                 description: data.description,
                 start: {
-                    dateTime: data.startTime.toISOString(),
+                    dateTime: data.startTime.toISOString().replace('Z', '-03:00'),
+                    timeZone: 'America/Sao_Paulo',
                 },
                 end: {
-                    dateTime: data.endTime.toISOString(),
+                    dateTime: data.endTime.toISOString().replace('Z', '-03:00'),
+                    timeZone: 'America/Sao_Paulo',
                 },
             };
 
-            // Se quisermos convidar o profissional, podemos adicionar como attendee
+            const attendees: { email: string }[] = [];
+
             if (data.professionalEmail) {
-                event.attendees = [{ email: data.professionalEmail }];
+                attendees.push({ email: data.professionalEmail });
+            }
+
+            if (data.clientEmail) {
+                attendees.push({ email: data.clientEmail });
+            }
+
+            if (attendees.length > 0) {
+                event.attendees = attendees;
             }
 
             const response = await this.calendar.events.insert({

@@ -52,7 +52,7 @@ export class AppointmentService {
 
             return tx.appointment.create({
                 data: { tenantId: data.tenantId, clientId: data.clientId, professionalId: data.professionalId, serviceId: data.serviceId, startTime, endTime },
-                include: { service: true, professional: { select: { id: true, name: true, email: true } }, client: { select: { id: true, name: true } } },
+                include: { service: true, professional: { select: { id: true, name: true, email: true } }, client: { select: { id: true, name: true, email: true } } },
             });
         });
 
@@ -62,7 +62,8 @@ export class AppointmentService {
             description: `Cliente: ${appointment.client.name}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,
             startTime: startTime,
             endTime: endTime,
-            professionalEmail: appointment.professional.email || undefined
+            professionalEmail: appointment.professional.email || undefined,
+            clientEmail: appointment.client.email || undefined
         }).then(eventId => {
             if (eventId) {
                 prisma.appointment.update({

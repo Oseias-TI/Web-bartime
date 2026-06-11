@@ -116,7 +116,7 @@ export function AppSidebar() {
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Scissors className="size-4" />
               </div>
-              <div className="flex flex-col gap-0.5 leading-none">
+              <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
                 <span className="font-semibold text-sm">Bartime</span>
                 <span className="text-xs text-muted-foreground truncate max-w-[140px]">
                   {tenant?.name || "Barbearia"}
@@ -190,7 +190,7 @@ export function AppSidebar() {
                   {professional?.name ? getInitials(professional.name) : "BF"}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col gap-0.5 leading-none">
+              <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
                 <span className="text-sm font-medium truncate max-w-[120px]">
                   {professional?.name}
                 </span>

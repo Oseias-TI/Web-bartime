@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogPopup, DialogTitle, DialogDescription, DialogClose, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogPopup, DialogTitle, DialogDescription, DialogClose, DialogTrigger, DialogHeader, DialogPanel, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from "@/components/ui/select";
 import { toastManager } from "@/components/ui/toast";
 import { appointmentsService, type Appointment, type CreateAppointmentData, type TimeSlot } from "@/services/appointments.service";
@@ -233,11 +233,13 @@ export default function AgendamentosPage() {
             }
           />
           <DialogPopup className="sm:max-w-lg">
-            <DialogTitle>Novo Agendamento</DialogTitle>
-            <DialogDescription>
-              Agende um horário para o cliente
-            </DialogDescription>
-            <div className="space-y-4 mt-4">
+            <DialogHeader>
+              <DialogTitle>Novo Agendamento</DialogTitle>
+              <DialogDescription>
+                Agende um horário para o cliente
+              </DialogDescription>
+            </DialogHeader>
+            <DialogPanel className="space-y-4">
               {/* Cliente */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Cliente</label>
@@ -354,24 +356,23 @@ export default function AgendamentosPage() {
                   </div>
                 )}
               </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <DialogClose
-                  render={<Button variant="outline">Cancelar</Button>}
-                />
-                <Button
-                  onClick={handleCreate}
-                  disabled={isCreating}
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
-                >
-                  {isCreating ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    "Agendar"
-                  )}
-                </Button>
-              </div>
-            </div>
+            </DialogPanel>
+            <DialogFooter>
+              <DialogClose
+                render={<Button variant="outline">Cancelar</Button>}
+              />
+              <Button
+                onClick={handleCreate}
+                disabled={isCreating}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
+              >
+                {isCreating ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Agendar"
+                )}
+              </Button>
+            </DialogFooter>
           </DialogPopup>
         </Dialog>
       </div>
@@ -529,11 +530,13 @@ export default function AgendamentosPage() {
       {/* Payment Method Modal */}
       <Dialog open={isCompleteModalOpen} onOpenChange={setIsCompleteModalOpen}>
         <DialogPopup className="sm:max-w-md">
-          <DialogTitle>Concluir Agendamento</DialogTitle>
-          <DialogDescription>
-            Confirme como o cliente realizou o pagamento.
-          </DialogDescription>
-          <div className="space-y-4 mt-4">
+          <DialogHeader>
+            <DialogTitle>Concluir Agendamento</DialogTitle>
+            <DialogDescription>
+              Confirme como o cliente realizou o pagamento.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Forma de Pagamento</label>
               <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v || "PIX")}>
@@ -548,16 +551,16 @@ export default function AgendamentosPage() {
                 </SelectPopup>
               </Select>
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <DialogClose render={<Button variant="outline">Cancelar</Button>} />
-              <Button
-                onClick={handleComplete}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold border-emerald-400/20"
-              >
-                Confirmar
-              </Button>
-            </div>
-          </div>
+          </DialogPanel>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancelar</Button>} />
+            <Button
+              onClick={handleComplete}
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold border-emerald-400/20"
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
         </DialogPopup>
       </Dialog>
     </div>

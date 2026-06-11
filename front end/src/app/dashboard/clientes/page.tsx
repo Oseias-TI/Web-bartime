@@ -33,6 +33,9 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger,
+  DialogHeader,
+  DialogPanel,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toastManager } from "@/components/ui/toast";
@@ -266,15 +269,17 @@ export default function ClientesPage() {
             }
           />
           <DialogPopup className="sm:max-w-lg">
-            <DialogTitle>
-              {editingClient ? "Editar Cliente" : "Novo Cliente"}
-            </DialogTitle>
-            <DialogDescription>
-              {editingClient
-                ? "Atualize os dados do cliente"
-                : "Cadastre um novo cliente"}
-            </DialogDescription>
-            <div className="space-y-4 mt-4">
+            <DialogHeader>
+              <DialogTitle>
+                {editingClient ? "Editar Cliente" : "Novo Cliente"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingClient
+                  ? "Atualize os dados do cliente"
+                  : "Cadastre um novo cliente"}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogPanel className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Nome *</label>
                 <Input
@@ -308,25 +313,25 @@ export default function ClientesPage() {
                   onChange={(e) => setFormPreferences(e.target.value)}
                 />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <DialogClose
-                  render={<Button variant="outline">Cancelar</Button>}
-                />
-                <Button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
-                >
-                  {isSaving ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : editingClient ? (
-                    "Salvar"
-                  ) : (
-                    "Cadastrar"
-                  )}
-                </Button>
-              </div>
-            </div>
+            </DialogPanel>
+            <DialogFooter>
+              <DialogClose
+                render={<Button variant="outline">Cancelar</Button>}
+              />
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
+              >
+                {isSaving ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : editingClient ? (
+                  "Salvar"
+                ) : (
+                  "Cadastrar"
+                )}
+              </Button>
+            </DialogFooter>
           </DialogPopup>
         </Dialog>
       </div>

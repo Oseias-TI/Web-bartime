@@ -23,6 +23,9 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger,
+  DialogHeader,
+  DialogPanel,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -178,15 +181,17 @@ export default function EquipePage() {
               }
             />
             <DialogPopup className="sm:max-w-md">
-              <DialogTitle>
-                {editingPro ? "Editar Profissional" : "Novo Profissional"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingPro
-                  ? "Atualize os dados do profissional"
-                  : "Cadastre um novo membro da equipe"}
-              </DialogDescription>
-              <div className="space-y-4 mt-4">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingPro ? "Editar Profissional" : "Novo Profissional"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingPro
+                    ? "Atualize os dados do profissional"
+                    : "Cadastre um novo membro da equipe"}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogPanel className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Nome *</label>
                   <Input
@@ -248,23 +253,23 @@ export default function EquipePage() {
                     onChange={(e) => setFormCommission(e.target.value)}
                   />
                 </div>
-                <div className="flex justify-end gap-3 pt-2">
-                  <DialogClose
-                    render={<Button variant="outline">Cancelar</Button>}
-                  />
-                  <Button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
-                  >
-                    {isSaving ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      "Salvar"
-                    )}
-                  </Button>
-                </div>
-              </div>
+              </DialogPanel>
+              <DialogFooter>
+                <DialogClose
+                  render={<Button variant="outline">Cancelar</Button>}
+                />
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
+                >
+                  {isSaving ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    "Salvar"
+                  )}
+                </Button>
+              </DialogFooter>
             </DialogPopup>
           </Dialog>
         )}

@@ -167,7 +167,8 @@ services:
 
 volumes:
   bartime_pgdata:
-    driver: local
+    external: true
+    name: backend_barberflow_pgdata
   bartime_pgadmin:
     driver: local
   bartime_backups:

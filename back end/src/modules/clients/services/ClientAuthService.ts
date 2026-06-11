@@ -31,10 +31,12 @@ export class ClientAuthService {
         const tenant = await prisma.tenant.findUnique({ where: { slug: data.slug } });
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
+        const emailClean = data.email ? data.email.trim() : null;
+
         // Check if email already exists
-        if (data.email) {
+        if (emailClean) {
             const existingEmail = await prisma.client.findFirst({
-                where: { tenantId: tenant.id, email: data.email }
+                where: { tenantId: tenant.id, email: emailClean }
             });
             if (existingEmail) {
                 throw new AppError('Este e-mail já está cadastrado. Faça login ou recupere sua senha.', 400);
@@ -59,7 +61,7 @@ export class ClientAuthService {
             data: {
                 tenantId: tenant.id,
                 name: data.name,
-                email: data.email,
+                email: emailClean,
                 phone: cleanPhone,
                 password: passwordHash
             }
@@ -75,9 +77,15 @@ export class ClientAuthService {
             token,
             client: {
                 id: client.id,
+                tenantId: client.tenantId,
                 name: client.name,
-                email: client.email,
-                phone: client.phone
+                phone: client.phone,
+                email: client.email
+            },
+            tenant: {
+                id: tenant.id,
+                name: tenant.name,
+                slug: tenant.slug
             }
         };
     }
@@ -166,11 +174,14 @@ export class ClientAuthService {
     async findTenants(contact: string) {
         if (!contact) throw new AppError('Contato é obrigatório.', 400);
 
+        const isEmail = contact.includes('@');
+        const cleanContact = isEmail ? contact.trim() : contact.replace(/\D/g, '');
+
         const clients = await prisma.client.findMany({
             where: {
                 OR: [
-                    { email: contact },
-                    { phone: contact }
+                    { email: cleanContact },
+                    { phone: cleanContact }
                 ]
             },
             include: {

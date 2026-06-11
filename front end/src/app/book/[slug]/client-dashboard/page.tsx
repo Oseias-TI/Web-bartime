@@ -68,8 +68,8 @@ export default function ClientDashboardPage() {
     );
   }
 
-  const upcoming = appointments.filter(a => new Date(a.startTime) >= new Date() && a.status !== 'CANCELED');
-  const past = appointments.filter(a => new Date(a.startTime) < new Date() || a.status === 'CANCELED');
+  const upcoming = appointments.filter(a => new Date(a.startTime) >= new Date() && a.status !== 'CANCELED' && a.status !== 'COMPLETED');
+  const past = appointments.filter(a => new Date(a.startTime) < new Date() || a.status === 'CANCELED' || a.status === 'COMPLETED');
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center">
@@ -133,7 +133,7 @@ export default function ClientDashboardPage() {
                   </div>
                   <div className="pl-2 space-y-1 mt-1">
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4" /> {format(new Date(app.startTime), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                      <CalendarIcon className="w-4 h-4" /> {format(new Date(app.startTime.replace('Z', '')), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                     </p>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
                       <Clock className="w-4 h-4" /> Com {app.professional.name}
@@ -157,7 +157,7 @@ export default function ClientDashboardPage() {
                 <div key={app.id} className="bg-zinc-100 dark:bg-zinc-900/50 p-4 rounded-2xl border flex justify-between items-center">
                   <div>
                     <p className="font-medium text-zinc-900 dark:text-zinc-300">{app.service.name}</p>
-                    <p className="text-xs text-zinc-500">{format(new Date(app.startTime), "dd/MM/yyyy", { locale: ptBR })} com {app.professional.name}</p>
+                    <p className="text-xs text-zinc-500">{format(new Date(app.startTime.replace('Z', '')), "dd/MM/yyyy", { locale: ptBR })} com {app.professional.name}</p>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${app.status === 'CANCELED' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                     {app.status === 'CANCELED' ? 'Cancelado' : 'Concluído'}

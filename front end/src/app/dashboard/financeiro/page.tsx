@@ -46,6 +46,9 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger,
+  DialogHeader,
+  DialogFooter,
+  DialogPanel,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -245,11 +248,13 @@ export default function FinanceiroPage() {
               }
             />
             <DialogPopup className="sm:max-w-md">
-              <DialogTitle>Novo Lançamento Manual</DialogTitle>
-              <DialogDescription>
-                Registre uma entrada ou saída no caixa
-              </DialogDescription>
-              <div className="space-y-4 mt-4">
+              <DialogHeader>
+                <DialogTitle>Novo Lançamento Manual</DialogTitle>
+                <DialogDescription>
+                  Registre uma entrada ou saída no caixa
+                </DialogDescription>
+              </DialogHeader>
+              <DialogPanel className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tipo</label>
                   <Select
@@ -295,20 +300,19 @@ export default function FinanceiroPage() {
                     onChange={(e) => setFormDescription(e.target.value)}
                   />
                 </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <DialogClose
-                    render={<Button variant="outline">Cancelar</Button>}
-                  />
-                  <Button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
-                  >
-                    Registrar
-                  </Button>
-                </div>
-              </div>
+              </DialogPanel>
+              <DialogFooter>
+                <DialogClose
+                  render={<Button variant="outline">Cancelar</Button>}
+                />
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold border-amber-400/20"
+                >
+                  Registrar
+                </Button>
+              </DialogFooter>
             </DialogPopup>
           </Dialog>
         </div>
@@ -433,11 +437,13 @@ export default function FinanceiroPage() {
       {/* ─── Commission Payout Modal ─── */}
       <Dialog open={isPayoutModalOpen} onOpenChange={setIsPayoutModalOpen}>
         <DialogPopup className="sm:max-w-lg">
-          <DialogTitle>Comissões Pendentes</DialogTitle>
-          <DialogDescription>
-            Pague as comissões pendentes dos profissionais
-          </DialogDescription>
-          <div className="mt-4">
+          <DialogHeader>
+            <DialogTitle>Comissões Pendentes</DialogTitle>
+            <DialogDescription>
+              Pague as comissões pendentes dos profissionais
+            </DialogDescription>
+          </DialogHeader>
+          <DialogPanel>
             {isLoadingProfessionals ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="size-8 animate-spin text-primary" />
@@ -497,13 +503,12 @@ export default function FinanceiroPage() {
                 ))}
               </div>
             )}
-
-            <div className="flex justify-end pt-4 mt-4 border-t border-border">
-              <DialogClose
-                render={<Button variant="outline">Fechar</Button>}
-              />
-            </div>
-          </div>
+          </DialogPanel>
+          <DialogFooter>
+            <DialogClose
+              render={<Button variant="outline">Fechar</Button>}
+            />
+          </DialogFooter>
         </DialogPopup>
       </Dialog>
     </div>

@@ -6,7 +6,7 @@ export const CreatePublicAppointmentSchema = z.object({
     professionalId: z.string().uuid({ message: 'ID de profissional inválido.' }).optional(),
     clientName: z.string().min(3, { message: 'O nome do cliente deve ter no mínimo 3 caracteres.' }).max(100),
     clientPhone: z.string().min(10, { message: 'Telefone inválido.' }).max(20),
-    clientEmail: z.string().email({ message: 'E-mail inválido.' }),
+    clientEmail: z.string().email({ message: 'E-mail inválido.' }).optional().nullable(),
     startTime: z
         .string()
         .datetime()
