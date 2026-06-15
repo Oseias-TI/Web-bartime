@@ -20,9 +20,12 @@ const logger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple()
       )
-    }),
-    new ElasticsearchTransport(esTransportOpts)
+    })
   ]
 });
+
+if (process.env.ELASTICSEARCH_NODE) {
+  logger.add(new ElasticsearchTransport(esTransportOpts));
+}
 
 export default logger;
