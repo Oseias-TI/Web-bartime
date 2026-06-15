@@ -391,7 +391,7 @@ export class SuperAdminService {
             throw new AppError('O novo e-mail é igual ao atual.', 400);
         }
 
-        const emailExists = await prisma.professional.findUnique({ where: { email: newEmail } });
+        const emailExists = await prisma.professional.findFirst({ where: { email: newEmail } });
         if (emailExists) {
             throw new AppError('Este e-mail já está em uso por outro usuário.', 400);
         }
