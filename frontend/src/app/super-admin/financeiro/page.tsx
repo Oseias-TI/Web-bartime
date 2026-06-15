@@ -17,7 +17,7 @@ export default function SuperAdminFinanceiroPage() {
       setIsLoading(true);
       try {
         const response = await superAdminService.getStats(filter);
-        setStats(response.data);
+        setStats(response);
       } catch (error: any) {
         toastManager.add({
           title: "Erro ao carregar os dados financeiros",

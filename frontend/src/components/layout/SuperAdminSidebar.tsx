@@ -130,7 +130,7 @@ export function SuperAdminSidebar() {
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       isActive={
-                        item.exactMatch
+                        (item as any).exactMatch
                           ? pathname === item.href
                           : pathname.startsWith(item.href)
                       }

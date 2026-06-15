@@ -78,7 +78,7 @@ export const superAdminService = {
 
   updateTenantStatus: async (id: string, status: string) => {
     const res = await api.patch<{ message: string; tenant: any }>(`/super-admin/tenants/${id}/status`, { status });
-    return res.data;
+    return res;
   },
 
   listUsers: async (params?: { search?: string; page?: number; limit?: number }) => {

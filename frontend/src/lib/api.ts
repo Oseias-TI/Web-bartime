@@ -190,7 +190,7 @@ class ApiClient {
         method: "POST",
         headers: this.getHeaders(isFormData),
         credentials: "include",
-        body: isFormData ? data : data ? JSON.stringify(data) : undefined,
+        body: isFormData ? (data as any) : data ? JSON.stringify(data) : undefined,
       });
 
     const response = await makeRequest();
@@ -220,7 +220,7 @@ class ApiClient {
         method: "PUT",
         headers: this.getHeaders(isFormData),
         credentials: "include",
-        body: isFormData ? data : data ? JSON.stringify(data) : undefined,
+        body: isFormData ? (data as any) : data ? JSON.stringify(data) : undefined,
       });
 
     const response = await makeRequest();
