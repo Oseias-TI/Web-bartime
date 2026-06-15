@@ -14,7 +14,7 @@
 O repositório está dividido em duas partes principais:
 
 - **`/frontend`**: Aplicação web desenvolvida com [Next.js](https://nextjs.org/) (versão 16.2), React 19 e Tailwind CSS 4. Interface moderna e responsiva para usuários e administradores da barbearia.
-- **`/back end`**: API desenvolvida com Node.js, Express, TypeScript e Prisma ORM. Fornece todos os recursos necessários para agendamentos, pagamentos (Stripe), relatórios, notificações por e-mail e armazenamento na nuvem (AWS S3).
+- **`/backend`**: API desenvolvida com Node.js, Express, TypeScript e Prisma ORM. Fornece todos os recursos necessários para agendamentos, pagamentos (Stripe), relatórios, notificações por e-mail e armazenamento na nuvem (AWS S3).
 
 ## 🚀 Funcionalidades
 
@@ -67,7 +67,7 @@ Para rodar a aplicação localmente, você precisará iniciar tanto o Backend qu
 
 Navegue até a pasta do backend:
 ```bash
-cd "back end"
+cd backend
 ```
 
 Instale as dependências:
@@ -91,7 +91,7 @@ Inicie a API em modo de desenvolvimento:
 npm run dev
 ```
 
-*A API estará rodando em `http://localhost:3333` (ou porta configurada).* Para mais detalhes sobre scripts, consulte o [README do Backend](file:///c:/TCC/back%20end/README.md).
+*A API estará rodando em `http://localhost:3333` (ou porta configurada).* Para mais detalhes sobre scripts, consulte o [README do Backend](backend/README.md).
 
 ### 2. Frontend
 
@@ -110,7 +110,7 @@ Inicie o servidor de desenvolvimento:
 npm run dev
 ```
 
-*A aplicação web estará acessível em `http://localhost:3000`.* Para mais detalhes, consulte o [README do Frontend](file:///c:/TCC/frontend/README.md).
+*A aplicação web estará acessível em `http://localhost:3000`.* Para mais detalhes, consulte o [README do Frontend](frontend/README.md).
 
 ---
 Feito com ♥ por Oseias-TI
