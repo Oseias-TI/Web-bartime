@@ -328,6 +328,7 @@ export class SuperAdminService {
                     email: true,
                     role: true,
                     active: true,
+                    avatarUrl: true,
                     tenant: {
                         select: {
                             id: true,
