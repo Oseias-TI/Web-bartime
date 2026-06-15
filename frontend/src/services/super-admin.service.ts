@@ -106,4 +106,9 @@ export const superAdminService = {
     const res = await api.patch<{ message: string; user: any }>(`/super-admin/users/${id}/password`, { password });
     return res;
   },
+
+  updateUserEmail: async (id: string, email: string) => {
+    const res = await api.patch<{ message: string; user: any }>(`/super-admin/users/${id}/email`, { email });
+    return res;
+  },
 };

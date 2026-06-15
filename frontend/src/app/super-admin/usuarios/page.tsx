@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Search, Users, ShieldAlert, CheckCircle2, Clock, XCircle, Shield, Store, User, Lock, Unlock, KeyRound } from "lucide-react";
+import { MoreHorizontal, Search, Users, ShieldAlert, CheckCircle2, Clock, XCircle, Shield, Store, User, Lock, Unlock, KeyRound, Mail } from "lucide-react";
 import { toastManager } from "@/components/ui/toast";
 
 // Avatar helper
@@ -99,6 +99,23 @@ export default function SuperAdminUsuariosPage() {
       toastManager.add({ title: "Senha alterada com sucesso!", type: "success" });
     } catch (error: any) {
       toastManager.add({ title: error.response?.data?.error || "Erro ao alterar senha", type: "error" });
+    }
+  };
+
+  const handleUpdateEmail = async (userId: string) => {
+    const newEmail = window.prompt("Digite o novo e-mail para o usuário:");
+    if (newEmail === null) return; // cancelou
+    if (!newEmail || !newEmail.includes('@')) {
+      toastManager.add({ title: "Digite um e-mail válido.", type: "error" });
+      return;
+    }
+
+    try {
+      await superAdminService.updateUserEmail(userId, newEmail);
+      toastManager.add({ title: "E-mail alterado com sucesso!", type: "success" });
+      loadUsers(searchTerm);
+    } catch (error: any) {
+      toastManager.add({ title: error.response?.data?.error || "Erro ao alterar e-mail", type: "error" });
     }
   };
 
@@ -252,6 +269,14 @@ export default function SuperAdminUsuariosPage() {
                           
                           {user.role !== 'SUPER_ADMIN' && (
                             <>
+                              <DropdownMenuItem 
+                                className={`rounded-md cursor-pointer mb-1 text-zinc-300 hover:text-white hover:bg-white/10`}
+                                onClick={() => handleUpdateEmail(user.id)}
+                              >
+                                <Mail className="w-3.5 h-3.5 mr-2 text-zinc-400" />
+                                Alterar E-mail
+                              </DropdownMenuItem>
+
                               <DropdownMenuItem 
                                 className={`rounded-md cursor-pointer mb-1 text-zinc-300 hover:text-white hover:bg-white/10`}
                                 onClick={() => handleResetPassword(user.id)}
