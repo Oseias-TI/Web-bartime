@@ -4,6 +4,8 @@ import { CreateAppointmentInput } from '../dtos/CreateAppointmentSchema';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
 import { sendMail } from '../../../shared/utils/mailer';
 import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
+import { IAppointmentRepository } from '../repositories/IAppointmentRepository';
+import { PrismaAppointmentRepository } from '../repositories/implementations/PrismaAppointmentRepository';
 
 interface CreateAppointmentData extends CreateAppointmentInput {
     tenantId: string;
@@ -15,9 +17,15 @@ function timeToMinutes(time: string): number {
 }
 
 export class AppointmentService {
+    // Injeção de dependência manual (no futuro pode usar tsyringe)
+    constructor(
+        private appointmentRepository: IAppointmentRepository = new PrismaAppointmentRepository()
+    ) {}
+
     async createAppointment(data: CreateAppointmentData) {
         const startTime = new Date(data.startTime);
 
+        // TODO: Mover isso para um IServiceRepository e IBusinessHourRepository
         const [service, businessHour] = await Promise.all([
             prisma.service.findFirst({ where: { id: data.serviceId, tenantId: data.tenantId, active: true } }),
             prisma.businessHour.findUnique({ where: { tenantId_dayOfWeek: { tenantId: data.tenantId, dayOfWeek: startTime.getUTCDay() } } }),
@@ -51,23 +59,17 @@ export class AppointmentService {
 
         const endTime = new Date(startTime.getTime() + service.durationMin * 60_000);
 
-        // BUG-02: Envolver verificação de conflito e criação em transação para evitar race condition
-        const appointment = await prisma.$transaction(async (tx) => {
-            const conflict = await tx.appointment.findFirst({
-                where: {
-                    tenantId: data.tenantId,
-                    professionalId: data.professionalId,
-                    status: { not: 'CANCELED' },
-                    startTime: { lt: endTime },
-                    endTime: { gt: startTime },
-                },
-            });
-            if (conflict) throw new AppError('Profissional já possui agendamento neste horário.', 409);
+        // Utilizando o Repository ao invés do Prisma diretamente
+        const hasConflict = await this.appointmentRepository.findConflictingAppointment(data.tenantId, data.professionalId, startTime, endTime);
+        if (hasConflict) throw new AppError('Profissional já possui agendamento neste horário.', 409);
 
-            return tx.appointment.create({
-                data: { tenantId: data.tenantId, clientId: data.clientId, professionalId: data.professionalId, serviceId: data.serviceId, startTime, endTime },
-                include: { service: true, professional: { select: { id: true, name: true, email: true } }, client: { select: { id: true, name: true, email: true } } },
-            });
+        const appointment = await this.appointmentRepository.create({
+            tenantId: data.tenantId,
+            clientId: data.clientId,
+            professionalId: data.professionalId,
+            serviceId: data.serviceId,
+            startTime,
+            endTime
         });
 
         // Add to Google Calendar asynchronously
@@ -76,14 +78,9 @@ export class AppointmentService {
             description: `Cliente: ${appointment.client.name}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,
             startTime: startTime,
             endTime: endTime,
-            professionalEmail: appointment.professional.email || undefined,
-            clientEmail: appointment.client.email || undefined
         }).then(eventId => {
             if (eventId) {
-                prisma.appointment.update({
-                    where: { id: appointment.id },
-                    data: { googleEventId: eventId }
-                }).catch(console.error);
+                this.appointmentRepository.updateGoogleEventId(appointment.id, eventId).catch(console.error);
             }
         });
 
@@ -117,24 +114,12 @@ export class AppointmentService {
 
     async listByDay(tenantId: string, date: string, professionalId?: string, paginationQuery: Record<string, any> = {}) {
         const params = getPaginationParams(paginationQuery);
-        // Usar Z para consistência com a convenção local-as-UTC do sistema
         const start = new Date(`${date}T00:00:00.000Z`);
         const end = new Date(`${date}T23:59:59.999Z`);
         
-        const where: any = { tenantId, startTime: { gte: start, lte: end } };
-        if (professionalId) {
-            where.professionalId = professionalId;
-        }
-
         const [data, total] = await Promise.all([
-            prisma.appointment.findMany({
-                where,
-                include: { client: { select: { name: true, phone: true } }, service: true, professional: { select: { name: true, id: true } } },
-                orderBy: { startTime: 'asc' },
-                skip: params.skip,
-                take: params.limit,
-            }),
-            prisma.appointment.count({ where }),
+            this.appointmentRepository.listByDay(tenantId, start, end, professionalId, params.skip, params.limit),
+            this.appointmentRepository.countByDay(tenantId, start, end, professionalId)
         ]);
 
         return buildPaginatedResult(data, total, params);
