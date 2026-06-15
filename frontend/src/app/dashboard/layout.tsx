@@ -43,7 +43,7 @@ export default function DashboardLayout({
       <SidebarInset>
         <AppHeader />
         <EmailVerificationBanner />
-        <main className="flex-1 p-4 md:p-6 animate-fade-in">
+        <main className="flex-1 w-full min-w-0 overflow-x-hidden p-4 md:p-6 animate-fade-in">
           {children}
         </main>
       </SidebarInset>
