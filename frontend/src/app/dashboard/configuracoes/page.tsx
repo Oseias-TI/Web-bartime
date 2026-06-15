@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   Plus,
   X,
+  User,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import { toastManager } from "@/components/ui/toast";
 import { tenantService, type Tenant, type BusinessHour } from "@/services/tenant.service";
 import { billingService, type BillingStatus } from "@/services/billing.service";
 import { authService } from "@/services/auth.service";
+import { professionalsService } from "@/services/professionals.service";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ApiError } from "@/lib/api";
 
@@ -74,7 +76,7 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 };
 
 export default function ConfiguracoesPage() {
-  const { tenant, updateTenant } = useAuth();
+  const { tenant, updateTenant, professional, updateProfessional } = useAuth();
   const [activeTab, setActiveTab] = useState("perfil");
   const [businessHours, setBusinessHours] = useState<BusinessHour[]>([]);
   const [isLoadingHours, setIsLoadingHours] = useState(false);
@@ -84,6 +86,11 @@ export default function ConfiguracoesPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  // Avatar upload
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   // Billing
   const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
@@ -240,6 +247,51 @@ export default function ConfiguracoesPage() {
     }
   };
 
+  // ─── Avatar Upload ───
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toastManager.add({
+        title: "Arquivo muito grande",
+        description: "O tamanho máximo é 2MB",
+        type: "warning",
+      });
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toastManager.add({
+        title: "Formato inválido",
+        description: "Envie apenas imagens (PNG, JPG, WEBP)",
+        type: "warning",
+      });
+      return;
+    }
+
+    // Preview
+    const reader = new FileReader();
+    reader.onload = (e) => setAvatarPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+
+    uploadAvatar(file);
+  };
+
+  const uploadAvatar = async (file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      const result = await professionalsService.updateAvatar(file);
+      updateProfessional({ avatarUrl: result.avatarUrl });
+      toastManager.add({ title: "Foto de perfil atualizada!", type: "success" });
+    } catch (err: any) {
+      setAvatarPreview(null);
+      toastManager.add({ title: "Erro ao enviar foto", description: err.message || String(err), type: "error" });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   // ─── Billing Actions ───
   const handleBillingAction = async (action: "checkout" | "portal") => {
     setIsBillingAction(true);
@@ -281,6 +333,7 @@ export default function ConfiguracoesPage() {
   };
 
   const displayLogoUrl = logoPreview || tenant?.logoUrl;
+  const displayAvatarUrl = avatarPreview || professional?.avatarUrl;
 
   return (
     <div className="space-y-6">
@@ -393,7 +446,52 @@ export default function ConfiguracoesPage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex items-center gap-6 pt-4 border-t border-border">
+                    <div
+                      className="size-24 rounded-full bg-muted border border-border flex items-center justify-center overflow-hidden relative group cursor-pointer"
+                      onClick={() => avatarInputRef.current?.click()}
+                    >
+                      {isUploadingAvatar ? (
+                        <Loader2 className="size-6 animate-spin text-primary" />
+                      ) : displayAvatarUrl ? (
+                        <img src={displayAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="size-8 text-muted-foreground" />
+                      )}
+                      {!isUploadingAvatar && (
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Camera className="size-6 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium mb-1">Sua Foto de Perfil</h3>
+                      <p className="text-xs text-muted-foreground mb-3">Recomendado: 512x512px. Max 2MB.</p>
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarSelect}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={isUploadingAvatar}
+                      >
+                        {isUploadingAvatar ? (
+                          <Loader2 className="size-3 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="size-3 mr-2" />
+                        )}
+                        Trocar foto
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2 pt-4 border-t border-border">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Nome do Estabelecimento</label>
                       <Input {...registerProfile("name")} />
