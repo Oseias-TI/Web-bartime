@@ -31,10 +31,10 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').
 app.use(cors({
     origin: (origin, callback) => {
         // Permitir requests sem origin (ex: ferramentas, mobile, server-to-server)
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
-            callback(new Error('Origem não permitida pelo CORS.'));
+            callback(new Error(`Origem não permitida pelo CORS: ${origin}`));
         }
     },
     credentials: true,
