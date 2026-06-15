@@ -42,6 +42,7 @@ type UserData = {
   email: string;
   role: string;
   active: boolean;
+  avatarUrl: string | null;
   createdAt: string;
   tenant: { id: string; name: string } | null;
 };
@@ -224,10 +225,17 @@ export default function SuperAdminUsuariosPage() {
                   <tr key={user.id} className="group hover:bg-white/[0.02] transition-colors duration-200">
                     <td className="py-4 px-4 align-top sm:align-middle">
                       <div className="flex items-center gap-4">
-                        {/* Virtual Avatar */}
-                        <div className={`shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(user.name)} flex items-center justify-center text-white font-medium text-sm shadow-sm ring-1 ring-white/10`}>
-                          {getInitials(user.name)}
-                        </div>
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            className="shrink-0 w-10 h-10 rounded-xl object-cover shadow-sm ring-1 ring-white/10"
+                          />
+                        ) : (
+                          <div className={`shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(user.name)} flex items-center justify-center text-white font-medium text-sm shadow-sm ring-1 ring-white/10`}>
+                            {getInitials(user.name)}
+                          </div>
+                        )}
                         <div>
                           <div className="font-medium text-zinc-100 group-hover:text-white transition-colors">{user.name}</div>
                           <div className="text-xs text-zinc-500 mt-0.5 font-mono tracking-tight">

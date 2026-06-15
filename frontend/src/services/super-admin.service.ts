@@ -89,6 +89,7 @@ export const superAdminService = {
         email: string;
         role: string;
         active: boolean;
+        avatarUrl: string | null;
         createdAt: string;
         tenant: { id: string; name: string } | null;
       }>;
