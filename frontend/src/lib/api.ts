@@ -107,7 +107,12 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response, retryFn?: () => Promise<Response>): Promise<T> {
     // BUG-11: Se 401 e temos um retry function, tentar renovar o token
-    if (response.status === 401 && retryFn) {
+    // Evita tentar renovar token nas rotas de autenticação (login, register, refresh)
+    const isAuthRoute = response.url.includes("/auth/business") || 
+                        response.url.includes("/auth/refresh") || 
+                        response.url.includes("/auth/register");
+                        
+    if (response.status === 401 && retryFn && !isAuthRoute) {
       try {
         const newToken = await this.handleTokenRefresh();
         this.accessToken = newToken;
