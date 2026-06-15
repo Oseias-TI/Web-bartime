@@ -22,6 +22,13 @@ export class GoogleCalendarService {
             // Prioriza a variável de ambiente (Railway), mas faz fallback pro arquivo (Local)
             if (process.env.GOOGLE_CREDENTIALS) {
                 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+                
+                // Correção essencial: ambientes como Railway às vezes escapam os \n para \\n
+                // o que corrompe a private_key e causa "Invalid JWT Signature"
+                if (credentials.private_key) {
+                    credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+                }
+
                 auth = new google.auth.GoogleAuth({
                     credentials,
                     scopes: ['https://www.googleapis.com/auth/calendar.events'],
