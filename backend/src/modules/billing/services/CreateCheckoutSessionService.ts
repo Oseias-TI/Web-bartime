@@ -1,6 +1,7 @@
-import { prisma } from '../../../lib/prisma';
 import { stripe } from '../../../shared/utils/stripe';
 import { AppError } from '../../../shared/errors/AppError';
+import { ITenantBillingRepository } from '../repositories/ITenantBillingRepository';
+import { PrismaTenantBillingRepository } from '../repositories/implementations/PrismaTenantBillingRepository';
 
 interface CreateCheckoutInput {
     tenantId: string;
@@ -9,8 +10,12 @@ interface CreateCheckoutInput {
 }
 
 export class CreateCheckoutSessionService {
+    constructor(
+        private tenantRepository: ITenantBillingRepository = new PrismaTenantBillingRepository()
+    ) {}
+
     async execute({ tenantId, adminEmail, adminName }: CreateCheckoutInput) {
-        const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+        const tenant = await this.tenantRepository.findById(tenantId);
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
         if (tenant.subscriptionStatus === 'ACTIVE' && tenant.stripeSubscriptionId)
@@ -21,7 +26,7 @@ export class CreateCheckoutSessionService {
         if (!customerId) {
             const customer = await stripe.customers.create({ email: adminEmail, name: adminName, metadata: { tenantId } });
             customerId = customer.id;
-            await prisma.tenant.update({ where: { id: tenantId }, data: { stripeCustomerId: customerId } });
+            await this.tenantRepository.updateStripeCustomerId(tenantId, customerId);
         }
 
         const session = await stripe.checkout.sessions.create({

@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
-import { prisma } from '../../../lib/prisma';
 import { stripe } from '../../../shared/utils/stripe';
 import { SubscriptionStatus } from '@prisma/client';
+import { ITenantBillingRepository } from '../repositories/ITenantBillingRepository';
+import { PrismaTenantBillingRepository } from '../repositories/implementations/PrismaTenantBillingRepository';
 
 // BUG-17: Tipado com o enum SubscriptionStatus do Prisma
 function mapStripeStatus(stripeStatus: string): SubscriptionStatus {
@@ -13,6 +14,10 @@ function mapStripeStatus(stripeStatus: string): SubscriptionStatus {
 }
 
 export class StripeWebhookService {
+    constructor(
+        private tenantRepository: ITenantBillingRepository = new PrismaTenantBillingRepository()
+    ) {}
+
     constructEvent(payload: Buffer, signature: string): Stripe.Event {
         return stripe.webhooks.constructEvent(payload, signature, process.env.STRIPE_WEBHOOK_SECRET as string);
     }
@@ -50,51 +55,54 @@ export class StripeWebhookService {
         const subscriptionId = session.subscription as string;
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-        await prisma.tenant.update({
-            where: { id: tenantId },
-            data: {
-                stripeCustomerId: session.customer as string,
-                stripeSubscriptionId: subscriptionId,
-                subscriptionStatus: mapStripeStatus(subscription.status),
-                currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-            },
+        await this.tenantRepository.updateSubscriptionStatus(tenantId, {
+            status: mapStripeStatus(subscription.status),
+            stripeCustomerId: session.customer as string,
+            stripeSubscriptionId: subscriptionId,
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000)
         });
     }
 
     private async handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-        const tenant = await prisma.tenant.findFirst({ where: { stripeSubscriptionId: subscription.id } });
+        const tenant = await this.tenantRepository.findByStripeSubscriptionId(subscription.id);
         if (!tenant) return;
 
-        await prisma.tenant.update({
-            where: { id: tenant.id },
-            data: { subscriptionStatus: mapStripeStatus(subscription.status), currentPeriodEnd: new Date((subscription as any).current_period_end * 1000) },
+        await this.tenantRepository.updateSubscriptionStatus(tenant.id, {
+            status: mapStripeStatus(subscription.status),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000)
         });
     }
 
     private async handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-        const tenant = await prisma.tenant.findFirst({ where: { stripeSubscriptionId: subscription.id } });
+        const tenant = await this.tenantRepository.findByStripeSubscriptionId(subscription.id);
         if (!tenant) return;
 
-        await prisma.tenant.update({ where: { id: tenant.id }, data: { subscriptionStatus: 'CANCELED', stripeSubscriptionId: null, currentPeriodEnd: null } });
+        await this.tenantRepository.updateSubscriptionStatus(tenant.id, {
+            status: 'CANCELED',
+            stripeSubscriptionId: null,
+            currentPeriodEnd: null
+        });
     }
 
     private async handleInvoicePaid(invoice: Stripe.Invoice) {
         if (!invoice.subscription) return;
         const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-        const tenant = await prisma.tenant.findFirst({ where: { stripeSubscriptionId: subscription.id } });
+        const tenant = await this.tenantRepository.findByStripeSubscriptionId(subscription.id);
         if (!tenant) return;
 
-        await prisma.tenant.update({
-            where: { id: tenant.id },
-            data: { subscriptionStatus: 'ACTIVE', currentPeriodEnd: new Date((subscription as any).current_period_end * 1000) },
+        await this.tenantRepository.updateSubscriptionStatus(tenant.id, {
+            status: 'ACTIVE',
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000)
         });
     }
 
     private async handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         if (!invoice.subscription) return;
-        const tenant = await prisma.tenant.findFirst({ where: { stripeSubscriptionId: invoice.subscription as string } });
+        const tenant = await this.tenantRepository.findByStripeSubscriptionId(invoice.subscription as string);
         if (!tenant) return;
 
-        await prisma.tenant.update({ where: { id: tenant.id }, data: { subscriptionStatus: 'PAST_DUE' } });
+        await this.tenantRepository.updateSubscriptionStatus(tenant.id, {
+            status: 'PAST_DUE'
+        });
     }
 }

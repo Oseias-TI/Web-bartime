@@ -1,4 +1,5 @@
-import { prisma } from '../../../lib/prisma';
+import { ITenantBillingRepository } from '../repositories/ITenantBillingRepository';
+import { PrismaTenantBillingRepository } from '../repositories/implementations/PrismaTenantBillingRepository';
 import { AppError } from '../../../shared/errors/AppError';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -10,11 +11,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export class BillingStatusService {
+    constructor(
+        private tenantRepository: ITenantBillingRepository = new PrismaTenantBillingRepository()
+    ) {}
+
     async get(tenantId: string) {
-        const tenant = await prisma.tenant.findUnique({
-            where: { id: tenantId },
-            select: { subscriptionStatus: true, currentPeriodEnd: true, trialEndsAt: true, stripeCustomerId: true, stripeSubscriptionId: true },
-        });
+        const tenant = await this.tenantRepository.findById(tenantId);
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
         const now = new Date();
