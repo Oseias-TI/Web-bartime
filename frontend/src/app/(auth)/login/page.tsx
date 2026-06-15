@@ -41,7 +41,7 @@ export default function LoginPage() {
         type: "success",
       });
 
-      if (prof.role === 'SUPER_ADMIN') {
+      if ((prof.role as string) === 'SUPER_ADMIN') {
         router.push("/super-admin");
       } else {
         router.push("/dashboard");
