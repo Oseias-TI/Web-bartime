@@ -90,28 +90,26 @@ export default function AgendamentosPage() {
   // Load available slots when professional + service + date are selected
   useEffect(() => {
     if (formProfessionalId && formServiceId && selectedDate) {
-      loadSlots();
+      const fetchSlots = async () => {
+        setIsLoadingSlots(true);
+        try {
+          const slots = await appointmentsService.getAvailability(
+            selectedDate,
+            formProfessionalId,
+            formServiceId
+          );
+          setAvailableSlots(slots);
+        } catch {
+          setAvailableSlots([]);
+        } finally {
+          setIsLoadingSlots(false);
+        }
+      };
+      fetchSlots();
     } else {
       setAvailableSlots([]);
     }
   }, [formProfessionalId, formServiceId, selectedDate]);
-
-  async function loadSlots() {
-    if (!formProfessionalId || !formServiceId) return;
-    setIsLoadingSlots(true);
-    try {
-      const slots = await appointmentsService.getAvailability(
-        selectedDate,
-        formProfessionalId,
-        formServiceId
-      );
-      setAvailableSlots(slots);
-    } catch {
-      setAvailableSlots([]);
-    } finally {
-      setIsLoadingSlots(false);
-    }
-  };
 
   const changeDate = (days: number) => {
     const d = new Date(selectedDate + "T12:00:00");

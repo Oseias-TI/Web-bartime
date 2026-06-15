@@ -48,24 +48,7 @@ export default function RelatoriosPage() {
       const data = await reportsService.generate({ start: startDate, end: endDate });
       setReportData(data);
     } catch {
-      // Mock data if API is not fully implemented
-      setReportData({
-        totalAppointments: 145,
-        completedAppointments: 132,
-        canceledAppointments: 13,
-        totalRevenue: 8540,
-        averageTicket: 64.7,
-        topServices: [
-          { name: "Corte Degradê", count: 85, revenue: 3825 },
-          { name: "Barba Terapia", count: 42, revenue: 1470 },
-          { name: "Corte Infantil", count: 18, revenue: 630 },
-        ],
-        topProfessionals: [
-          { name: "João Silva", count: 65, revenue: 3950 },
-          { name: "Pedro Santos", count: 42, revenue: 2540 },
-          { name: "Marcos Lima", count: 25, revenue: 1510 },
-        ]
-      });
+      setReportData(null);
     } finally {
       setIsLoading(false);
     }
@@ -162,6 +145,13 @@ export default function RelatoriosPage() {
         <div className="flex items-center justify-center h-64">
           <div className="size-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
+      ) : !reportData ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center space-y-3">
+          <BarChart3 className="size-12 text-muted-foreground/40" />
+          <p className="text-muted-foreground text-lg font-medium">Nenhum dado disponível</p>
+          <p className="text-muted-foreground text-sm">Não foi possível carregar os relatórios para este período.</p>
+          <Button variant="outline" onClick={loadData} className="mt-2">Tentar novamente</Button>
+        </div>
       ) : (
         <>
           {/* Top KPIs */}
@@ -174,7 +164,7 @@ export default function RelatoriosPage() {
                 </div>
                 <div className="text-2xl font-bold">{reportData.totalAppointments}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {reportData.completedAppointments} concluídos ({((reportData.completedAppointments / reportData.totalAppointments) * 100).toFixed(0)}%)
+                  {reportData.completedAppointments} concluídos ({reportData.totalAppointments > 0 ? ((reportData.completedAppointments / reportData.totalAppointments) * 100).toFixed(0) : 0}%)
                 </p>
               </CardContent>
             </Card>
@@ -187,7 +177,7 @@ export default function RelatoriosPage() {
                 </div>
                 <div className="text-2xl font-bold">{reportData.canceledAppointments}</div>
                 <p className="text-xs text-red-500 mt-1">
-                  {((reportData.canceledAppointments / reportData.totalAppointments) * 100).toFixed(1)}% do total
+                  {reportData.totalAppointments > 0 ? ((reportData.canceledAppointments / reportData.totalAppointments) * 100).toFixed(1) : "0.0"}% do total
                 </p>
               </CardContent>
             </Card>

@@ -198,7 +198,7 @@ export default function FinanceiroPage() {
   };
 
   const chartData = cashFlow.map((item) => ({
-    dia: format(new Date(item.date), "dd/MM"),
+    dia: format(new Date(item.date + "T12:00:00"), "dd/MM"),
     entradas: item.income,
     saidas: item.expense,
   }));

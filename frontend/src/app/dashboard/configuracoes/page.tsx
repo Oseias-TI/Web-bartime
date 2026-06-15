@@ -57,6 +57,14 @@ const passwordSchema = z
 
 type PasswordForm = z.infer<typeof passwordSchema>;
 
+const defaultHours: BusinessHour[] = Array.from({ length: 7 }).map((_, i) => ({
+  id: String(i),
+  dayOfWeek: i,
+  open: i > 0 && i < 6,
+  openTime: i > 0 && i < 6 ? "09:00" : "",
+  closeTime: i > 0 && i < 6 ? "18:00" : "",
+}));
+
 const statusLabels: Record<string, { label: string; color: string }> = {
   ACTIVE: { label: "Ativo", color: "bg-emerald-500/20 text-emerald-500" },
   TRIAL: { label: "Trial", color: "bg-blue-500/20 text-blue-500" },
@@ -107,26 +115,19 @@ export default function ConfiguracoesPage() {
     resolver: zodResolver(passwordSchema),
   });
 
-  const defaultHours: BusinessHour[] = Array.from({ length: 7 }).map((_, i) => ({
-    id: String(i),
-    dayOfWeek: i,
-    open: i > 0 && i < 6,
-    openTime: i > 0 && i < 6 ? "09:00" : "",
-    closeTime: i > 0 && i < 6 ? "18:00" : "",
-  }));
+
 
   const loadHours = useCallback(async () => {
     setIsLoadingHours(true);
     try {
       const hours = await tenantService.getBusinessHours();
-      console.log("[ConfigPage] business-hours response:", hours);
       if (Array.isArray(hours) && hours.length > 0) {
         setBusinessHours(hours.sort((a, b) => a.dayOfWeek - b.dayOfWeek));
       } else {
         setBusinessHours(defaultHours);
       }
-    } catch (err: any) {
-      console.error("[ConfigPage] Erro ao carregar horários:", JSON.stringify(err), err?.message, err?.statusCode, err?.error);
+    } catch {
+
       setBusinessHours(defaultHours);
       toastManager.add({ title: "Erro ao carregar horários, usando padrões", type: "warning" });
     } finally {
@@ -134,22 +135,12 @@ export default function ConfiguracoesPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (activeTab === "horarios" && businessHours.length === 0) {
-      loadHours();
-    }
-    if (activeTab === "assinatura" && !billingStatus) {
-      loadBilling();
-    }
-  }, [activeTab, businessHours.length, billingStatus, loadHours]);
-
-  async function loadBilling() {
+  const loadBillingCb = useCallback(async () => {
     setIsLoadingBilling(true);
     try {
       const status = await billingService.getStatus();
       setBillingStatus(status);
     } catch {
-      // Show basic info from tenant context if billing API fails
       setBillingStatus({
         subscriptionStatus: tenant?.subscriptionStatus || "TRIAL",
         currentPeriodEnd: null,
@@ -159,7 +150,18 @@ export default function ConfiguracoesPage() {
     } finally {
       setIsLoadingBilling(false);
     }
-  };
+  }, [tenant?.subscriptionStatus]);
+
+  useEffect(() => {
+    if (activeTab === "horarios" && businessHours.length === 0) {
+      loadHours();
+    }
+    if (activeTab === "assinatura" && !billingStatus) {
+      loadBillingCb();
+    }
+  }, [activeTab, businessHours.length, billingStatus, loadHours, loadBillingCb]);
+
+
 
   const onProfileSave = async (data: any) => {
     try {
@@ -497,11 +499,16 @@ export default function ConfiguracoesPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                  updateDay(index, "openTime2", "13:00");
-                                  updateDay(index, "closeTime2", "18:00");
-                                  if (day.closeTime === "18:00") {
-                                      updateDay(index, "closeTime", "12:00");
-                                  }
+                                  setBusinessHours(prev => {
+                                    const newHours = [...prev];
+                                    newHours[index] = {
+                                      ...newHours[index],
+                                      openTime2: "13:00",
+                                      closeTime2: "18:00",
+                                      ...(day.closeTime === "18:00" ? { closeTime: "12:00" } : {}),
+                                    };
+                                    return newHours;
+                                  });
                                 }}
                                 className="h-9 px-2 text-muted-foreground hover:text-foreground"
                                 title="Adicionar turno"
