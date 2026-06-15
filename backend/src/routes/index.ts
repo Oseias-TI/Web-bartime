@@ -104,6 +104,7 @@ routes.patch('/super-admin/tenants/:id/status', ensureSuperAdmin, superAdmin.upd
 routes.get('/super-admin/users', ensureSuperAdmin, superAdmin.listUsers);
 routes.patch('/super-admin/users/:id/status', ensureSuperAdmin, superAdmin.updateUserStatus);
 routes.patch('/super-admin/users/:id/password', ensureSuperAdmin, superAdmin.updateUserPassword);
+routes.patch('/super-admin/users/:id/email', ensureSuperAdmin, superAdmin.updateUserEmail);
 
 // ═══════════════════════════════════════════════
 //  PROTEGIDAS — requer assinatura válida

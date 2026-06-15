@@ -86,4 +86,11 @@ export class SuperAdminController {
         const result = await new SuperAdminService().updateUserPassword(req.params.id, password);
         return res.json(result);
     });
+
+    // PATCH /super-admin/users/:id/email
+    updateUserEmail = asyncHandler(async (req: Request, res: Response) => {
+        const { email } = req.body;
+        const result = await new SuperAdminService().updateUserEmail(req.params.id, email);
+        return res.json(result);
+    });
 }

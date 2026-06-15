@@ -379,4 +379,32 @@ export class SuperAdminService {
 
         return { message: 'Senha alterada com sucesso.', user: updated };
     }
+    async updateUserEmail(professionalId: string, newEmail: string) {
+        if (!newEmail || !newEmail.includes('@')) {
+            throw new AppError('E-mail inválido.', 400);
+        }
+
+        const professional = await prisma.professional.findUnique({ where: { id: professionalId } });
+        if (!professional) throw new AppError('Usuário não encontrado.', 404);
+
+        if (professional.email === newEmail) {
+            throw new AppError('O novo e-mail é igual ao atual.', 400);
+        }
+
+        const emailExists = await prisma.professional.findUnique({ where: { email: newEmail } });
+        if (emailExists) {
+            throw new AppError('Este e-mail já está em uso por outro usuário.', 400);
+        }
+
+        const updated = await prisma.professional.update({
+            where: { id: professionalId },
+            data: { email: newEmail },
+            select: { id: true, name: true, email: true }
+        });
+
+        // Opcional: revogar os tokens porque o e-mail mudou (exige relogar)
+        await prisma.refreshToken.deleteMany({ where: { professionalId } });
+
+        return { message: 'E-mail alterado com sucesso.', user: updated };
+    }
 }
