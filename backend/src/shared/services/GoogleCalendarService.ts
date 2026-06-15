@@ -14,12 +14,27 @@ export class GoogleCalendarService {
 
     private initialize() {
         try {
+            const fs = require('fs');
             const keyFilePath = path.resolve(__dirname, '../../../google-credentials.json');
             
-            const auth = new google.auth.GoogleAuth({
-                keyFile: keyFilePath,
-                scopes: ['https://www.googleapis.com/auth/calendar.events'],
-            });
+            let auth;
+
+            // Prioriza a variável de ambiente (Railway), mas faz fallback pro arquivo (Local)
+            if (process.env.GOOGLE_CREDENTIALS) {
+                const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+                auth = new google.auth.GoogleAuth({
+                    credentials,
+                    scopes: ['https://www.googleapis.com/auth/calendar.events'],
+                });
+            } else if (fs.existsSync(keyFilePath)) {
+                auth = new google.auth.GoogleAuth({
+                    keyFile: keyFilePath,
+                    scopes: ['https://www.googleapis.com/auth/calendar.events'],
+                });
+            } else {
+                console.warn('[GoogleCalendarService] Nenhuma credencial encontrada. O serviço de calendário ficará inativo.');
+                return;
+            }
 
             this.calendar = google.calendar({ version: 'v3', auth });
         } catch (error) {
