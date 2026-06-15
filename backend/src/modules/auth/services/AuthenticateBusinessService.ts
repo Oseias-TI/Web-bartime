@@ -8,6 +8,7 @@ export class AuthenticateBusinessService {
     async execute({ email, password }: AuthInput) {
         const professional = await prisma.professional.findFirst({
             where: { email, active: true },
+            orderBy: { role: 'desc' } // Prioriza SUPER_ADMIN (S > R > B > A) caso o mesmo e-mail exista em vários tenants
         });
 
         if (!professional) throw new AppError('E-mail ou senha incorretos.', 401);

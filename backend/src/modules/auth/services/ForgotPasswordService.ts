@@ -6,7 +6,10 @@ const RESET_TOKEN_EXPIRES_MINUTES = 30;
 
 export class ForgotPasswordService {
     async execute(email: string) {
-        const professional = await prisma.professional.findFirst({ where: { email, active: true } });
+        const professional = await prisma.professional.findFirst({ 
+            where: { email, active: true },
+            orderBy: { role: 'desc' } 
+        });
         if (!professional) return;
 
         await prisma.passwordResetToken.updateMany({
