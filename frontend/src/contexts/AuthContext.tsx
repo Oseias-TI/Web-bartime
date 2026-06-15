@@ -10,7 +10,7 @@ export interface Professional {
   email: string;
   avatarUrl: string | null;
   commissionRate: number;
-  role: "ADMIN" | "BARBER" | "RECEPTIONIST";
+  role: "ADMIN" | "BARBER" | "RECEPTIONIST" | "SUPER_ADMIN";
   active: boolean;
   emailVerified: boolean;
 }
