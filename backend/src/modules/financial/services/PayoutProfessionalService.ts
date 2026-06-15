@@ -1,27 +1,25 @@
-import { prisma } from '../../../lib/prisma';
+import { ICommissionRepository } from '../repositories/ICommissionRepository';
+import { PrismaCommissionRepository } from '../repositories/implementations/PrismaCommissionRepository';
+import { prisma } from '../../../lib/prisma'; // Only to find professional name if needed, or we can use another repo. Wait, I should fetch professional name here or in repo?
+// Actually, it's better to fetch professional name here and pass it.
 import { AppError } from '../../../shared/errors/AppError';
 
 export class PayoutProfessionalService {
+    constructor(
+        private commissionRepository: ICommissionRepository = new PrismaCommissionRepository()
+    ) {}
+
     async execute({ professionalId, tenantId }: { professionalId: string; tenantId: string }) {
-        return prisma.$transaction(async tx => {
-            const pending = await tx.commission.findMany({ where: { tenantId, professionalId, status: 'PENDING' } });
-            if (pending.length === 0) throw new AppError('Nenhuma comissão pendente para este profissional.', 404);
-            const totalPaid = pending.reduce((acc, c) => acc + Number(c.amount), 0);
-            await tx.commission.updateMany({ where: { tenantId, professionalId, status: 'PENDING' }, data: { status: 'PAID' } });
-
-            const professional = await tx.professional.findUnique({ where: { id: professionalId }, select: { name: true } });
-            await tx.transaction.create({
-                data: {
-                    tenantId,
-                    type: 'EXPENSE',
-                    category: 'Pagamento de Comissão',
-                    description: `Comissão paga para ${professional?.name || 'Profissional'} (${pending.length} atend.)`,
-                    amount: totalPaid,
-                    paymentMethod: 'Pix'
-                }
-            });
-
-            return { totalPaid: Number(totalPaid.toFixed(2)), count: pending.length, professionalId };
+        // Fetch professional name first (this would ideally use IProfessionalRepository in the future)
+        const professional = await prisma.professional.findUnique({ 
+            where: { id: professionalId }, 
+            select: { name: true } 
         });
+
+        if (!professional) {
+            throw new AppError('Profissional não encontrado.', 404);
+        }
+
+        return this.commissionRepository.payoutProfessional(tenantId, professionalId, professional.name);
     }
 }
