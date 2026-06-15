@@ -23,10 +23,14 @@ export class GoogleCalendarService {
             if (process.env.GOOGLE_CREDENTIALS) {
                 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
                 
-                // Correção essencial: ambientes como Railway às vezes escapam os \n para \\n
-                // o que corrompe a private_key e causa "Invalid JWT Signature"
                 if (credentials.private_key) {
+                    // Tenta garantir que os \n escapados voltem a ser quebras de linha reais
                     credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+                    
+                    // Log de depuração (seguro, não vaza a chave inteira)
+                    console.log(`[GoogleCalendarService] Tamanho da chave: ${credentials.private_key.length}`);
+                    console.log(`[GoogleCalendarService] Contém quebras de linha reais (\\n)? ${credentials.private_key.includes('\n')}`);
+                    console.log(`[GoogleCalendarService] Contém barras literais (\\\\n)? ${credentials.private_key.includes('\\n')}`);
                 }
 
                 auth = new google.auth.GoogleAuth({
@@ -74,17 +78,8 @@ export class GoogleCalendarService {
                 },
             };
 
-            const attendees: calendar_v3.Schema$EventAttendee[] = [];
-            if (data.clientEmail) attendees.push({ email: data.clientEmail });
-            if (data.professionalEmail) attendees.push({ email: data.professionalEmail });
-
-            if (attendees.length > 0) {
-                event.attendees = attendees;
-            }
-
             const response = await this.calendar.events.insert({
                 calendarId: this.calendarId,
-                sendUpdates: 'all', // Faz o Google enviar e-mail de notificação pros convidados!
                 requestBody: event,
             });
 
