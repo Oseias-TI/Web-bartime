@@ -67,8 +67,17 @@ export class GoogleCalendarService {
                 },
             };
 
+            const attendees: calendar_v3.Schema$EventAttendee[] = [];
+            if (data.clientEmail) attendees.push({ email: data.clientEmail });
+            if (data.professionalEmail) attendees.push({ email: data.professionalEmail });
+
+            if (attendees.length > 0) {
+                event.attendees = attendees;
+            }
+
             const response = await this.calendar.events.insert({
                 calendarId: this.calendarId,
+                sendUpdates: 'all', // Faz o Google enviar e-mail de notificação pros convidados!
                 requestBody: event,
             });
 
