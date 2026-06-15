@@ -28,12 +28,26 @@ export class AppointmentService {
             throw new AppError('A barbearia não funciona neste dia.', 400);
 
         const startMinutes = startTime.getUTCHours() * 60 + startTime.getUTCMinutes();
-        const openMinutes = timeToMinutes(businessHour.openTime);
-        const closeMinutes = timeToMinutes(businessHour.closeTime);
         const endMinutes = startMinutes + service.durationMin;
 
-        if (startMinutes < openMinutes || endMinutes > closeMinutes)
-            throw new AppError(`Agendamento fora do horário de funcionamento (${businessHour.openTime}–${businessHour.closeTime}).`, 400);
+        const open1 = timeToMinutes(businessHour.openTime);
+        const close1 = timeToMinutes(businessHour.closeTime);
+        const inShift1 = startMinutes >= open1 && endMinutes <= close1;
+
+        let inShift2 = false;
+        if (businessHour.openTime2 && businessHour.closeTime2) {
+            const open2 = timeToMinutes(businessHour.openTime2);
+            const close2 = timeToMinutes(businessHour.closeTime2);
+            inShift2 = startMinutes >= open2 && endMinutes <= close2;
+        }
+
+        if (!inShift1 && !inShift2) {
+            let msg = `Agendamento fora do horário de funcionamento (${businessHour.openTime}–${businessHour.closeTime})`;
+            if (businessHour.openTime2 && businessHour.closeTime2) {
+                msg += ` ou (${businessHour.openTime2}–${businessHour.closeTime2})`;
+            }
+            throw new AppError(msg, 400);
+        }
 
         const endTime = new Date(startTime.getTime() + service.durationMin * 60_000);
 

@@ -4,7 +4,8 @@ import { ElasticsearchTransport } from 'winston-elasticsearch';
 const esTransportOpts = {
   level: 'info',
   clientOpts: { node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200' },
-  indexPrefix: 'bartime-logs'
+  indexPrefix: 'bartime-logs',
+  apm: undefined as any
 };
 
 const logger = winston.createLogger({

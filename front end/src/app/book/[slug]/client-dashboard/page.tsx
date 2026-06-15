@@ -45,7 +45,7 @@ export default function ClientDashboardPage() {
         setAppointments(data);
         setTenant(tenantData);
       } catch (err) {
-        console.log(err.message);
+        console.log((err as any).message);
       } finally {
         setIsLoading(false);
       }

@@ -33,7 +33,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function RelatoriosPage() {
   const { professional } = useAuth();
-  const isAdmin = professional?.role === "ADMIN";
+  const isAdmin = professional?.role === "ADMIN" || professional?.role === "SUPER_ADMIN";
   const [reportData, setReportData] = useState<Report | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   

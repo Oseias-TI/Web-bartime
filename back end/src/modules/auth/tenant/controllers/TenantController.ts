@@ -20,8 +20,20 @@ export class TenantController {
 
     // PATCH /tenant/logo — faz upload da logo
     updateLogo = asyncHandler(async (req: Request, res: Response) => {
+        console.log("Recebeu PATCH /tenant/logo");
+        console.log("req.file:", req.file);
+        console.log("req.body:", req.body);
+        console.log("headers:", req.headers);
         if (!req.file) throw new AppError('Nenhuma imagem foi enviada.', 400);
-        const fileUrl = `http://localhost:${process.env.PORT || 3333}/uploads/avatars/${req.file.filename}`;
+        
+        let fileUrl: string;
+        const s3File = req.file as any;
+        if (s3File.key && process.env.AWS_PUBLIC_URL) {
+            fileUrl = `${process.env.AWS_PUBLIC_URL}/${s3File.key}`;
+        } else {
+            fileUrl = `http://localhost:${process.env.PORT || 3333}/uploads/avatars/${req.file.filename}`;
+        }
+        
         const result = await new TenantService().updateLogo(req.user.tenantId, fileUrl);
         return res.json({ message: 'Logo atualizada com sucesso.', ...result });
     });

@@ -36,7 +36,7 @@ interface AuthContextData {
   tenant: Tenant | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<Professional>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   updateProfessional: (data: Partial<Professional>) => void;
@@ -99,6 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("@Bartime:refreshToken", response.refreshToken);
     localStorage.setItem("@Bartime:professional", JSON.stringify(response.professional));
     localStorage.setItem("@Bartime:tenant", JSON.stringify(response.tenant));
+
+    return response.professional;
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {

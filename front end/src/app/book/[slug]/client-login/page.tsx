@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { api, clientApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeft, Scissors } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ export default function ClientLoginPage() {
   const [regPhone, setRegPhone] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -158,6 +160,14 @@ export default function ClientLoginPage() {
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
                   />
+                  <div className="flex justify-end mt-2">
+                    <Link 
+                      href={`/book/${slug}/forgot-password`}
+                      className="text-xs font-medium text-primary hover:underline"
+                    >
+                      Esqueceu a senha?
+                    </Link>
+                  </div>
                 </div>
 
                 <Button 
@@ -170,12 +180,7 @@ export default function ClientLoginPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 text-center text-sm text-zinc-500">
-                Já agendou antes e não tem senha? <br/>
-                <Link href={`/book/${slug}/client-setup`} className="text-primary font-medium hover:underline mt-1 inline-block">
-                  Criar senha do Primeiro Acesso
-                </Link>
-              </div>
+
             </div>
           ) : (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
@@ -225,10 +230,22 @@ export default function ClientLoginPage() {
                   />
                 </div>
 
+                <div className="flex items-start space-x-3 pt-2">
+                  <Checkbox 
+                    id="terms-client"
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <label htmlFor="terms-client" className="text-xs text-zinc-600 dark:text-zinc-400 leading-tight">
+                    Li e concordo com os <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link> e a <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link>.
+                  </label>
+                </div>
+
                 <Button 
                   type="submit"
                   className="w-full h-14 rounded-2xl text-lg font-medium shadow-lg mt-4"
-                  disabled={isLoading || !regName || !regPhone || !regEmail || !regPassword}
+                  disabled={isLoading || !regName || !regPhone || !regEmail || !regPassword || !acceptTerms}
                   suppressHydrationWarning
                 >
                   {isLoading ? "Cadastrando..." : "Cadastrar e Entrar"}

@@ -42,6 +42,11 @@ export class RefreshTokenService {
 
         if (!stored.professional.active) throw new AppError('Conta desativada.', 403);
 
+        const tenant = await prisma.tenant.findUnique({ where: { id: stored.professional.tenantId } });
+        if (tenant?.subscriptionStatus === 'CANCELED') {
+            throw new AppError('Esta barbearia foi desativada. Entre em contato com o suporte.', 403);
+        }
+
         return this.generateTokens(
             stored.professional.id,
             stored.professional.tenantId,

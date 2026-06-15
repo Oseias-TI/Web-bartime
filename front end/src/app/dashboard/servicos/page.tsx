@@ -53,7 +53,7 @@ import type { ApiError } from "@/lib/api";
 
 export default function ServicosPage() {
   const { professional } = useAuth();
-  const isAdmin = professional?.role === "ADMIN";
+  const isAdmin = professional?.role === "ADMIN" || professional?.role === "SUPER_ADMIN";
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -6,7 +6,15 @@ export class BusinessHourService {
         return prisma.$transaction(async tx => {
             await tx.businessHour.deleteMany({ where: { tenantId } });
             const created = await tx.businessHour.createMany({
-                data: hours.map(h => ({ tenantId, dayOfWeek: h.dayOfWeek, openTime: h.open ? h.openTime : null, closeTime: h.open ? h.closeTime : null, open: h.open })),
+                data: hours.map(h => ({
+                    tenantId,
+                    dayOfWeek: h.dayOfWeek,
+                    openTime: h.open ? h.openTime : null,
+                    closeTime: h.open ? h.closeTime : null,
+                    openTime2: h.open ? h.openTime2 : null,
+                    closeTime2: h.open ? h.closeTime2 : null,
+                    open: h.open
+                })),
             });
             return { message: 'Horários salvos com sucesso.', count: created.count };
         });
@@ -22,7 +30,9 @@ export class BusinessHourService {
                 dayName: DAY_NAMES[day], 
                 open: configured ? configured.open : isWeekday, 
                 openTime: configured ? configured.openTime : (isWeekday ? "09:00" : null), 
-                closeTime: configured ? configured.closeTime : (isWeekday ? "18:00" : null) 
+                closeTime: configured ? configured.closeTime : (isWeekday ? "18:00" : null),
+                openTime2: configured ? configured.openTime2 : null,
+                closeTime2: configured ? configured.closeTime2 : null
             };
         });
     }

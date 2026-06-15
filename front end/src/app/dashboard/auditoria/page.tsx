@@ -52,7 +52,7 @@ const defaultAction = { label: "Ação", icon: Activity, color: "text-stone-400 
 
 export default function AuditoriaPage() {
   const { professional } = useAuth();
-  const isAdmin = professional?.role === "ADMIN";
+  const isAdmin = professional?.role === "ADMIN" || professional?.role === "SUPER_ADMIN";
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

@@ -42,7 +42,8 @@ import {
 import { useAuth, type Professional } from "@/contexts/AuthContext";
 import type { ApiError } from "@/lib/api";
 
-const roleConfig = {
+const roleConfig: Record<string, { label: string; icon: any; color: string }> = {
+  SUPER_ADMIN: { label: "Plataforma", icon: Shield, color: "text-red-500" },
   ADMIN: { label: "Administrador", icon: Shield, color: "text-amber-500" },
   BARBER: { label: "Barbeiro", icon: ScissorsIcon, color: "text-blue-500" },
   RECEPTIONIST: { label: "Recepcionista", icon: Headphones, color: "text-purple-500" },
@@ -50,7 +51,7 @@ const roleConfig = {
 
 export default function EquipePage() {
   const { professional: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === "ADMIN";
+  const isAdmin = currentUser?.role === "ADMIN" || currentUser?.role === "SUPER_ADMIN";
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -286,7 +287,7 @@ export default function EquipePage() {
               </Card>
             ))
           : activePros.map((pro) => {
-              const role = roleConfig[pro.role as keyof typeof roleConfig];
+              const role = roleConfig[pro.role] || { label: pro.role, icon: UserCog, color: "text-gray-500" };
               const RoleIcon = role.icon;
 
               return (

@@ -15,3 +15,6 @@ coverage/
 .idea/
 .vscode/
 ag-kit/
+uploads/
+back end/uploads/
+front end/out/

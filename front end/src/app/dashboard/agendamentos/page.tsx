@@ -96,7 +96,7 @@ export default function AgendamentosPage() {
     }
   }, [formProfessionalId, formServiceId, selectedDate]);
 
-  const loadSlots = async () => {
+  async function loadSlots() {
     if (!formProfessionalId || !formServiceId) return;
     setIsLoadingSlots(true);
     try {

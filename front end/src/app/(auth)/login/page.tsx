@@ -35,12 +35,17 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await login(data.email, data.password);
+      const prof = await login(data.email, data.password);
       toastManager.add({
         title: "Bem-vindo de volta!",
         type: "success",
       });
-      router.push("/dashboard");
+
+      if (prof.role === 'SUPER_ADMIN') {
+        router.push("/super-admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
       const apiError = error as ApiError;
       toastManager.add({
@@ -148,6 +153,20 @@ export default function LoginPage() {
               Cadastre sua barbearia
             </Link>
           </p>
+
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-sm text-neutral-400">
+              Sua conta foi bloqueada ou precisa de ajuda?{" "}
+              <a
+                href="https://wa.me/5511999999999"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 font-medium transition-colors inline-flex items-center gap-1"
+              >
+                Fale com o Suporte
+              </a>
+            </p>
+          </div>
         </div>
       </div>
 

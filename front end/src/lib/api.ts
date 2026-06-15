@@ -183,7 +183,7 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    const isFormData = data instanceof FormData;
+    const isFormData = data instanceof FormData || (typeof data === "object" && data !== null && "append" in data);
 
     const makeRequest = () =>
       fetch(`${API_URL}${endpoint}`, {
@@ -198,14 +198,14 @@ class ApiClient {
   }
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
-    const isFormData = data instanceof FormData;
+    const isFormData = data instanceof FormData || (typeof data === "object" && data !== null && "append" in data);
 
     const makeRequest = () =>
       fetch(`${API_URL}${endpoint}`, {
         method: "PATCH",
         headers: this.getHeaders(isFormData),
         credentials: "include",
-        body: isFormData ? data : data ? JSON.stringify(data) : undefined,
+        body: isFormData ? (data as any) : data ? JSON.stringify(data) : undefined,
       });
 
     const response = await makeRequest();
@@ -213,12 +213,14 @@ class ApiClient {
   }
 
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
+    const isFormData = data instanceof FormData || (typeof data === "object" && data !== null && "append" in data);
+
     const makeRequest = () =>
       fetch(`${API_URL}${endpoint}`, {
         method: "PUT",
-        headers: this.getHeaders(),
+        headers: this.getHeaders(isFormData),
         credentials: "include",
-        body: data ? JSON.stringify(data) : undefined,
+        body: isFormData ? data : data ? JSON.stringify(data) : undefined,
       });
 
     const response = await makeRequest();

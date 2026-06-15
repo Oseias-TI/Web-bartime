@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { ClientAuthService } from '../services/ClientAuthService';
+import { ClientForgotPasswordService } from '../services/ClientForgotPasswordService';
+import { ClientResetPasswordService } from '../services/ClientResetPasswordService';
 import { asyncHandler } from '../../../shared/utils/asyncHandler';
 
 export class ClientAuthController {
@@ -48,5 +50,18 @@ export class ClientAuthController {
         const { contact } = req.query;
         const result = await new ClientAuthService().findTenants(contact as string);
         return res.json(result);
+    });
+
+    forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+        const { slug } = req.params;
+        const { email } = req.body;
+        await new ClientForgotPasswordService().execute(email, slug);
+        return res.status(200).json({ message: 'E-mail de recuperação enviado com sucesso.' });
+    });
+
+    resetPassword = asyncHandler(async (req: Request, res: Response) => {
+        const { token, password } = req.body;
+        await new ClientResetPasswordService().execute(token, password);
+        return res.status(200).json({ message: 'Senha redefinida com sucesso.' });
     });
 }

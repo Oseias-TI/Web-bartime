@@ -10,6 +10,7 @@ import { Scissors, Eye, EyeOff, Loader2, ArrowLeft, ArrowRight, CheckCircle2 } f
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toastManager } from "@/components/ui/toast";
 import type { ApiError } from "@/lib/api";
 
@@ -30,6 +31,9 @@ const registerSchema = z
       .refine((val) => val.replace(/\D/g, "").length === 14, {
         message: "CNPJ deve ter 14 números",
       }),
+    acceptTerms: z.boolean().refine(val => val === true, {
+      message: "Você deve aceitar os termos de uso e política de privacidade",
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
@@ -48,10 +52,17 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     trigger,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      acceptTerms: false,
+    }
   });
+
+  const acceptTerms = watch("acceptTerms");
 
   const handleNextStep = async () => {
     const valid = await trigger(["name", "email", "password", "confirmPassword"]);
@@ -259,7 +270,29 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex items-start space-x-3 mt-4 bg-white/5 p-3 rounded-xl border border-white/10">
+                <Checkbox 
+                  id="terms" 
+                  checked={acceptTerms}
+                  onCheckedChange={(checked) => {
+                    setValue("acceptTerms", checked === true, { shouldValidate: true });
+                  }} 
+                  className="mt-0.5"
+                />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none text-neutral-300"
+                  >
+                    Li e concordo com os <Link href="/termos" className="text-white hover:text-neutral-300 underline underline-offset-4 transition-colors">Termos de Uso</Link> e a <Link href="/privacidade" className="text-white hover:text-neutral-300 underline underline-offset-4 transition-colors">Política de Privacidade</Link>.
+                  </label>
+                  {errors.acceptTerms && (
+                    <p className="text-xs text-red-400">{errors.acceptTerms.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
                 <Button
                   type="button"
                   variant="outline"

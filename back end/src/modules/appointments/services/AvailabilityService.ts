@@ -47,25 +47,40 @@ export class AvailabilityService {
         if (!businessHour || !businessHour.open || !businessHour.openTime || !businessHour.closeTime) return [];
 
         const slots: TimeSlot[] = [];
-        const openTime = toDateTime(date, businessHour.openTime);
-        const closeTime = toDateTime(date, businessHour.closeTime);
         const serviceDurationMs = service.durationMin * 60_000;
         const slotIntervalMs = SLOT_INTERVAL_MIN * 60_000;
-        let cursor = openTime.getTime();
-
+        
         // Usar o "agora" na mesma convenção local-as-UTC para marcar slots passados
         const nowLocalAsUTC = localNowAsUTC();
 
-        while (cursor + serviceDurationMs <= closeTime.getTime()) {
-            const slotStart = new Date(cursor);
-            const slotEnd = new Date(cursor + serviceDurationMs);
-            const hasConflict = existingAppointments.some(appt => {
-                const apptStart = new Date(appt.startTime).getTime();
-                const apptEnd = new Date(appt.endTime).getTime();
-                return slotStart.getTime() < apptEnd && slotEnd.getTime() > apptStart;
+        const shifts = [];
+        if (businessHour.openTime && businessHour.closeTime) {
+            shifts.push({
+                start: toDateTime(date, businessHour.openTime).getTime(),
+                end: toDateTime(date, businessHour.closeTime).getTime()
             });
-            slots.push({ startTime: toTimeString(slotStart), endTime: toTimeString(slotEnd), available: !hasConflict && slotStart.getTime() > nowLocalAsUTC });
-            cursor += slotIntervalMs;
+        }
+        if (businessHour.openTime2 && businessHour.closeTime2) {
+            shifts.push({
+                start: toDateTime(date, businessHour.openTime2).getTime(),
+                end: toDateTime(date, businessHour.closeTime2).getTime()
+            });
+        }
+
+
+        for (const shift of shifts) {
+            let cursor = shift.start;
+            while (cursor + serviceDurationMs <= shift.end) {
+                const slotStart = new Date(cursor);
+                const slotEnd = new Date(cursor + serviceDurationMs);
+                const hasConflict = existingAppointments.some(appt => {
+                    const apptStart = new Date(appt.startTime).getTime();
+                    const apptEnd = new Date(appt.endTime).getTime();
+                    return slotStart.getTime() < apptEnd && slotEnd.getTime() > apptStart;
+                });
+                slots.push({ startTime: toTimeString(slotStart), endTime: toTimeString(slotEnd), available: !hasConflict && slotStart.getTime() > nowLocalAsUTC });
+                cursor += slotIntervalMs;
+            }
         }
 
         return slots;

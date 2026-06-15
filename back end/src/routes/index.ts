@@ -73,6 +73,8 @@ routes.get('/public/client/tenants', clientAuth.findTenants);
 routes.post('/public/tenant/:slug/client-auth/login', authLimiter, clientAuth.login);
 routes.post('/public/tenant/:slug/client-auth/register', authLimiter, clientAuth.register);
 routes.post('/public/tenant/:slug/client-auth/setup', authLimiter, clientAuth.setupPassword);
+routes.post('/public/tenant/:slug/client-auth/forgot-password', authLimiter, clientAuth.forgotPassword);
+routes.post('/public/tenant/:slug/client-auth/reset-password', clientAuth.resetPassword);
 
 // Dashboard do Cliente
 routes.get('/public/tenant/:slug/client/appointments', ensureClientAuthenticated, clients.listClientAppointments);
@@ -94,8 +96,14 @@ routes.post('/billing/portal', ensureRole(['ADMIN']), billing.portal);
 // ── Super Admin ─────────────────────────────────
 routes.get('/super-admin/stats', ensureSuperAdmin, superAdmin.stats);
 routes.get('/super-admin/tenants', ensureSuperAdmin, superAdmin.listTenants);
+routes.post('/super-admin/tenants', ensureSuperAdmin, superAdmin.createTenant);
 routes.get('/super-admin/tenants/:id', ensureSuperAdmin, superAdmin.getTenant);
+routes.put('/super-admin/tenants/:id', ensureSuperAdmin, superAdmin.updateTenant);
+routes.delete('/super-admin/tenants/:id', ensureSuperAdmin, superAdmin.deleteTenant);
 routes.patch('/super-admin/tenants/:id/status', ensureSuperAdmin, superAdmin.updateStatus);
+routes.get('/super-admin/users', ensureSuperAdmin, superAdmin.listUsers);
+routes.patch('/super-admin/users/:id/status', ensureSuperAdmin, superAdmin.updateUserStatus);
+routes.patch('/super-admin/users/:id/password', ensureSuperAdmin, superAdmin.updateUserPassword);
 
 // ═══════════════════════════════════════════════
 //  PROTEGIDAS — requer assinatura válida

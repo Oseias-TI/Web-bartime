@@ -17,6 +17,8 @@ export interface BusinessHour {
   open: boolean;
   openTime: string | null;
   closeTime: string | null;
+  openTime2?: string | null;
+  closeTime2?: string | null;
 }
 
 export const tenantService = {

@@ -96,7 +96,7 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { professional, tenant, logout } = useAuth();
 
-  const isAdmin = professional?.role === "ADMIN";
+  const isAdmin = professional?.role === "ADMIN" || professional?.role === "SUPER_ADMIN";
 
   const getInitials = (name: string) => {
     return name
@@ -195,7 +195,9 @@ export function AppSidebar() {
                   {professional?.name}
                 </span>
                 <span className="text-xs text-muted-foreground capitalize">
-                  {professional?.role === "ADMIN"
+                  {professional?.role === "SUPER_ADMIN"
+                    ? "Super Admin"
+                    : professional?.role === "ADMIN"
                     ? "Administrador"
                     : professional?.role === "BARBER"
                       ? "Barbeiro"

@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Scissors, ArrowLeft, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
       {/* Background effects */}
@@ -38,13 +43,13 @@ export default function NotFound() {
             <Scissors className="size-4" />
             Ir para o Início
           </Link>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#f5efe6]/5 px-6 py-3 text-sm font-medium text-neutral-300 hover:bg-[#f5efe6]/10 transition-all duration-200 w-full sm:w-auto justify-center"
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#f5efe6]/5 px-6 py-3 text-sm font-medium text-neutral-300 hover:bg-[#f5efe6]/10 transition-all duration-200 w-full sm:w-auto justify-center cursor-pointer"
           >
             <ArrowLeft className="size-4" />
             Voltar
-          </Link>
+          </button>
         </div>
 
         <p className="text-xs text-neutral-600 mt-12">

@@ -8,10 +8,23 @@ jest.mock('../../../../../src/lib/prisma', () => ({
         service: { findMany: jest.fn(), findUnique: jest.fn(), findFirst: jest.fn() },
         professional: { findMany: jest.fn(), findFirst: jest.fn() },
         businessHour: { findFirst: jest.fn() },
-        appointment: { findMany: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
+        appointment: { findMany: jest.fn(), findFirst: jest.fn(), create: jest.fn(), update: jest.fn().mockResolvedValue({}) },
         client: { findFirst: jest.fn(), create: jest.fn() },
         $transaction: jest.fn(),
     },
+}));
+
+// ── Mock do GoogleCalendarService (evita chamadas reais à API do Google) ──
+jest.mock('../../../../../src/shared/services/GoogleCalendarService', () => ({
+    googleCalendarService: {
+        createEvent: jest.fn().mockResolvedValue('mock-event-id'),
+        deleteEvent: jest.fn().mockResolvedValue(true),
+    },
+}));
+
+// ── Mock do Mailer (evita chamadas SMTP reais) ───────────────────────────
+jest.mock('../../../../../src/shared/utils/mailer', () => ({
+    sendMail: jest.fn().mockResolvedValue(true),
 }));
 
 describe('PublicBookingService (Unit)', () => {
@@ -55,14 +68,19 @@ describe('PublicBookingService (Unit)', () => {
         (prisma.professional.findFirst as jest.Mock).mockResolvedValue({ id: 'prof-1' });
         (prisma.client.findFirst as jest.Mock).mockResolvedValue(null);
         (prisma.client.create as jest.Mock).mockResolvedValue({ id: 'client-1' });
-        
+
         (prisma.$transaction as jest.Mock).mockImplementation(async (cb) => {
             return cb(prisma);
         });
 
         // Simula sem conflitos
         (prisma.appointment.findFirst as jest.Mock).mockResolvedValue(null);
-        (prisma.appointment.create as jest.Mock).mockResolvedValue({ id: 'appt-1' });
+        (prisma.appointment.create as jest.Mock).mockResolvedValue({
+            id: 'appt-1',
+            client: { id: 'client-1', name: 'Cliente Novo' },
+            service: { name: 'Corte', price: 50, durationMin: 30 },
+            professional: { id: 'prof-1', name: 'Barbeiro Teste', email: null },
+        });
 
         const result = await publicBookingService.createAppointment({
             slug: 'teste-slug',
@@ -82,7 +100,7 @@ describe('PublicBookingService (Unit)', () => {
         (prisma.service.findUnique as jest.Mock).mockResolvedValue({ id: 'service-1', durationMin: 30 });
         (prisma.professional.findFirst as jest.Mock).mockResolvedValue({ id: 'prof-1' });
         (prisma.client.findFirst as jest.Mock).mockResolvedValue({ id: 'client-1' });
-        
+
         (prisma.$transaction as jest.Mock).mockImplementation(async (cb) => {
             return cb(prisma);
         });

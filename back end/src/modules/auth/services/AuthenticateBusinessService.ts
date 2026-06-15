@@ -21,6 +21,10 @@ export class AuthenticateBusinessService {
 
         if (!tenant) throw new AppError('Tenant não encontrado.', 404);
 
+        if (tenant.subscriptionStatus === 'CANCELED' && professional.role !== 'SUPER_ADMIN') {
+            throw new AppError('Esta barbearia foi desativada. Entre em contato com o suporte.', 403);
+        }
+
         const { accessToken, refreshToken, expiresIn } =
             await new RefreshTokenService().generateTokens(
                 professional.id,

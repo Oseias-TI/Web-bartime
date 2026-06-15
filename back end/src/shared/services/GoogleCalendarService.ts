@@ -45,33 +45,16 @@ export class GoogleCalendarService {
                 summary: data.summary,
                 description: data.description,
                 start: {
-                    dateTime: data.startTime.toISOString().replace('Z', '-03:00'),
-                    timeZone: 'America/Sao_Paulo',
+                    dateTime: data.startTime.toISOString(),
                 },
                 end: {
-                    dateTime: data.endTime.toISOString().replace('Z', '-03:00'),
-                    timeZone: 'America/Sao_Paulo',
+                    dateTime: data.endTime.toISOString(),
                 },
             };
-
-            const attendees: { email: string }[] = [];
-
-            if (data.professionalEmail) {
-                attendees.push({ email: data.professionalEmail });
-            }
-
-            if (data.clientEmail) {
-                attendees.push({ email: data.clientEmail });
-            }
-
-            if (attendees.length > 0) {
-                event.attendees = attendees;
-            }
 
             const response = await this.calendar.events.insert({
                 calendarId: this.calendarId,
                 requestBody: event,
-                sendUpdates: 'all', // Envia email para os attendees (se houver)
             });
 
             return response.data.id || null;

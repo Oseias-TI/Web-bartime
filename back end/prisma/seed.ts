@@ -10,6 +10,25 @@ async function main() {
 
     const randomId = Math.floor(Math.random() * 99999);
     
+    // 0. Criar Super Admin e Tenant da Plataforma
+    const platformTenant = await prisma.tenant.create({
+        data: {
+            name: `Administração Bartime`,
+            slug: `admin-bartime-${randomId}`,
+            cnpj: `00000000000000`,
+            subscriptionStatus: 'ACTIVE',
+            professionals: {
+                create: {
+                    name: 'Super Administrador',
+                    email: 'super@bartime.com',
+                    password: hashedPassword,
+                    role: 'SUPER_ADMIN'
+                }
+            }
+        }
+    });
+    console.log(`✅ Super Admin criado: super@bartime.com / Oseias123!`);
+
     // 1. Criar um Tenant (Barbearia Fake)
     const tenant = await prisma.tenant.create({
         data: {

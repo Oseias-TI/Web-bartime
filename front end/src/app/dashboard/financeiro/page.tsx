@@ -72,7 +72,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function FinanceiroPage() {
   const { professional } = useAuth();
-  const isAdmin = professional?.role === "ADMIN";
+  const isAdmin = professional?.role === "ADMIN" || professional?.role === "SUPER_ADMIN";
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [cashFlow, setCashFlow] = useState<CashFlow[]>([]);

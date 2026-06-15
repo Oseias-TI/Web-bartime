@@ -1,7 +1,7 @@
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
-
+import { sendMail } from '../../../shared/utils/mailer';
 
 export class PublicBookingService {
     async getAllTenants() {
@@ -14,9 +14,12 @@ export class PublicBookingService {
     async getTenantBySlug(slug: string) {
         const tenant = await prisma.tenant.findUnique({
             where: { slug },
-            select: { id: true, name: true, logoUrl: true, businessHours: true }
+            select: { id: true, name: true, logoUrl: true, businessHours: true, subscriptionStatus: true }
         });
         if (!tenant) throw new AppError('Barbearia não encontrada', 404);
+        if (tenant.subscriptionStatus === 'CANCELED') {
+            throw new AppError('Esta barbearia não está mais ativa na plataforma.', 403);
+        }
         return tenant;
     }
 
@@ -57,22 +60,29 @@ export class PublicBookingService {
             if (service) serviceDurationMin = service.durationMin;
         }
 
+        const shifts = [];
+        if (businessHour.openTime && businessHour.closeTime) {
+            const [openH, openM] = businessHour.openTime.split(':').map(Number);
+            const [closeH, closeM] = businessHour.closeTime.split(':').map(Number);
+            shifts.push({ openMinutes: openH * 60 + openM, closeMinutes: closeH * 60 + closeM });
+        }
+        if (businessHour.openTime2 && businessHour.closeTime2) {
+            const [openH, openM] = businessHour.openTime2.split(':').map(Number);
+            const [closeH, closeM] = businessHour.closeTime2.split(':').map(Number);
+            shifts.push({ openMinutes: openH * 60 + openM, closeMinutes: closeH * 60 + closeM });
+        }
+
         // Gerar slots de 30 em 30 min
         const slots: string[] = [];
-        const [openH, openM] = businessHour.openTime.split(':').map(Number);
-        const [closeH, closeM] = businessHour.closeTime.split(':').map(Number);
-        const closeMinutes = closeH * 60 + closeM;
         
-        let currentH = openH;
-        let currentM = openM;
-
-        while (currentH * 60 + currentM + serviceDurationMin <= closeMinutes) {
-            const timeStr = `${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`;
-            slots.push(timeStr);
-            currentM += 30;
-            if (currentM >= 60) {
-                currentM -= 60;
-                currentH += 1;
+        for (const shift of shifts) {
+            let currentMins = shift.openMinutes;
+            while (currentMins + serviceDurationMin <= shift.closeMinutes) {
+                const currentH = Math.floor(currentMins / 60);
+                const currentM = currentMins % 60;
+                const timeStr = `${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`;
+                slots.push(timeStr);
+                currentMins += 30;
             }
         }
 
@@ -194,6 +204,47 @@ export class PublicBookingService {
                 }).catch(console.error);
             }
         });
+
+        const dateStr = startDate.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: 'long' });
+        const timeStr = startDate.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+
+        if (appointment.professional.email) {
+            sendMail({
+                to: appointment.professional.email,
+                subject: 'Bartime — Novo Agendamento Recebido!',
+                html: `
+                  <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+                    <h2>Olá, ${appointment.professional.name}!</h2>
+                    <p>Um novo agendamento foi feito pela área pública do cliente:</p>
+                    <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                      <tr><td style="padding:8px;color:#6b7280;">Cliente</td><td style="padding:8px;font-weight:bold;">${appointment.client.name} (${data.clientPhone})</td></tr>
+                      <tr style="background:#f9fafb;"><td style="padding:8px;color:#6b7280;">Serviço</td><td style="padding:8px;font-weight:bold;">${appointment.service.name}</td></tr>
+                      <tr><td style="padding:8px;color:#6b7280;">Data</td><td style="padding:8px;font-weight:bold;">${dateStr}</td></tr>
+                      <tr style="background:#f9fafb;"><td style="padding:8px;color:#6b7280;">Horário</td><td style="padding:8px;font-weight:bold;">${timeStr}</td></tr>
+                    </table>
+                  </div>
+                `,
+            }).catch(err => console.error(`[PublicBooking] Erro email barbeiro:`, err));
+        }
+
+        if (data.clientEmail) {
+            sendMail({
+                to: data.clientEmail,
+                subject: 'Bartime — Agendamento Confirmado!',
+                html: `
+                  <div style="font-family:sans-serif;max-width:480px;margin:0 auto;">
+                    <h2>Olá, ${appointment.client.name}!</h2>
+                    <p>Seu agendamento foi confirmado com sucesso na barbearia ${tenant.name}:</p>
+                    <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                      <tr><td style="padding:8px;color:#6b7280;">Profissional</td><td style="padding:8px;font-weight:bold;">${appointment.professional.name}</td></tr>
+                      <tr style="background:#f9fafb;"><td style="padding:8px;color:#6b7280;">Serviço</td><td style="padding:8px;font-weight:bold;">${appointment.service.name}</td></tr>
+                      <tr><td style="padding:8px;color:#6b7280;">Data</td><td style="padding:8px;font-weight:bold;">${dateStr}</td></tr>
+                      <tr style="background:#f9fafb;"><td style="padding:8px;color:#6b7280;">Horário</td><td style="padding:8px;font-weight:bold;">${timeStr}</td></tr>
+                    </table>
+                  </div>
+                `,
+            }).catch(err => console.error(`[PublicBooking] Erro email cliente:`, err));
+        }
 
         return appointment;
     }

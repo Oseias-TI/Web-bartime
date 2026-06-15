@@ -17,6 +17,8 @@ import {
   EyeOff,
   AlertCircle,
   CheckCircle2,
+  Plus,
+  X,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -141,7 +143,7 @@ export default function ConfiguracoesPage() {
     }
   }, [activeTab, businessHours.length, billingStatus, loadHours]);
 
-  const loadBilling = async () => {
+  async function loadBilling() {
     setIsLoadingBilling(true);
     try {
       const status = await billingService.getStatus();
@@ -228,9 +230,9 @@ export default function ConfiguracoesPage() {
       const result = await tenantService.updateLogo(file);
       updateTenant({ logoUrl: result.logoUrl });
       toastManager.add({ title: "Logo atualizada!", type: "success" });
-    } catch {
+    } catch (err: any) {
       setLogoPreview(null);
-      toastManager.add({ title: "Erro ao enviar logo", type: "error" });
+      toastManager.add({ title: "Erro ao enviar logo", description: err.message || String(err), type: "error" });
     } finally {
       setIsUploadingLogo(false);
     }
@@ -472,22 +474,76 @@ export default function ConfiguracoesPage() {
                            </span>
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="time"
-                            value={day.openTime || ""}
-                            onChange={(e) => updateDay(index, "openTime", e.target.value)}
-                            disabled={!day.open}
-                            className="w-24 h-9"
-                          />
-                          <span className="text-muted-foreground text-sm">até</span>
-                          <Input
-                            type="time"
-                            value={day.closeTime || ""}
-                            onChange={(e) => updateDay(index, "closeTime", e.target.value)}
-                            disabled={!day.open}
-                            className="w-24 h-9"
-                          />
+                        <div className="flex flex-col gap-2 items-end">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="time"
+                              value={day.openTime || ""}
+                              onChange={(e) => updateDay(index, "openTime", e.target.value)}
+                              disabled={!day.open}
+                              className="w-24 h-9"
+                            />
+                            <span className="text-muted-foreground text-sm">até</span>
+                            <Input
+                              type="time"
+                              value={day.closeTime || ""}
+                              onChange={(e) => updateDay(index, "closeTime", e.target.value)}
+                              disabled={!day.open}
+                              className="w-24 h-9"
+                            />
+                            {day.open && !day.openTime2 && !day.closeTime2 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  updateDay(index, "openTime2", "13:00");
+                                  updateDay(index, "closeTime2", "18:00");
+                                  if (day.closeTime === "18:00") {
+                                      updateDay(index, "closeTime", "12:00");
+                                  }
+                                }}
+                                className="h-9 px-2 text-muted-foreground hover:text-foreground"
+                                title="Adicionar turno"
+                              >
+                                <Plus className="size-4" />
+                              </Button>
+                            )}
+                          </div>
+
+                          {day.open && (day.openTime2 || day.closeTime2) && (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="time"
+                                value={day.openTime2 || ""}
+                                onChange={(e) => updateDay(index, "openTime2", e.target.value)}
+                                disabled={!day.open}
+                                className="w-24 h-9"
+                              />
+                              <span className="text-muted-foreground text-sm">até</span>
+                              <Input
+                                type="time"
+                                value={day.closeTime2 || ""}
+                                onChange={(e) => updateDay(index, "closeTime2", e.target.value)}
+                                disabled={!day.open}
+                                className="w-24 h-9"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const newHours = [...businessHours];
+                                  newHours[index] = { ...newHours[index], openTime2: null, closeTime2: null };
+                                  setBusinessHours(newHours);
+                                }}
+                                className="h-9 px-2 text-destructive hover:bg-destructive/10"
+                                title="Remover turno"
+                              >
+                                <X className="size-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

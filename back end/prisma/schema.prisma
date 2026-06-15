@@ -32,13 +32,15 @@ model Tenant {
 }
 
 model BusinessHour {
-  id        String  @id @default(uuid())
-  tenantId  String
-  dayOfWeek Int
-  open      Boolean @default(true)
-  openTime  String?
-  closeTime String?
-  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  id         String  @id @default(uuid())
+  tenantId   String
+  dayOfWeek  Int
+  open       Boolean @default(true)
+  openTime   String?
+  closeTime  String?
+  openTime2  String?
+  closeTime2 String?
+  tenant     Tenant  @relation(fields: [tenantId], references: [id])
 
   @@unique([tenantId, dayOfWeek])
   @@map("business_hours")
@@ -55,6 +57,7 @@ model Client {
   loyaltyPoints Int           @default(0)
   createdAt     DateTime      @default(now())
   appointments  Appointment[]
+  passwordResetTokens ClientPasswordResetToken[]
   tenant        Tenant        @relation(fields: [tenantId], references: [id])
 
   @@unique([tenantId, phone])
@@ -148,6 +151,18 @@ model PasswordResetToken {
   professional   Professional @relation(fields: [professionalId], references: [id])
 
   @@map("password_reset_tokens")
+}
+
+model ClientPasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  clientId  String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  client    Client   @relation(fields: [clientId], references: [id])
+
+  @@map("client_password_reset_tokens")
 }
 
 model Professional {
