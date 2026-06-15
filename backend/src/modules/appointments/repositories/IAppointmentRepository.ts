@@ -21,6 +21,7 @@ export interface IAppointmentResponse {
         id: string;
         name: string;
         durationMin: number;
+        price?: number;
     };
     client: {
         id: string;
@@ -32,14 +33,29 @@ export interface IAppointmentResponse {
         id: string;
         name: string;
         email?: string | null;
+        commissionRate?: number;
     };
 }
 
 export interface IAppointmentRepository {
     create(data: ICreateAppointmentDTO): Promise<IAppointmentResponse>;
     findConflictingAppointment(tenantId: string, professionalId: string, startTime: Date, endTime: Date): Promise<boolean>;
-    findById(id: string, tenantId: string): Promise<any | null>;
+    findById(id: string, tenantId: string): Promise<IAppointmentResponse | null>;
     updateGoogleEventId(id: string, googleEventId: string): Promise<void>;
     listByDay(tenantId: string, start: Date, end: Date, professionalId?: string, skip?: number, take?: number): Promise<any[]>;
     countByDay(tenantId: string, start: Date, end: Date, professionalId?: string): Promise<number>;
+    
+    // Aggregate transactional methods
+    cancelAppointmentWithCommissions(appointmentId: string): Promise<any>;
+    completeAppointmentAndCreateFinancials(
+        appointmentId: string, 
+        paymentMethod: string, 
+        servicePrice: number, 
+        commissionAmount: number,
+        tenantId: string,
+        professionalId: string,
+        clientId: string,
+        serviceName: string,
+        professionalName: string
+    ): Promise<{ appointment: any, commission: any, revenue: number }>;
 }
