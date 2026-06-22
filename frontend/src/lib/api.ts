@@ -136,7 +136,12 @@ class ApiClient {
         }
       }
 
-      throw new ApiError(errorData.error || errorData.message || "Erro desconhecido", errorData.statusCode || response.status);
+      let errorMessage = errorData.error || errorData.message || "Erro desconhecido";
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        errorMessage += ": " + errorData.errors.map((e: any) => e.message).join(", ");
+      }
+
+      throw new ApiError(errorMessage, errorData.statusCode || response.status);
     }
     
     if (response.status === 204) {
