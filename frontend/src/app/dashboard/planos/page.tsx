@@ -1,10 +1,10 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api";
+import { billingService } from "@/services/billing.service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, CreditCard, Scissors, AlertTriangle } from "lucide-react";
+import { CheckCircle2, CreditCard, Scissors, AlertTriangle, Clock } from "lucide-react";
 import { useState } from "react";
 import { toastManager } from "@/components/ui/toast";
 
@@ -19,7 +19,7 @@ export default function PlanosPage() {
   const handleSubscribe = async () => {
     setIsLoading(true);
     try {
-      const response = await api.post<{ url: string }>("/billing/checkout");
+      const response = await billingService.createCheckout();
       if (response.url) {
         window.location.href = response.url;
       }
@@ -36,7 +36,7 @@ export default function PlanosPage() {
   const handleManageSubscription = async () => {
     setIsLoading(true);
     try {
-      const response = await api.post<{ url: string }>("/billing/portal");
+      const response = await billingService.createPortal();
       if (response.url) {
         window.location.href = response.url;
       }
@@ -72,7 +72,7 @@ export default function PlanosPage() {
                 {isPro ? (
                   <Scissors className="w-6 h-6 text-primary" />
                 ) : isTrial ? (
-                  <ClockIcon className="w-6 h-6 text-yellow-500" />
+                  <Clock className="w-6 h-6 text-yellow-500" />
                 ) : (
                   <AlertTriangle className="w-6 h-6 text-red-500" />
                 )}
@@ -137,22 +137,3 @@ export default function PlanosPage() {
   );
 }
 
-function ClockIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
