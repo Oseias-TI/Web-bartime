@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { AppointmentService } from './modules/appointments/services/AppointmentService';
+import { AppointmentService } from '../modules/appointments/services/AppointmentService';
 
 const prisma = new PrismaClient();
 
