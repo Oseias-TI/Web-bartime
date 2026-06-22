@@ -111,7 +111,7 @@ export default function EquipePage() {
       if (editingPro) {
         await professionalsService.update(editingPro.id, {
           name: formName,
-          commissionRate: parseFloat(formCommission),
+          commissionRate: formCommission ? parseFloat(formCommission) : 0,
         });
         toastManager.add({ title: "Profissional atualizado!", type: "success" });
       } else {
@@ -120,7 +120,7 @@ export default function EquipePage() {
           email: formEmail,
           password: formPassword,
           role: formRole,
-          commissionRate: parseFloat(formCommission),
+          commissionRate: formCommission ? parseFloat(formCommission) : 0,
         };
         await professionalsService.create(data);
         toastManager.add({ title: "Profissional cadastrado!", type: "success" });
@@ -242,18 +242,20 @@ export default function EquipePage() {
                     </div>
                   </>
                 )}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Taxa de Comissão (%)
-                  </label>
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={formCommission}
-                    onChange={(e) => setFormCommission(e.target.value)}
-                  />
-                </div>
+                {formRole !== "RECEPTIONIST" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Taxa de Comissão (%)
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formCommission}
+                      onChange={(e) => setFormCommission(e.target.value)}
+                    />
+                  </div>
+                )}
               </DialogPanel>
               <DialogFooter>
                 <DialogClose

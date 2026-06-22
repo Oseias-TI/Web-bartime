@@ -111,7 +111,7 @@ export default function PlanosPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-3xl font-bold text-primary mb-4">
-              R$ 99<span className="text-lg text-muted-foreground font-normal">/mês</span>
+              R$ 49,00<span className="text-lg text-muted-foreground font-normal">/mês</span>
             </div>
             
             <ul className="space-y-3">
