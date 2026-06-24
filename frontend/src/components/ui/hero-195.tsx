@@ -2,18 +2,25 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogPanel,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowRight,
@@ -91,10 +98,9 @@ function Hero195({
       </div>
 
       <div className="max-w-6xl mx-auto">
-        {/* Top section — headline + quick signup */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-          {/* Left — headline */}
-          <div className="space-y-6">
+        {/* Top section — headline */}
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-20 mt-4 md:mt-10">
+          <div className="space-y-6 flex flex-col items-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-neutral-300">
               <Scissors className="size-3.5" />
               Gestão completa pra barbearia
@@ -107,73 +113,55 @@ function Hero195({
               </span>
             </h1>
 
-            <p className="text-lg text-muted-foreground leading-relaxed max-w-md">
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
               Agenda, clientes, equipe e financeiro — tudo organizado num lugar
               só. Comece grátis, sem complicação.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <Button
+                asChild
                 size="lg"
                 className="h-12 px-8 text-base gap-2 bg-white text-black hover:!bg-black hover:!text-white font-semibold shadow-lg shadow-white/10"
               >
-                Testar Grátis
-                <ArrowRight className="size-4" />
+                <Link href="/register">
+                  Testar Grátis
+                  <ArrowRight className="size-4" />
+                </Link>
               </Button>
-              <Button
-                size="lg"
-                className="h-12 px-8 text-base gap-2 bg-transparent border border-white/20 text-white hover:bg-white/10 hover:text-white"
-              >
-                <Play className="size-4" />
-                Ver como funciona
-              </Button>
+              <Dialog>
+                <DialogTrigger
+                  render={
+                    <Button
+                      size="lg"
+                      className="h-12 px-8 text-base gap-2 bg-transparent border border-white/20 text-white hover:bg-white/10 hover:text-white"
+                    />
+                  }
+                >
+                  <Play className="size-4" />
+                  Ver como funciona
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] bg-neutral-900 border-white/10 text-white p-0 overflow-hidden">
+                  <DialogHeader className="p-6 pb-0">
+                    <DialogTitle className="text-white font-[family-name:var(--font-playfair)] text-2xl">
+                      Como funciona o Bartime
+                    </DialogTitle>
+                    <DialogDescription className="text-neutral-400">
+                      Veja uma prévia de como o sistema pode ajudar sua barbearia.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogPanel>
+                    <div className="aspect-video w-full rounded-xl bg-black/50 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
+                      {/* You can replace this with an actual iframe or <video> tag later */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+                      <Play className="size-16 text-white/20 mb-4" />
+                      <p className="text-neutral-400 font-medium">Pré-visualização do Sistema</p>
+                      <p className="text-neutral-600 text-sm mt-2">O vídeo de demonstração será exibido aqui.</p>
+                    </div>
+                  </DialogPanel>
+                </DialogContent>
+              </Dialog>
             </div>
-          </div>
-
-          {/* Right — signup card with BorderBeam */}
-          <div className="relative">
-            <Card className="relative overflow-hidden bg-white/5 backdrop-blur-xl border-white/10 shadow-2xl">
-              <BorderBeam
-                size={200}
-                duration={10}
-                colorFrom="#ffffff"
-                colorTo="#a3a3a3"
-                delay={0}
-              />
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl text-white font-[family-name:var(--font-playfair)]">
-                  Cadastro rápido
-                </CardTitle>
-                <CardDescription className="text-neutral-400">
-                  Crie sua conta em 30 segundos. Sem cartão de crédito.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="hero-name" className="text-white">Nome da barbearia</Label>
-                  <Input
-                    id="hero-name"
-                    placeholder="Ex: Barbearia do João"
-                    className="h-11 bg-white/5 border-white/10 focus:border-white focus:ring-white/20 text-white placeholder:text-neutral-500"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="hero-email" className="text-white">Seu email</Label>
-                  <Input
-                    id="hero-email"
-                    type="email"
-                    placeholder="joao@email.com"
-                    className="h-11 bg-white/5 border-white/10 focus:border-white focus:ring-white/20 text-white placeholder:text-neutral-500"
-                  />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full h-11 bg-white text-black hover:!bg-black hover:!text-white font-semibold shadow-md shadow-white/10">
-                  Começar Grátis
-                  <ArrowRight className="size-4 ml-2" />
-                </Button>
-              </CardFooter>
-            </Card>
           </div>
         </div>
 
