@@ -39,7 +39,7 @@ export default function SolicitacaoPage() {
       `Enviado em: ${new Date().toLocaleString("pt-BR")}`
     );
 
-    window.location.href = `mailto:privacidade@bartime.com.br?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:oseiasduraes133@gmail.com?subject=${subject}&body=${body}`;
     setSubmitted(true);
   };
 
