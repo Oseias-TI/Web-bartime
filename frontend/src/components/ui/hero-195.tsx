@@ -30,6 +30,8 @@ import {
   BarChart3,
   CheckCircle2,
   Play,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -84,6 +86,18 @@ function Hero195({
   className?: string;
 }) {
   const [activeTab, setActiveTab] = useState("agenda");
+  const [currentPreview, setCurrentPreview] = useState(0);
+
+  const previews = [
+    "/preview-dashboard.png",
+    "/preview-agendamentos.png",
+    "/preview-clientes.png",
+    "/preview-servicos.png",
+    "/preview-equipe.png",
+    "/preview-financeiro.png",
+    "/preview-relatorios.png",
+    "/preview-auditoria.png",
+  ];
 
   return (
     <section
@@ -149,12 +163,58 @@ function Hero195({
                     </DialogDescription>
                   </DialogHeader>
                   <DialogPanel>
-                    <div className="aspect-video w-full rounded-xl bg-black/50 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
-                      {/* You can replace this with an actual iframe or <video> tag later */}
+                    <div className="relative aspect-video w-full rounded-xl bg-black/50 flex flex-col items-center justify-center border border-white/5 overflow-hidden group">
                       <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
-                      <Play className="size-16 text-white/20 mb-4" />
-                      <p className="text-neutral-400 font-medium">Pré-visualização do Sistema</p>
-                      <p className="text-neutral-600 text-sm mt-2">O vídeo de demonstração será exibido aqui.</p>
+                      
+                      <img 
+                        src={previews[currentPreview]} 
+                        alt={`Pré-visualização ${currentPreview + 1}`} 
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement?.querySelector('.fallback-msg')?.classList.remove('hidden');
+                        }}
+                        onLoad={(e) => {
+                          e.currentTarget.style.display = 'block';
+                          e.currentTarget.parentElement?.querySelector('.fallback-msg')?.classList.add('hidden');
+                        }}
+                      />
+
+                      <div className="fallback-msg hidden absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+                        <Play className="size-16 text-white/20 mb-4" />
+                        <p className="text-neutral-400 font-medium text-center px-4 mb-2">
+                          Imagem não encontrada
+                        </p>
+                        <p className="text-neutral-500 text-sm text-center px-4">
+                          Salve o print na pasta <code className="bg-white/10 px-1 rounded text-white">public</code> como <code className="bg-white/10 px-1 rounded text-white">{previews[currentPreview].replace('/', '')}</code>
+                        </p>
+                      </div>
+
+                      {/* Controls */}
+                      <button 
+                        onClick={() => setCurrentPreview((prev) => (prev === 0 ? previews.length - 1 : prev - 1))}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 size-10 rounded-full bg-black/60 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/90 focus:opacity-100"
+                      >
+                        <ChevronLeft className="size-5" />
+                      </button>
+
+                      <button 
+                        onClick={() => setCurrentPreview((prev) => (prev === previews.length - 1 ? 0 : prev + 1))}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 size-10 rounded-full bg-black/60 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/90 focus:opacity-100"
+                      >
+                        <ChevronRight className="size-5" />
+                      </button>
+
+                      {/* Indicators */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                        {previews.map((_, idx) => (
+                          <button 
+                            key={idx} 
+                            onClick={() => setCurrentPreview(idx)}
+                            className={`size-2 rounded-full transition-colors ${idx === currentPreview ? 'bg-white' : 'bg-white/30 hover:bg-white/50'}`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </DialogPanel>
                 </DialogContent>
