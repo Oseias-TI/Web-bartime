@@ -30,8 +30,8 @@ const barberPricing = [
   },
   {
     name: "Profissional",
-    price: "89",
-    yearlyPrice: "71",
+    price: "49",
+    yearlyPrice: "39",
     period: "mês",
     description: "Tudo que sua barbearia precisa, sem limite.",
     features: [
