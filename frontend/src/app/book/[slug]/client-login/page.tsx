@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api, clientApi } from "@/lib/api";
+import { CURRENT_PRIVACY_VERSION } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -75,7 +76,9 @@ export default function ClientLoginPage() {
         name: regName,
         phone: regPhone,
         email: regEmail,
-        password: regPassword
+        password: regPassword,
+        // LGPD: Enviar versão da política de privacidade aceita
+        consentVersion: CURRENT_PRIVACY_VERSION,
       });
 
       localStorage.setItem(`@Bartime:clientToken_${slug}`, response.token);

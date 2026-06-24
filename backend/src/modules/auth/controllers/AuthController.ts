@@ -20,7 +20,9 @@ export class AuthController {
     // POST /auth/register — público
     register = asyncHandler(async (req: Request, res: Response) => {
         const data = RegisterSchema.parse(req.body);
-        const result = await new RegisterTenantService().execute(data);
+        // LGPD: Capturar IP do cliente para registro de consentimento
+        const consentIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || null;
+        const result = await new RegisterTenantService().execute({ ...data, consentIp: consentIp || undefined });
         return res.status(201).json(result);
     });
 

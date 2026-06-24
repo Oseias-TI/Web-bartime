@@ -5,8 +5,11 @@ import { RegisterInput } from '../dtos/RegisterSchema';
 import { RefreshTokenService } from './RefreshTokenService';
 import { SendVerificationEmailService } from './SendVerificationEmailService';
 
+// LGPD: Versão atual da política de privacidade — atualizar sempre que a política mudar
+export const CURRENT_PRIVACY_VERSION = '2026-06-11';
+
 export class RegisterTenantService {
-    async execute({ tenantName, cnpj, adminName, email, password }: RegisterInput) {
+    async execute({ tenantName, cnpj, adminName, email, password, consentVersion, consentIp }: RegisterInput) {
         const cnpjExists = await prisma.tenant.findUnique({ where: { cnpj } });
         if (cnpjExists) throw new AppError('Este CNPJ já está cadastrado.', 409);
 
@@ -25,6 +28,7 @@ export class RegisterTenantService {
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
+        const privacyVersion = consentVersion || CURRENT_PRIVACY_VERSION;
 
         const { tenant, admin } = await prisma.$transaction(async tx => {
             const tenant = await tx.tenant.create({
@@ -45,6 +49,10 @@ export class RegisterTenantService {
                     password: passwordHash,
                     role: 'ADMIN',
                     emailVerified: false,
+                    // LGPD: Registrar consentimento no momento do cadastro
+                    consentedAt: new Date(),
+                    consentVersion: privacyVersion,
+                    consentIp: consentIp || null,
                 },
             });
 
@@ -59,6 +67,16 @@ export class RegisterTenantService {
 
             await tx.businessHour.createMany({
                 data: defaultBusinessHours,
+            });
+
+            // LGPD: Criar registro de consentimento no audit trail
+            await tx.consentLog.create({
+                data: {
+                    professionalId: admin.id,
+                    action: 'GRANTED',
+                    consentVersion: privacyVersion,
+                    ipAddress: consentIp || null,
+                },
             });
 
             return { tenant, admin };
@@ -99,4 +117,4 @@ export class RegisterTenantService {
             },
         };
     }
-}
+}

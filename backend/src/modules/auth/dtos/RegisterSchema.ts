@@ -10,6 +10,8 @@ export const RegisterSchema = z.object({
         .min(8)
         .regex(/[A-Z]/, { message: 'Senha deve ter ao menos uma letra maiúscula.' })
         .regex(/[0-9]/, { message: 'Senha deve ter ao menos um número.' }),
+    consentVersion: z.string().optional(),
+    consentIp: z.string().optional(),
 });
 
-export type RegisterInput = z.infer<typeof RegisterSchema>;
+export type RegisterInput = z.infer<typeof RegisterSchema>;

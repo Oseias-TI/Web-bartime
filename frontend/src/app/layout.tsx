@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/components/ui/toast";
+import { StorageBanner } from "@/components/lgpd/StorageBanner";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -42,6 +43,7 @@ export default function RootLayout({
           <AuthProvider>
             <ToastProvider position="bottom-right">
               {children}
+              <StorageBanner />
             </ToastProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -79,6 +79,10 @@ routes.post('/public/tenant/:slug/client-auth/reset-password', clientAuth.resetP
 // Dashboard do Cliente
 routes.get('/public/tenant/:slug/client/appointments', ensureClientAuthenticated, clients.listClientAppointments);
 
+// LGPD — Direitos do Titular (rotas do cliente autenticado)
+routes.get('/public/tenant/:slug/client/export', ensureClientAuthenticated, clients.exportOwnData);
+routes.delete('/public/tenant/:slug/client/data', ensureClientAuthenticated, clients.anonymizeOwnData);
+
 
 // ═══════════════════════════════════════════════
 //  PROTEGIDAS — sem checkSubscription
@@ -160,10 +164,15 @@ routes.get('/appointments/availability', availability.getSlots);
 routes.post('/clients', auditLog({ action: 'CLIENT_CREATED', entity: 'Client' }), clients.create);
 routes.get('/clients', clients.list);
 routes.get('/clients/inactive', clients.listInactive);
-routes.get('/clients/:id/profile', clients.showProfile);
-routes.get('/clients/:id/spending', clients.showSpending);
+// LGPD Art. 37 — Registrar acesso a dados pessoais detalhados
+routes.get('/clients/:id/profile', auditLog({ action: 'CLIENT_PROFILE_VIEWED', entity: 'Client' }), clients.showProfile);
+routes.get('/clients/:id/spending', auditLog({ action: 'CLIENT_SPENDING_VIEWED', entity: 'Client' }), clients.showSpending);
 routes.patch('/clients/:id', auditLog({ action: 'CLIENT_UPDATED', entity: 'Client' }), clients.update);
 routes.post('/clients/:id/redeem', auditLog({ action: 'POINTS_REDEEMED', entity: 'Client' }), clients.redeemPoints);
+
+// LGPD — Direitos do Titular (rotas administrativas)
+routes.get('/clients/:id/export', ensureRole(['ADMIN']), auditLog({ action: 'CLIENT_DATA_EXPORTED', entity: 'Client' }), clients.exportClientData);
+routes.delete('/clients/:id/data', ensureRole(['ADMIN']), auditLog({ action: 'CLIENT_DATA_ANONYMIZED', entity: 'Client' }), clients.anonymizeClientData);
 
 // ── Agendamentos ────────────────────────────────
 routes.post('/appointments', auditLog({ action: 'APPOINTMENT_CREATED', entity: 'Appointment' }), appointments.create);

@@ -51,4 +51,34 @@ export class ClientController {
         const result = await new ClientService().getClientAppointments(req.user.tenantId, req.user.id);
         return res.json(result);
     });
+
+    // ═══════════════════════════════════════════════
+    //  LGPD — Direitos do Titular (Art. 18)
+    // ═══════════════════════════════════════════════
+
+    // LGPD Art. 18, V — Portabilidade (admin exporta dados de um cliente)
+    exportClientData = asyncHandler(async (req: Request, res: Response) => {
+        const result = await new ClientService().exportClientData(req.user.tenantId, req.params.id);
+        return res.json(result);
+    });
+
+    // LGPD Art. 18, V — Portabilidade (cliente exporta seus próprios dados)
+    exportOwnData = asyncHandler(async (req: Request, res: Response) => {
+        const result = await new ClientService().exportClientData(req.user.tenantId, req.user.id);
+        return res.json(result);
+    });
+
+    // LGPD Art. 18, VI — Exclusão (admin anonimiza dados de um cliente)
+    anonymizeClientData = asyncHandler(async (req: Request, res: Response) => {
+        const ipAddress = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || undefined;
+        const result = await new ClientService().anonymizeClient(req.user.tenantId, req.params.id, ipAddress);
+        return res.json(result);
+    });
+
+    // LGPD Art. 18, VI — Exclusão (cliente solicita anonimização dos próprios dados)
+    anonymizeOwnData = asyncHandler(async (req: Request, res: Response) => {
+        const ipAddress = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || undefined;
+        const result = await new ClientService().anonymizeClient(req.user.tenantId, req.user.id, ipAddress);
+        return res.json(result);
+    });
 }

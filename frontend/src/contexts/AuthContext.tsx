@@ -49,7 +49,11 @@ interface RegisterData {
   password: string;
   tenantName: string;
   cnpj: string;
+  consentVersion?: string;
 }
+
+// LGPD: Versão atual da política de privacidade — deve ser atualizada em sincronia com o backend
+export const CURRENT_PRIVACY_VERSION = '2026-06-11';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
@@ -111,6 +115,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password: data.password,
       tenantName: data.tenantName,
       cnpj: data.cnpj,
+      // LGPD: Enviar versão da política de privacidade aceita
+      consentVersion: data.consentVersion || CURRENT_PRIVACY_VERSION,
     });
 
     api.setToken(response.token);

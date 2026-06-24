@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Scissors, Eye, EyeOff, Loader2, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, CURRENT_PRIVACY_VERSION } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -77,6 +77,8 @@ export default function RegisterPage() {
         password: data.password,
         tenantName: data.tenantName,
         cnpj: data.cnpj.replace(/\D/g, ""),
+        // LGPD: Enviar versão da política de privacidade aceita pelo usuário
+        consentVersion: CURRENT_PRIVACY_VERSION,
       });
       setStep(3);
     } catch (error) {

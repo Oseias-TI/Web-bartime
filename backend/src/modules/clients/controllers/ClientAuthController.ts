@@ -20,14 +20,18 @@ export class ClientAuthController {
 
     register = asyncHandler(async (req: Request, res: Response) => {
         const { slug } = req.params;
-        const { name, email, phone, password } = req.body;
+        const { name, email, phone, password, consentVersion } = req.body;
+        // LGPD: Capturar IP do cliente para registro de consentimento
+        const consentIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || null;
 
         const result = await new ClientAuthService().registerClient({
             slug,
             name,
             email,
             phone,
-            password
+            password,
+            consentVersion,
+            consentIp: consentIp || undefined,
         });
 
         return res.json(result);

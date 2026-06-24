@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api, clientApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Clock, Scissors, LogOut } from "lucide-react";
+import { CalendarIcon, Clock, Scissors, LogOut, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -88,9 +88,14 @@ export default function ClientDashboardPage() {
               <h2 className="font-bold text-zinc-900 dark:text-zinc-100">{tenant.name}</h2>
             </div>
           )}
-          <button onClick={handleLogout} className="p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={() => router.push(`/book/${slug}/client-privacy`)} className="p-2 text-zinc-400 hover:text-primary transition-colors rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Minha Privacidade">
+              <Shield className="w-5 h-5" />
+            </button>
+            <button onClick={handleLogout} className="p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between items-center w-full mt-2">

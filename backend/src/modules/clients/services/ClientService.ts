@@ -19,7 +19,7 @@ export class ClientService {
             where: { tenantId_phone: { tenantId: data.tenantId, phone: data.phone } },
         });
         if (exists) throw new AppError('Telefone já cadastrado para outro cliente.', 409);
-        
+
         const client = await prisma.client.create({ data });
         // Invalidate cache
         await redisClient.del(`clients:list:${data.tenantId}`);
@@ -54,7 +54,7 @@ export class ClientService {
         ]);
 
         const result = buildPaginatedResult(data, total, params);
-        
+
         if (redisClient.isReady) {
             await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(result)); // Cache for 5 minutes
         }
@@ -154,7 +154,7 @@ export class ClientService {
         }
 
         const updated = await prisma.client.update({ where: { id: clientId }, data });
-        
+
         // Invalidate list cache and possibly profile cache if implemented
         if (redisClient.isReady) {
             const keys = await redisClient.keys(`clients:list:${tenantId}*`);
@@ -190,5 +190,134 @@ export class ClientService {
         });
 
         return appointments;
+    }
+
+    // ═══════════════════════════════════════════════
+    //  LGPD — Direitos do Titular (Art. 18)
+    // ═══════════════════════════════════════════════
+
+    /**
+     * LGPD Art. 18, VI — Direito à eliminação dos dados pessoais.
+     * Anonimiza os dados do cliente ao invés de deletar, preservando
+     * integridade referencial com agendamentos e registros financeiros.
+     */
+    async anonymizeClient(tenantId: string, clientId: string, ipAddress?: string) {
+        const client = await prisma.client.findFirst({ where: { id: clientId, tenantId } });
+        if (!client) throw new AppError('Cliente não encontrado.', 404);
+
+        // Verificar se já foi anonimizado
+        if (client.name === '[Removido]') {
+            throw new AppError('Os dados deste cliente já foram removidos.', 400);
+        }
+
+        // Cancelar agendamentos pendentes antes da anonimização
+        await prisma.appointment.updateMany({
+            where: { clientId, tenantId, status: 'PENDING' },
+            data: { status: 'CANCELED' },
+        });
+
+        // Anonimizar dados pessoais e registrar no audit trail
+        const anonymized = await prisma.$transaction(async tx => {
+            const updated = await tx.client.update({
+                where: { id: clientId },
+                data: {
+                    name: '[Removido]',
+                    phone: `removed_${Date.now()}`,
+                    email: null,
+                    password: null,
+                    preferences: null,
+                    consentedAt: null,
+                    consentVersion: null,
+                    consentIp: null,
+                },
+            });
+
+            // Registrar revogação de consentimento
+            await tx.consentLog.create({
+                data: {
+                    clientId,
+                    action: 'REVOKED',
+                    consentVersion: client.consentVersion || 'unknown',
+                    ipAddress: ipAddress || null,
+                },
+            });
+
+            // Registrar no audit log
+            await tx.auditLog.create({
+                data: {
+                    tenantId,
+                    action: 'CLIENT_DATA_ANONYMIZED',
+                    entity: 'Client',
+                    entityId: clientId,
+                    metadata: { reason: 'LGPD Art. 18 VI - Solicitação de exclusão pelo titular' },
+                    ipAddress: ipAddress || null,
+                },
+            });
+
+            return updated;
+        });
+
+        // Invalidar cache
+        if (redisClient.isReady) {
+            const keys = await redisClient.keys(`clients:list:${tenantId}*`);
+            if (keys.length > 0) await redisClient.del(keys);
+        }
+
+        return { message: 'Dados pessoais removidos com sucesso conforme LGPD Art. 18, VI.' };
+    }
+
+    /**
+     * LGPD Art. 18, V — Direito à portabilidade dos dados.
+     * Retorna todos os dados pessoais do cliente em formato estruturado.
+     */
+    async exportClientData(tenantId: string, clientId: string) {
+        const client = await prisma.client.findFirst({
+            where: { id: clientId, tenantId },
+            select: {
+                id: true,
+                name: true,
+                phone: true,
+                email: true,
+                preferences: true,
+                loyaltyPoints: true,
+                consentedAt: true,
+                consentVersion: true,
+                createdAt: true,
+            },
+        });
+        if (!client) throw new AppError('Cliente não encontrado.', 404);
+
+        const appointments = await prisma.appointment.findMany({
+            where: { tenantId, clientId },
+            select: {
+                id: true,
+                startTime: true,
+                endTime: true,
+                status: true,
+                paymentMethod: true,
+                service: { select: { name: true, price: true } },
+                professional: { select: { name: true } },
+            },
+            orderBy: { startTime: 'desc' },
+        });
+
+        const consentHistory = await prisma.consentLog.findMany({
+            where: { clientId },
+            select: {
+                action: true,
+                consentVersion: true,
+                ipAddress: true,
+                createdAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+
+        return {
+            exportDate: new Date().toISOString(),
+            lgpdReference: 'Art. 18, V — Direito à portabilidade dos dados',
+            personalData: client,
+            appointments,
+            consentHistory,
+        };
     }
 }

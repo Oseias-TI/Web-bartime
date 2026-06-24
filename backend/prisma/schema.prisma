@@ -47,18 +47,22 @@ model BusinessHour {
 }
 
 model Client {
-  id            String        @id @default(uuid())
-  tenantId      String
-  name          String
-  phone         String
-  email         String?
-  password      String?
-  preferences   String?
-  loyaltyPoints Int           @default(0)
-  createdAt     DateTime      @default(now())
-  appointments  Appointment[]
+  id             String        @id @default(uuid())
+  tenantId       String
+  name           String
+  phone          String
+  email          String?
+  password       String?
+  preferences    String?
+  loyaltyPoints  Int           @default(0)
+  consentedAt    DateTime?
+  consentVersion String?
+  consentIp      String?
+  createdAt      DateTime      @default(now())
+  appointments   Appointment[]
+  consentLogs    ConsentLog[]
   passwordResetTokens ClientPasswordResetToken[]
-  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  tenant         Tenant        @relation(fields: [tenantId], references: [id])
 
   @@unique([tenantId, phone])
   @@map("clients")
@@ -176,6 +180,9 @@ model Professional {
   role                    Role                     @default(BARBER)
   active                  Boolean                  @default(true)
   emailVerified           Boolean                  @default(false)
+  consentedAt             DateTime?
+  consentVersion          String?
+  consentIp               String?
   appointments            Appointment[]
   commissions             Commission[]
   emailVerificationTokens EmailVerificationToken[]
@@ -226,6 +233,22 @@ model AppointmentReminder {
   @@map("appointment_reminders")
 }
 
+model ConsentLog {
+  id             String        @id @default(uuid())
+  clientId       String?
+  professionalId String?
+  action         ConsentAction
+  consentVersion String
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime      @default(now())
+  client         Client?       @relation(fields: [clientId], references: [id])
+
+  @@index([clientId, createdAt])
+  @@index([professionalId, createdAt])
+  @@map("consent_logs")
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN
@@ -261,4 +284,10 @@ enum SubscriptionStatus {
 enum ReminderType {
   EMAIL_24H
   EMAIL_1H
+}
+
+enum ConsentAction {
+  GRANTED
+  REVOKED
+  UPDATED
 }
