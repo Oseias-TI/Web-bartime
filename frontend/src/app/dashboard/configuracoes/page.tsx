@@ -20,6 +20,10 @@ import {
   Plus,
   X,
   User,
+  HelpCircle,
+  Mail,
+  MessageCircle,
+  Shield,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -386,6 +390,16 @@ export default function ConfiguracoesPage() {
             }`}
           >
             <Lock className="size-4" /> Segurança
+          </button>
+          <button
+            onClick={() => setActiveTab("suporte")}
+            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              activeTab === "suporte"
+                ? "bg-primary/10 text-primary"
+                : "hover:bg-muted"
+            }`}
+          >
+            <HelpCircle className="size-4" /> Suporte e Privacidade
           </button>
         </div>
 
@@ -863,6 +877,52 @@ export default function ConfiguracoesPage() {
                  </form>
                </CardContent>
              </Card>
+          )}
+
+          {activeTab === "suporte" && (
+             <div className="space-y-6">
+               <Card className="bg-card border-border">
+                 <CardHeader>
+                   <CardTitle>Suporte Técnico</CardTitle>
+                   <CardDescription>
+                     Precisa de ajuda ou encontrou um problema? Entre em contato conosco.
+                   </CardDescription>
+                 </CardHeader>
+                 <CardContent>
+                   <div className="flex flex-col sm:flex-row gap-4">
+                     <Button onClick={() => window.open("mailto:suporte@bartime.com.br")} className="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold">
+                       <Mail className="size-4 mr-2" />
+                       E-mail de Suporte
+                     </Button>
+                     <Button variant="outline" onClick={() => window.open("https://wa.me/5511999999999", "_blank")}>
+                       <MessageCircle className="size-4 mr-2" />
+                       WhatsApp
+                     </Button>
+                   </div>
+                 </CardContent>
+               </Card>
+
+               <Card className="bg-card border-border">
+                 <CardHeader>
+                   <CardTitle>Privacidade e LGPD</CardTitle>
+                   <CardDescription>
+                     Gerencie seus dados e conheça nossas políticas de privacidade.
+                   </CardDescription>
+                 </CardHeader>
+                 <CardContent className="space-y-4">
+                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-border rounded-lg gap-4">
+                     <div>
+                       <h4 className="font-medium">Portal de Privacidade (LGPD)</h4>
+                       <p className="text-sm text-muted-foreground">Solicite acesso, portabilidade ou exclusão dos seus dados pessoais.</p>
+                     </div>
+                     <Button variant="outline" onClick={() => window.open("/solicitacao-lgpd", "_blank")} className="w-full sm:w-auto">
+                       <Shield className="size-4 mr-2" />
+                       Acessar Portal
+                     </Button>
+                   </div>
+                 </CardContent>
+               </Card>
+             </div>
           )}
         </div>
       </div>
