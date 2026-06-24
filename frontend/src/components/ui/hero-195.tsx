@@ -120,14 +120,12 @@ function Hero195({
 
             <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <Button
-                asChild
+                render={<Link href="/register" />}
                 size="lg"
                 className="h-12 px-8 text-base gap-2 bg-white text-black hover:!bg-black hover:!text-white font-semibold shadow-lg shadow-white/10"
               >
-                <Link href="/register">
-                  Testar Grátis
-                  <ArrowRight className="size-4" />
-                </Link>
+                Testar Grátis
+                <ArrowRight className="size-4" />
               </Button>
               <Dialog>
                 <DialogTrigger
