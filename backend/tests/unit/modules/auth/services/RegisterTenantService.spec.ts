@@ -15,6 +15,9 @@ jest.mock('../../../../../src/lib/prisma', () => ({
         businessHour: {
             createMany: jest.fn(),
         },
+        consentLog: {
+            create: jest.fn(),
+        },
         $transaction: jest.fn(),
     },
 }));
@@ -88,6 +91,7 @@ describe('RegisterTenantService (Unit)', () => {
         expect(result.professional).toHaveProperty('role', 'ADMIN');
         expect(prisma.tenant.create).toHaveBeenCalled();
         expect(prisma.businessHour.createMany).toHaveBeenCalled();
+        expect(prisma.consentLog.create).toHaveBeenCalled();
     });
 
     it('deve estourar erro (409 Conflict) caso o CNPJ ja esteja cadastrado', async () => {

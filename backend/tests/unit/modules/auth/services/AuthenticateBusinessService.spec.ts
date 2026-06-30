@@ -72,7 +72,10 @@ describe('AuthenticateBusinessService (Unit)', () => {
         const result = await authService.execute({ email, password });
 
         // Assert
-        expect(prisma.professional.findFirst).toHaveBeenCalledWith({ where: { email, active: true } });
+        expect(prisma.professional.findFirst).toHaveBeenCalledWith({
+            where: { email, active: true },
+            orderBy: { role: 'desc' },
+        });
         expect(bcrypt.compare).toHaveBeenCalledWith(password, professionalData.password);
         expect(prisma.tenant.findUnique).toHaveBeenCalledWith({ where: { id: professionalData.tenantId } });
         expect(mockGenerateTokens).toHaveBeenCalledWith(professionalData.id, professionalData.tenantId, professionalData.role);

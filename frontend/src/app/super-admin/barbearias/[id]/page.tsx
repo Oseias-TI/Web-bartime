@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { superAdminService } from "@/services/super-admin.service";
 import { toastManager } from "@/components/ui/toast";
@@ -26,13 +26,7 @@ export default function EditarBarbeariaPage() {
     slug: "",
   });
 
-  useEffect(() => {
-    if (tenantId) {
-      loadTenantData();
-    }
-  }, [tenantId]);
-
-  const loadTenantData = async () => {
+  const loadTenantData = useCallback(async () => {
     try {
       // Reusing the getTenant API route we created
       const data = await api.get<any>(`/super-admin/tenants/${tenantId}`);
@@ -47,7 +41,13 @@ export default function EditarBarbeariaPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenantId]);
+
+  useEffect(() => {
+    if (tenantId) {
+      loadTenantData();
+    }
+  }, [tenantId, loadTenantData]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

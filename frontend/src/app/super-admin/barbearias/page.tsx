@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { superAdminService, TenantListResult } from "@/services/super-admin.service";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -156,7 +157,7 @@ export default function SuperAdminTenantsPage() {
             />
           </div>
           
-          <Button className="bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] rounded-xl px-5 h-[42px] transition-all" render={<a href="/super-admin/barbearias/nova" />}>
+          <Button className="bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] rounded-xl px-5 h-[42px] transition-all" render={<Link href="/super-admin/barbearias/nova" />}>
             <Plus className="w-4 h-4 mr-2" />
             Nova Conta
           </Button>
@@ -246,7 +247,7 @@ export default function SuperAdminTenantsPage() {
                           
                           <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Gestão</div>
                           
-                          <DropdownMenuItem className="hover:bg-white/5 rounded-md cursor-pointer mb-1" render={<a href={`/super-admin/barbearias/${tenant.id}`} />}>
+                          <DropdownMenuItem className="hover:bg-white/5 rounded-md cursor-pointer mb-1" render={<Link href={`/super-admin/barbearias/${tenant.id}`} />}>
                             <Edit2 className="w-3.5 h-3.5 mr-2" />
                             Editar Dados
                           </DropdownMenuItem>

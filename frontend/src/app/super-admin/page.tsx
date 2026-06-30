@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { superAdminService, PlatformStats } from "@/services/super-admin.service";
 import {
   Card,
@@ -33,11 +33,7 @@ export default function SuperAdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [timeFilter, setTimeFilter] = useState("Mensal");
 
-  useEffect(() => {
-    loadStats();
-  }, [timeFilter]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await superAdminService.getStats(timeFilter);
@@ -47,7 +43,11 @@ export default function SuperAdminDashboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeFilter]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   if (isLoading || !stats) {
     return (
