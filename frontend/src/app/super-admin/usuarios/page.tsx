@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { superAdminService } from "@/services/super-admin.service";
@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Search, Users, ShieldAlert, CheckCircle2, Clock, XCircle, Shield, Store, User, Lock, Unlock, KeyRound, Mail } from "lucide-react";
 import { toastManager } from "@/components/ui/toast";
 
-// Avatar helper
 const getInitials = (name: string) => {
   return name.substring(0, 2).toUpperCase();
 };
@@ -89,7 +88,7 @@ export default function SuperAdminUsuariosPage() {
 
   const handleResetPassword = async (userId: string) => {
     const newPassword = window.prompt("Digite a nova senha para o usuário (mínimo 6 caracteres):");
-    if (newPassword === null) return; // cancelou
+    if (newPassword === null) return;
     if (newPassword.length < 6) {
       toastManager.add({ title: "A senha deve ter no mínimo 6 caracteres.", type: "error" });
       return;
@@ -105,7 +104,7 @@ export default function SuperAdminUsuariosPage() {
 
   const handleUpdateEmail = async (userId: string) => {
     const newEmail = window.prompt("Digite o novo e-mail para o usuário:");
-    if (newEmail === null) return; // cancelou
+    if (newEmail === null) return;
     if (!newEmail || !newEmail.includes('@')) {
       toastManager.add({ title: "Digite um e-mail válido.", type: "error" });
       return;
@@ -165,16 +164,15 @@ export default function SuperAdminUsuariosPage() {
 
   return (
     <div className="space-y-8 animate-fade-in pb-10">
-      
-      {/* Header & Command Bar */}
-      <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 relative z-10">
+
+<div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 relative z-10">
         <div>
           <h1 className="text-3xl font-light text-white tracking-tight">Usuários</h1>
           <p className="text-zinc-400 text-sm mt-2">Visão global e controle de acesso de todos os profissionais e donos da rede.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-          {/* Command K Vibe Search */}
+          
           <div className="relative w-full sm:w-[320px] group">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500 group-focus-within:text-blue-500 transition-colors">
               <Search className="h-4 w-4" />
@@ -190,8 +188,7 @@ export default function SuperAdminUsuariosPage() {
         </div>
       </div>
 
-      {/* Ghost Table */}
-      <div className="w-full relative z-10">
+<div className="w-full relative z-10">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

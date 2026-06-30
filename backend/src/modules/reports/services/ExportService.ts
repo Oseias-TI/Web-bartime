@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs';
+﻿import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import { Response } from 'express';
 import { prisma } from '../../../lib/prisma';
@@ -11,7 +11,6 @@ interface ExportParams {
 
 export class ExportService {
 
-    // ── Excel ───────────────────────────────────────────────────────────────
     async exportToExcel(params: ExportParams, res: Response) {
         const { tenantId, start, end } = params;
 
@@ -40,7 +39,6 @@ export class ExportService {
         workbook.creator = 'Bartime';
         workbook.created = new Date();
 
-        // ── Aba 1: Atendimentos ─────────────────────────────────────────────
         const sheetAppointments = workbook.addWorksheet('Atendimentos');
         sheetAppointments.columns = [
             { header: 'Data', key: 'date', width: 20 },
@@ -70,7 +68,6 @@ export class ExportService {
             });
         }
 
-        // ── Aba 2: Financeiro ───────────────────────────────────────────────
         const sheetFinancial = workbook.addWorksheet('Financeiro');
         sheetFinancial.columns = [
             { header: 'Data', key: 'date', width: 20 },
@@ -94,11 +91,9 @@ export class ExportService {
                 amount: Number(tx.amount),
             });
 
-            // Receita em verde, despesa em vermelho
             row.getCell('amount').font = { color: { argb: tx.type === 'INCOME' ? 'FF16a34a' : 'FFdc2626' } };
         }
 
-        // ── Aba 3: Comissões ─────────────────────────────────────────────────
         const sheetCommissions = workbook.addWorksheet('Comissões');
         sheetCommissions.columns = [
             { header: 'Data', key: 'date', width: 20 },
@@ -119,16 +114,13 @@ export class ExportService {
             });
         }
 
-        // Envia o arquivo
         const dateRange = `${start.toISOString().slice(0, 10)}_${end.toISOString().slice(0, 10)}`;
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=relatorio_${dateRange}.xlsx`);
 
-        // BUG-20: write() já encerra o stream — res.end() duplicado removido
         await workbook.xlsx.write(res);
     }
 
-    // ── PDF ────────────────────────────────────────────────────────────────
     async exportToPdf(params: ExportParams, res: Response) {
         const { tenantId, start, end } = params;
 
@@ -164,7 +156,6 @@ export class ExportService {
         res.setHeader('Content-Disposition', `attachment; filename=relatorio_${dateRange}.pdf`);
         doc.pipe(res);
 
-        // Cabeçalho
         doc.fontSize(20).font('Helvetica-Bold').text('Bartime', { align: 'center' });
         doc.fontSize(14).font('Helvetica').text(tenant?.name ?? '', { align: 'center' });
         doc.fontSize(10).fillColor('#6b7280').text(
@@ -176,7 +167,6 @@ export class ExportService {
         doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke('#e5e7eb');
         doc.moveDown(1);
 
-        // Resumo financeiro
         doc.fontSize(13).font('Helvetica-Bold').fillColor('#111827').text('Resumo Financeiro');
         doc.moveDown(0.5);
 
@@ -195,7 +185,6 @@ export class ExportService {
         doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke('#e5e7eb');
         doc.moveDown(1);
 
-        // Top profissionais
         doc.fontSize(13).font('Helvetica-Bold').fillColor('#111827').text('Top Profissionais');
         doc.moveDown(0.5);
 

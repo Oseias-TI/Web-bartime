@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -180,7 +180,6 @@ body {
   }
 }
 
-/* Scrollbar customizada */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -199,7 +198,6 @@ body {
   background: rgba(201, 154, 69, 0.3);
 }
 
-/* Animações */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -227,7 +225,6 @@ body {
   animation: pulse-warm 2s infinite;
 }
 
-/* Textura sutil de ruído para backgrounds */
 .bg-noise {
   position: relative;
 }

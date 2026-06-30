@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <div className="min-h-screen relative text-neutral-100">
       <BackgroundSnippet />
-      {/* ─── Navbar ─── */}
+      
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-transparent/80 backdrop-blur-xl">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-16">
           <Link href="/" className="flex items-center gap-2.5">
@@ -87,11 +87,9 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ─── Hero ─── */}
-      <Hero195 />
+<Hero195 />
 
-      {/* ─── How it works ─── */}
-      <section id="como-funciona" className="py-20 md:py-28 border-t border-white/10">
+<section id="como-funciona" className="py-20 md:py-28 border-t border-white/10">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center mb-16">
             <p className="text-sm font-semibold text-white uppercase tracking-wider mb-3">
@@ -143,8 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Pricing ─── */}
-      <section id="planos" className="border-t border-white/10">
+<section id="planos" className="border-t border-white/10">
         <Pricing
           title="Preço justo, sem pegadinha"
           description="Escolha o melhor plano para a sua barbearia crescer"
@@ -152,8 +149,7 @@ export default function Home() {
         />
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="py-20 md:py-28 border-t border-white/10">
+<section className="py-20 md:py-28 border-t border-white/10">
         <div className="mx-auto max-w-6xl px-6">
           <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-neutral-900 to-neutral-950 p-10 md:p-16 text-center relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none">
@@ -179,8 +175,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
-      <footer className="border-t border-white/10 py-10">
+<footer className="border-t border-white/10 py-10">
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -36,10 +36,8 @@ export default function GlobalClientLoginPage() {
   const handleSelectTenant = (slug: string) => {
     const token = localStorage.getItem(`@Bartime:clientToken_${slug}`);
     if (token) {
-      // Já está logado nesta barbearia
       router.push(`/book/${slug}`);
     } else {
-      // Vai para a tela de login da barbearia específica
       router.push(`/book/${slug}/client-login`);
     }
   };
@@ -49,9 +47,8 @@ export default function GlobalClientLoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-xl overflow-hidden border border-zinc-100 dark:border-zinc-800 flex flex-col max-h-[90vh]">
-        
-        {/* Header */}
-        <div className="p-8 text-center bg-zinc-900 dark:bg-black text-white relative shrink-0 overflow-hidden">
+
+<div className="p-8 text-center bg-zinc-900 dark:bg-black text-white relative shrink-0 overflow-hidden">
           <div className="relative z-10">
             <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
               <Scissors className="w-8 h-8 text-white" />
@@ -65,8 +62,7 @@ export default function GlobalClientLoginPage() {
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 flex flex-col flex-1 overflow-hidden">
+<div className="p-6 flex flex-col flex-1 overflow-hidden">
           <div className="relative mb-6 shrink-0">
             <Input
               type="text"

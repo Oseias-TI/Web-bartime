@@ -1,4 +1,4 @@
-import { ClientService } from '../../../../../src/modules/clients/services/ClientService';
+﻿import { ClientService } from '../../../../../src/modules/clients/services/ClientService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { redisClient } from '../../../../../src/lib/redis';
 import { AppError } from '../../../../../src/shared/errors/AppError';
@@ -27,9 +27,7 @@ describe('CreateClientService (Unit)', () => {
         jest.clearAllMocks();
     });
 
-    // ── Teste de Negócio: criação com dados válidos ─────────────────────────
     it('deve criar um cliente quando dados validos forem enviados', async () => {
-        // Arrange
         const clientData = {
             tenantId: 'tenant-123',
             name: 'Cliente Novo',
@@ -42,10 +40,8 @@ describe('CreateClientService (Unit)', () => {
         (prisma.client.findUnique as jest.Mock).mockResolvedValue(null);
         (prisma.client.create as jest.Mock).mockResolvedValue(createdClient);
 
-        // Act
         const result = await clientService.createClient(clientData);
 
-        // Assert
         expect(prisma.client.findUnique).toHaveBeenCalledWith({
             where: { tenantId_phone: { tenantId: clientData.tenantId, phone: clientData.phone } },
         });
@@ -53,9 +49,7 @@ describe('CreateClientService (Unit)', () => {
         expect(result).toEqual(createdClient);
     });
 
-    // ── Teste de Negócio: telefone duplicado → AppError ─────────────────────
     it('nao deve criar um cliente quando o telefone ja estiver em uso', async () => {
-        // Arrange
         const clientData = {
             tenantId: 'tenant-123',
             name: 'Cliente Duplicado',
@@ -64,7 +58,6 @@ describe('CreateClientService (Unit)', () => {
 
         (prisma.client.findUnique as jest.Mock).mockResolvedValue({ id: 'existing-client' });
 
-        // Act & Assert
         await expect(clientService.createClient(clientData)).rejects.toBeInstanceOf(AppError);
         expect(prisma.client.create).not.toHaveBeenCalled();
     });

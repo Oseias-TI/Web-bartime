@@ -1,11 +1,10 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 
 export class ResetPasswordService {
     async execute(token: string, newPassword: string) {
-        // BUG-16: Hashear o token recebido para comparar com o hash armazenado
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
         const resetToken = await prisma.passwordResetToken.findUnique({

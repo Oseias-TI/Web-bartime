@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import { prisma } from '../../../lib/prisma';
 import { sendMail } from '../../../shared/utils/mailer';
 
@@ -18,7 +18,6 @@ export class ForgotPasswordService {
         });
 
         const rawToken = crypto.randomBytes(32).toString('hex');
-        // BUG-16: Hashear o token antes de salvar no banco
         const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
         const expiresAt = new Date();
         expiresAt.setMinutes(expiresAt.getMinutes() + RESET_TOKEN_EXPIRES_MINUTES);
@@ -27,7 +26,6 @@ export class ForgotPasswordService {
             data: { token: hashedToken, professionalId: professional.id, expiresAt },
         });
 
-        // O rawToken (não hasheado) é enviado por e-mail
         const resetUrl = `${process.env.APP_URL}/reset-password?token=${rawToken}`;
 
         await sendMail({

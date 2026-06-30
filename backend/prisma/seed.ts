@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -10,7 +10,6 @@ async function main() {
 
     const randomId = Math.floor(Math.random() * 99999);
     
-    // 0. Criar Super Admin e Tenant da Plataforma
     const platformTenant = await prisma.tenant.create({
         data: {
             name: `Administração Bartime`,
@@ -29,7 +28,6 @@ async function main() {
     });
     console.log(`✅ Super Admin criado: super@bartime.com / Oseias123!`);
 
-    // 1. Criar um Tenant (Barbearia Fake)
     const tenant = await prisma.tenant.create({
         data: {
             name: `Barbearia Vintage Fake ${randomId}`,
@@ -48,20 +46,18 @@ async function main() {
     });
     console.log(`✅ Barbearia criada: ${tenant.name}`);
 
-    // 2. Criar Horários de Funcionamento
     for (let i = 0; i <= 6; i++) {
         await prisma.businessHour.create({
             data: {
                 tenantId: tenant.id,
                 dayOfWeek: i,
-                open: i !== 0, // Fecha domingo (0)
+                open: i !== 0,
                 openTime: '08:00',
                 closeTime: '20:00'
             }
         });
     }
 
-    // 3. Criar Serviços Fakes
     const service1 = await prisma.service.create({
         data: { tenantId: tenant.id, name: 'Corte Social', price: 40.0, durationMin: 30 }
     });
@@ -70,7 +66,6 @@ async function main() {
     });
     console.log(`✅ Serviços criados: ${service1.name}, ${service2.name}`);
 
-    // 4. Criar Profissionais Fakes
     const prof1 = await prisma.professional.create({
         data: { tenantId: tenant.id, name: 'Pedro Tesoura', email: `pedro${randomId}@fake.com`, password: hashedPassword, role: 'BARBER', commissionRate: 50.0 }
     });
@@ -79,7 +74,6 @@ async function main() {
     });
     console.log(`✅ Profissionais criados: ${prof1.name}, ${prof2.name}`);
 
-    // 5. Criar Clientes Fakes
     const clients = [];
     for (let i = 1; i <= 5; i++) {
         const client = await prisma.client.create({
@@ -89,7 +83,6 @@ async function main() {
     }
     console.log(`✅ 5 Clientes fakes criados!`);
 
-    // 6. Criar Agendamentos Fakes
     const today = new Date();
     await prisma.appointment.create({
         data: {

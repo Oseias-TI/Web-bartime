@@ -1,10 +1,9 @@
-import Stripe from 'stripe';
+﻿import Stripe from 'stripe';
 import { stripe } from '../../../shared/utils/stripe';
 import { SubscriptionStatus } from '@prisma/client';
 import { ITenantBillingRepository } from '../repositories/ITenantBillingRepository';
 import { PrismaTenantBillingRepository } from '../repositories/implementations/PrismaTenantBillingRepository';
 
-// BUG-17: Tipado com o enum SubscriptionStatus do Prisma
 function mapStripeStatus(stripeStatus: string): SubscriptionStatus {
     const map: Record<string, SubscriptionStatus> = {
         active: SubscriptionStatus.ACTIVE, trialing: SubscriptionStatus.ACTIVE, past_due: SubscriptionStatus.PAST_DUE, canceled: SubscriptionStatus.CANCELED,
@@ -49,7 +48,6 @@ export class StripeWebhookService {
         const tenantId = session.metadata?.tenantId;
         if (!tenantId) return;
 
-        // BUG-17: session.subscription pode ser null em checkouts sem assinatura recorrente
         if (!session.subscription) return;
 
         const subscriptionId = session.subscription as string;

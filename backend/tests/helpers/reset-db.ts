@@ -1,11 +1,10 @@
-import { prisma } from '../../src/lib/prisma';
+﻿import { prisma } from '../../src/lib/prisma';
 
 afterAll(async () => {
     await prisma.$disconnect();
 });
 
 export const resetDb = async () => {
-    // Delete in reverse order of dependencies
     await prisma.appointmentReminder.deleteMany();
     await prisma.auditLog.deleteMany();
     await prisma.transaction.deleteMany();

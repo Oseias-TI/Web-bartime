@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -81,13 +81,11 @@ export default function FinanceiroPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [monthFilter, setMonthFilter] = useState(format(new Date(), "yyyy-MM"));
 
-  // Commission payout
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [isLoadingProfessionals, setIsLoadingProfessionals] = useState(false);
   const [payingOutId, setPayingOutId] = useState<string | null>(null);
 
-  // Form
   const [formType, setFormType] = useState<"INCOME" | "EXPENSE">("INCOME");
   const [formCategory, setFormCategory] = useState("");
   const [formAmount, setFormAmount] = useState("");
@@ -111,7 +109,6 @@ export default function FinanceiroPage() {
       setSummary(sum);
       setCashFlow(flow);
     } catch {
-      // Handle error or use empty state
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +146,7 @@ export default function FinanceiroPage() {
         description: "O pagamento foi registrado com sucesso.",
         type: "success",
       });
-      loadData(); // Refresh summary
+      loadData();
     } catch (error) {
       toastManager.add({
         title: "Erro ao pagar comissão",
@@ -179,7 +176,6 @@ export default function FinanceiroPage() {
       toastManager.add({ title: "Transação registrada!", type: "success" });
       setIsModalOpen(false);
       
-      // Reset form
       setFormType("INCOME");
       setFormCategory("");
       setFormAmount("");
@@ -222,7 +218,7 @@ export default function FinanceiroPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Financeiro</h1>
@@ -318,8 +314,7 @@ export default function FinanceiroPage() {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+<div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
         <Card className="bg-card border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between space-y-0 pb-2">
@@ -376,7 +371,7 @@ export default function FinanceiroPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7">
-        {/* Chart */}
+        
         <Card className="lg:col-span-4 bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">Fluxo de Caixa Mensal</CardTitle>
@@ -401,8 +396,7 @@ export default function FinanceiroPage() {
           </CardContent>
         </Card>
 
-        {/* Transactions List */}
-        <Card className="lg:col-span-3 bg-card border-border">
+<Card className="lg:col-span-3 bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">Últimas Transações</CardTitle>
           </CardHeader>
@@ -434,8 +428,7 @@ export default function FinanceiroPage() {
         </Card>
       </div>
 
-      {/* ─── Commission Payout Modal ─── */}
-      <Dialog open={isPayoutModalOpen} onOpenChange={setIsPayoutModalOpen}>
+<Dialog open={isPayoutModalOpen} onOpenChange={setIsPayoutModalOpen}>
         <DialogPopup className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Comissões Pendentes</DialogTitle>

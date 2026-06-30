@@ -24,7 +24,6 @@ export default function ClientPrivacyPage() {
     try {
       const data = await clientApi.get<any>(`/public/tenant/${slug}/client/export`);
 
-      // Baixar como arquivo JSON
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -52,13 +51,11 @@ export default function ClientPrivacyPage() {
     try {
       await clientApi.delete(`/public/tenant/${slug}/client/data`);
 
-      // Limpar dados locais
       localStorage.removeItem(`@Bartime:clientToken_${slug}`);
       localStorage.removeItem(`@Bartime:clientInfo_${slug}`);
 
       setMessage({ type: "success", text: "Seus dados foram removidos com sucesso." });
 
-      // Redirecionar após 2 segundos
       setTimeout(() => {
         router.push(`/book/${slug}`);
       }, 2000);
@@ -72,7 +69,6 @@ export default function ClientPrivacyPage() {
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center p-4">
       <div className="w-full max-w-md">
 
-        {/* Header */}
         <button
           onClick={() => router.push(`/book/${slug}/client-dashboard`)}
           className="text-sm text-zinc-500 flex items-center gap-1 mb-6 mt-6 hover:text-primary transition-colors"
@@ -90,7 +86,6 @@ export default function ClientPrivacyPage() {
           </div>
         </div>
 
-        {/* Mensagem */}
         {message && (
           <div
             className={`p-3 rounded-xl text-sm mb-6 text-center ${
@@ -103,7 +98,6 @@ export default function ClientPrivacyPage() {
           </div>
         )}
 
-        {/* Portabilidade */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border shadow-sm p-5 mb-4">
           <div className="flex items-start gap-3 mb-4">
             <Download className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -134,7 +128,6 @@ export default function ClientPrivacyPage() {
           </Button>
         </div>
 
-        {/* Exclusão */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border shadow-sm p-5 mb-4 border-red-200 dark:border-red-900/30">
           <div className="flex items-start gap-3 mb-4">
             <Trash2 className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -204,7 +197,6 @@ export default function ClientPrivacyPage() {
           )}
         </div>
 
-        {/* Links */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border shadow-sm p-5 space-y-3">
           <Link
             href="/privacidade"

@@ -1,4 +1,4 @@
-import { ServiceService } from '../../../../../src/modules/services/services/ServiceService';
+﻿import { ServiceService } from '../../../../../src/modules/services/services/ServiceService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { AppError } from '../../../../../src/shared/errors/AppError';
 
@@ -22,9 +22,7 @@ describe('ServiceService (Unit)', () => {
         jest.clearAllMocks();
     });
 
-    // ── create() ────────────────────────────────────────────────────────────
-
-    it('deve criar um servico com dados validos', async () => {
+it('deve criar um servico com dados validos', async () => {
         const data = { name: 'Corte Degradê', price: 45, durationMin: 30 };
         const created = { id: 'service-1', tenantId, ...data, active: true };
 
@@ -50,9 +48,7 @@ describe('ServiceService (Unit)', () => {
         expect(prisma.service.create).not.toHaveBeenCalled();
     });
 
-    // ── listAll() ───────────────────────────────────────────────────────────
-
-    it('deve retornar servicos ativos ordenados por nome', async () => {
+it('deve retornar servicos ativos ordenados por nome', async () => {
         const services = [
             { id: 's1', name: 'Barba', price: 20, active: true },
             { id: 's2', name: 'Corte', price: 30, active: true },
@@ -69,9 +65,7 @@ describe('ServiceService (Unit)', () => {
         expect(result).toHaveLength(2);
     });
 
-    // ── update() ────────────────────────────────────────────────────────────
-
-    it('deve atualizar servico existente', async () => {
+it('deve atualizar servico existente', async () => {
         const serviceId = 'service-1';
         const existing = { id: serviceId, tenantId, name: 'Corte', price: 30 };
         const updated = { ...existing, price: 35 };
@@ -97,9 +91,7 @@ describe('ServiceService (Unit)', () => {
             .rejects.toMatchObject({ statusCode: 404 });
     });
 
-    // ── deactivate() ────────────────────────────────────────────────────────
-
-    it('deve desativar servico existente', async () => {
+it('deve desativar servico existente', async () => {
         const serviceId = 'service-1';
         const existing = { id: serviceId, tenantId, name: 'Corte', active: true };
         const deactivated = { ...existing, active: false };

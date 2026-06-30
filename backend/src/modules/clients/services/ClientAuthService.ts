@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppError } from '../../../shared/errors/AppError';
@@ -36,7 +36,6 @@ export class ClientAuthService {
 
         const emailClean = data.email ? data.email.trim() : null;
 
-        // Check if email already exists
         if (emailClean) {
             const existingEmail = await prisma.client.findFirst({
                 where: { tenantId: tenant.id, email: emailClean }
@@ -48,7 +47,6 @@ export class ClientAuthService {
 
         const cleanPhone = data.phone.replace(/\D/g, '');
 
-        // Check if phone already exists
         if (cleanPhone) {
             const existingPhone = await prisma.client.findFirst({
                 where: { tenantId: tenant.id, phone: cleanPhone }
@@ -61,7 +59,6 @@ export class ClientAuthService {
         const passwordHash = await bcrypt.hash(data.password, 10);
         const privacyVersion = data.consentVersion || CURRENT_PRIVACY_VERSION;
 
-        // LGPD: Criar cliente e registro de consentimento em transação
         const client = await prisma.$transaction(async tx => {
             const client = await tx.client.create({
                 data: {
@@ -70,14 +67,12 @@ export class ClientAuthService {
                     email: emailClean,
                     phone: cleanPhone,
                     password: passwordHash,
-                    // LGPD: Registrar consentimento no momento do cadastro
                     consentedAt: new Date(),
                     consentVersion: privacyVersion,
                     consentIp: data.consentIp || null,
                 }
             });
 
-            // LGPD: Criar registro de consentimento no audit trail
             await tx.consentLog.create({
                 data: {
                     clientId: client.id,
@@ -118,7 +113,6 @@ export class ClientAuthService {
         const tenant = await prisma.tenant.findUnique({ where: { slug } });
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
-        // Se contiver '@', é email. Se não, assumimos que é telefone e removemos formatação.
         const isEmail = emailOrPhone.includes('@');
         const cleanContact = isEmail ? emailOrPhone.trim() : emailOrPhone.replace(/\D/g, '');
 
@@ -167,7 +161,6 @@ export class ClientAuthService {
         const tenant = await prisma.tenant.findUnique({ where: { slug } });
         if (!tenant) throw new AppError('Barbearia não encontrada.', 404);
 
-        // Se contiver '@', é email. Se não, assumimos que é telefone e removemos formatação.
         const isEmail = emailOrPhone.includes('@');
         const cleanContact = isEmail ? emailOrPhone.trim() : emailOrPhone.replace(/\D/g, '');
 
@@ -218,7 +211,6 @@ export class ClientAuthService {
             }
         });
 
-        // Filter out null tenants (just in case) and return unique ones
         const uniqueTenants = new Map();
         for (const client of clients) {
             if (client.tenant && !uniqueTenants.has(client.tenant.slug)) {

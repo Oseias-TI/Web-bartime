@@ -1,21 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Shield, X } from "lucide-react";
 import Link from "next/link";
 
-/**
- * LGPD — Banner informativo sobre uso de localStorage.
- * Exibido apenas uma vez na primeira visita. Ao aceitar, armazena
- * a preferência no próprio localStorage.
- */
 export function StorageBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const accepted = localStorage.getItem("@Bartime:storageConsent");
     if (!accepted) {
-      // Pequeno delay para não bloquear a renderização inicial
       const timer = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(timer);
     }

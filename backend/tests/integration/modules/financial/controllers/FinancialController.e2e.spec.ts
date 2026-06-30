@@ -1,8 +1,7 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-// ── Mock do Prisma ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/prisma', () => ({
     prisma: {
         transaction: {
@@ -27,7 +26,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do Redis ──────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/redis', () => ({
     redisClient: {
         del: jest.fn(),
@@ -37,7 +35,6 @@ jest.mock('../../../../../src/lib/redis', () => ({
     },
 }));
 
-// ── Mock do Logger ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/logger', () => ({
     __esModule: true,
     default: {
@@ -52,7 +49,6 @@ jest.mock('../../../../../src/shared/utils/logger', () => ({
     },
 }));
 
-// ── Mock Middlewares ──────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/middlewares/checkSubscription', () => ({
     checkSubscription: (req: any, res: any, next: any) => next(),
 }));
@@ -90,9 +86,7 @@ describe('FinancialController (Integration)', () => {
         jest.clearAllMocks();
     });
 
-    // ── POST /financial/transactions ────────────────────────────────────────
-
-    it('deve retornar 201 Created ao criar transacao com dados validos', async () => {
+it('deve retornar 201 Created ao criar transacao com dados validos', async () => {
         const txData = {
             type: 'INCOME',
             category: 'Serviço',
@@ -139,9 +133,7 @@ describe('FinancialController (Integration)', () => {
         expect(response.status).toBe(403);
     });
 
-    // ── GET /financial/transactions ─────────────────────────────────────────
-
-    it('deve retornar 200 OK com lista de transacoes por periodo', async () => {
+it('deve retornar 200 OK com lista de transacoes por periodo', async () => {
         const transactions = [
             { id: uuidv4(), tenantId, type: 'INCOME', category: 'Serviço', amount: 50, createdAt: '2030-01-15T10:00:00Z' },
             { id: uuidv4(), tenantId, type: 'EXPENSE', category: 'Aluguel', amount: 200, createdAt: '2030-01-16T10:00:00Z' },
@@ -158,9 +150,7 @@ describe('FinancialController (Integration)', () => {
         expect(response.body).toHaveLength(2);
     });
 
-    // ── DELETE /financial/transactions/:id ──────────────────────────────────
-
-    it('deve retornar 200 OK ao excluir transacao manual', async () => {
+it('deve retornar 200 OK ao excluir transacao manual', async () => {
         const txId = uuidv4();
         const existing = { id: txId, tenantId, type: 'EXPENSE', appointmentId: null };
 

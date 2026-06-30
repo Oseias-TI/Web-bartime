@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import { prisma } from '../../../lib/prisma';
 import { sendMail } from '../../../shared/utils/mailer';
 
@@ -6,11 +6,9 @@ const RESET_TOKEN_EXPIRES_MINUTES = 30;
 
 export class ClientForgotPasswordService {
     async execute(email: string, slug: string) {
-        // Find the tenant to ensure the client belongs to it
         const tenant = await prisma.tenant.findUnique({ where: { slug } });
         if (!tenant) return;
 
-        // Find the client by email and tenant
         const client = await prisma.client.findFirst({
             where: { email, tenantId: tenant.id },
             include: { tenant: true }

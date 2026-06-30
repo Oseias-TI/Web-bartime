@@ -73,7 +73,6 @@ export default function ClientDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center">
-      {/* Header */}
       <header className="w-full max-w-md bg-white dark:bg-zinc-900 border-b p-6 shadow-sm flex flex-col">
         <div className="flex justify-between items-start w-full mb-4">
           {tenant && (
@@ -113,10 +112,8 @@ export default function ClientDashboardPage() {
         </Button>
       </header>
 
-      {/* Main Content Area */}
       <main className="w-full max-w-md flex-1 p-4 pb-10 space-y-8">
         
-        {/* Próximos Agendamentos */}
         <section>
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">Próximos Cortes</h2>
           
@@ -150,7 +147,6 @@ export default function ClientDashboardPage() {
           )}
         </section>
 
-        {/* Histórico */}
         <section>
           <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">Histórico</h2>
           

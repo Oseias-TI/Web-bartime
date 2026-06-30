@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { ClientAuthService } from '../services/ClientAuthService';
 import { ClientForgotPasswordService } from '../services/ClientForgotPasswordService';
 import { ClientResetPasswordService } from '../services/ClientResetPasswordService';
@@ -21,7 +21,6 @@ export class ClientAuthController {
     register = asyncHandler(async (req: Request, res: Response) => {
         const { slug } = req.params;
         const { name, email, phone, password, consentVersion } = req.body;
-        // LGPD: Capturar IP do cliente para registro de consentimento
         const consentIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || null;
 
         const result = await new ClientAuthService().registerClient({

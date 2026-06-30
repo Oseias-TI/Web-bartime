@@ -1,7 +1,6 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import bcrypt from 'bcryptjs';
 
-// ── Mock do Prisma ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/prisma', () => ({
     prisma: {
         professional: {
@@ -17,7 +16,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do Redis ──────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/redis', () => ({
     redisClient: {
         del: jest.fn(),
@@ -27,7 +25,6 @@ jest.mock('../../../../../src/lib/redis', () => ({
     },
 }));
 
-// ── Mock do Logger ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/logger', () => ({
     __esModule: true,
     default: {
@@ -42,7 +39,6 @@ jest.mock('../../../../../src/shared/utils/logger', () => ({
     },
 }));
 
-// ── Mock do Rate Limiter (evita 429 Too Many Requests) ────────────────────
 jest.mock('../../../../../src/shared/middlewares/rateLimiter', () => ({
     globalLimiter: (req: any, res: any, next: any) => next(),
     authLimiter: (req: any, res: any, next: any) => next(),
@@ -59,7 +55,6 @@ describe('AuthController (Integration)', () => {
     });
 
     it('deve retornar 200 OK ao autenticar com credenciais validas', async () => {
-        // Arrange
         const email = 'admin@teste.com';
         const password = 'Password123';
         const hashedPassword = await bcrypt.hash(password, 8);
@@ -69,7 +64,7 @@ describe('AuthController (Integration)', () => {
             tenantId: 'tenant-1',
             name: 'Admin',
             email,
-            password: hashedPassword, // match real bcrypt.compare
+            password: hashedPassword,
             role: 'ADMIN',
             active: true,
         });
@@ -79,12 +74,10 @@ describe('AuthController (Integration)', () => {
             name: 'Barbearia Teste',
         });
 
-        // Act
         const response = await request(app)
             .post('/auth/business')
             .send({ email, password });
 
-        // Assert
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('token');
         expect(response.body).toHaveProperty('accessToken');
@@ -92,7 +85,6 @@ describe('AuthController (Integration)', () => {
     });
 
     it('deve retornar 401 Unauthorized se a senha estiver incorreta', async () => {
-        // Arrange
         const email = 'admin@teste.com';
         const password = 'WrongPassword';
         const hashedPassword = await bcrypt.hash('CorrectPassword123', 8);
@@ -105,12 +97,10 @@ describe('AuthController (Integration)', () => {
             active: true,
         });
 
-        // Act
         const response = await request(app)
             .post('/auth/business')
             .send({ email, password });
 
-        // Assert
         expect(response.status).toBe(401);
         expect(response.body).toHaveProperty('message');
         expect(response.body.message).toMatch(/incorretos/i);

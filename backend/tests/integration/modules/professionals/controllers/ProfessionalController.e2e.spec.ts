@@ -1,8 +1,7 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-// ── Mock do Prisma ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/prisma', () => ({
     prisma: {
         professional: {
@@ -18,7 +17,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do Redis ──────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/redis', () => ({
     redisClient: {
         del: jest.fn(),
@@ -28,7 +26,6 @@ jest.mock('../../../../../src/lib/redis', () => ({
     },
 }));
 
-// ── Mock do Logger ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/logger', () => ({
     __esModule: true,
     default: {
@@ -43,7 +40,6 @@ jest.mock('../../../../../src/shared/utils/logger', () => ({
     },
 }));
 
-// ── Mock Middlewares ──────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/middlewares/checkSubscription', () => ({
     checkSubscription: (req: any, res: any, next: any) => next(),
 }));
@@ -80,9 +76,7 @@ describe('ProfessionalController (Integration)', () => {
         jest.clearAllMocks();
     });
 
-    // ── GET /professionals ──────────────────────────────────────────────────
-
-    it('deve retornar 200 OK com lista paginada de profissionais', async () => {
+it('deve retornar 200 OK com lista paginada de profissionais', async () => {
         const professionals = [
             { id: uuidv4(), name: 'João', email: 'joao@test.com', role: 'BARBER', commissionRate: 40, avatarUrl: null, active: true, _count: { appointments: 5 } },
             { id: uuidv4(), name: 'Maria', email: 'maria@test.com', role: 'ADMIN', commissionRate: 50, avatarUrl: null, active: true, _count: { appointments: 10 } },
@@ -100,9 +94,7 @@ describe('ProfessionalController (Integration)', () => {
         expect(response.body.data).toHaveLength(2);
     });
 
-    // ── GET /professionals/:id ──────────────────────────────────────────────
-
-    it('deve retornar 200 OK ao buscar profissional por ID', async () => {
+it('deve retornar 200 OK ao buscar profissional por ID', async () => {
         const profId = uuidv4();
         const professional = {
             id: profId,
@@ -134,9 +126,7 @@ describe('ProfessionalController (Integration)', () => {
         expect(response.body.message).toMatch(/não encontrado/i);
     });
 
-    // ── PATCH /professionals/:id ────────────────────────────────────────────
-
-    it('deve retornar 200 OK ao atualizar profissional', async () => {
+it('deve retornar 200 OK ao atualizar profissional', async () => {
         const profId = uuidv4();
         const existing = { id: profId, tenantId, name: 'João', role: 'BARBER', active: true };
         const updated = { id: profId, name: 'João Silva', email: 'joao@test.com', role: 'BARBER', commissionRate: 45, avatarUrl: null };
@@ -153,9 +143,7 @@ describe('ProfessionalController (Integration)', () => {
         expect(response.body.name).toBe('João Silva');
     });
 
-    // ── DELETE /professionals/:id ───────────────────────────────────────────
-
-    it('deve retornar 200 OK ao desativar profissional', async () => {
+it('deve retornar 200 OK ao desativar profissional', async () => {
         const profId = uuidv4();
         const existing = { id: profId, tenantId, name: 'Carlos', role: 'BARBER', active: true };
         const deactivated = { id: profId, name: 'Carlos', active: false };

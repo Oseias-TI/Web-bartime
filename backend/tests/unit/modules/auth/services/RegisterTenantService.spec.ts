@@ -1,4 +1,4 @@
-import { RegisterTenantService } from '../../../../../src/modules/auth/services/RegisterTenantService';
+﻿import { RegisterTenantService } from '../../../../../src/modules/auth/services/RegisterTenantService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { AppError } from '../../../../../src/shared/errors/AppError';
 import bcrypt from 'bcryptjs';
@@ -119,11 +119,10 @@ describe('RegisterTenantService (Unit)', () => {
     });
 
     it('deve gerar multiplos slugs corretamente caso duas barbearias tenham nomes parecidos', async () => {
-        // Primeira chamada (procura pelo slug original)
         (prisma.tenant.findUnique as jest.Mock)
-            .mockResolvedValueOnce(null) // CNPJ não existe
-            .mockResolvedValueOnce({ id: 'tenant-old' }) // slug "barbearia-teste" já existe
-            .mockResolvedValueOnce(null); // slug "barbearia-teste-1" não existe
+            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce({ id: 'tenant-old' })
+            .mockResolvedValueOnce(null);
 
         (prisma.$transaction as jest.Mock).mockImplementation(async (cb) => {
             return cb(prisma);

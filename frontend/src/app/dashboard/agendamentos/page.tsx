@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
@@ -40,14 +40,12 @@ export default function AgendamentosPage() {
   const [filterProfessional, setFilterProfessional] = useState("");
   const [searchClient, setSearchClient] = useState("");
 
-  // Form state
   const [formClientId, setFormClientId] = useState("");
   const [formServiceId, setFormServiceId] = useState("");
   const [formProfessionalId, setFormProfessionalId] = useState("");
   const [formStartTime, setFormStartTime] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
-  // Availability slots
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
@@ -74,7 +72,6 @@ export default function AgendamentosPage() {
       setServices(s.filter((s) => s.active));
       setProfessionals(p.filter((p) => p.active));
     } catch {
-      // silently fail
     }
   }, []);
 
@@ -87,7 +84,6 @@ export default function AgendamentosPage() {
     init();
   }, [loadAppointments, loadFormData]);
 
-  // Load available slots when professional + service + date are selected
   useEffect(() => {
     if (formProfessionalId && formServiceId && selectedDate) {
       const fetchSlots = async () => {
@@ -210,7 +206,7 @@ export default function AgendamentosPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Agendamentos</h1>
@@ -238,7 +234,7 @@ export default function AgendamentosPage() {
               </DialogDescription>
             </DialogHeader>
             <DialogPanel className="space-y-4">
-              {/* Cliente */}
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium">Cliente</label>
                 <Input
@@ -261,8 +257,7 @@ export default function AgendamentosPage() {
                 </Select>
               </div>
 
-              {/* Serviço */}
-              <div className="space-y-2">
+<div className="space-y-2">
                 <label className="text-sm font-medium">Serviço</label>
                 <Select value={formServiceId} onValueChange={(v) => setFormServiceId(v || "")}>
                   <SelectTrigger>
@@ -278,8 +273,7 @@ export default function AgendamentosPage() {
                 </Select>
               </div>
 
-              {/* Profissional */}
-              <div className="space-y-2">
+<div className="space-y-2">
                 <label className="text-sm font-medium">Profissional</label>
                 <Select value={formProfessionalId} onValueChange={(v) => setFormProfessionalId(v || "")}>
                   <SelectTrigger>
@@ -295,8 +289,7 @@ export default function AgendamentosPage() {
                 </Select>
               </div>
 
-              {/* Horário — Available Slots */}
-              <div className="space-y-2">
+<div className="space-y-2">
                 <label className="text-sm font-medium">Horário</label>
 
                 {formProfessionalId && formServiceId ? (
@@ -375,8 +368,7 @@ export default function AgendamentosPage() {
         </Dialog>
       </div>
 
-      {/* Date Navigator & Filters */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card p-1">
           <Button variant="ghost" size="icon-sm" onClick={() => changeDate(-1)}>
             <ChevronLeft className="size-4" />
@@ -425,8 +417,7 @@ export default function AgendamentosPage() {
         </Select>
       </div>
 
-      {/* Appointments List */}
-      {isLoading ? (
+{isLoading ? (
         <div className="grid gap-3">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="bg-card border-border">
@@ -466,7 +457,7 @@ export default function AgendamentosPage() {
                 >
                   <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      {/* Time */}
+                      
                       <div className="flex items-center gap-3 min-w-[100px]">
                         <div className="text-center">
                           <p className="text-lg font-bold text-primary">
@@ -479,8 +470,7 @@ export default function AgendamentosPage() {
                         <div className="h-10 w-px bg-border" />
                       </div>
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
+<div className="flex-1 min-w-0">
                         <p className="font-semibold truncate">
                           {apt.client.name}
                         </p>
@@ -490,8 +480,7 @@ export default function AgendamentosPage() {
                         </p>
                       </div>
 
-                      {/* Status & Actions */}
-                      <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
                         <Badge variant={status.variant}>
                           <StatusIcon className="size-3 mr-1" />
                           {status.label}
@@ -525,8 +514,7 @@ export default function AgendamentosPage() {
         </div>
       )}
 
-      {/* Payment Method Modal */}
-      <Dialog open={isCompleteModalOpen} onOpenChange={setIsCompleteModalOpen}>
+<Dialog open={isCompleteModalOpen} onOpenChange={setIsCompleteModalOpen}>
         <DialogPopup className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Concluir Agendamento</DialogTitle>

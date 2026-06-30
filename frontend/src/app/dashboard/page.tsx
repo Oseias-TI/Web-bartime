@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -66,12 +66,11 @@ export default function DashboardPage() {
       setAppointments(appts);
       setSummary(fin);
 
-      // Map cash flow to chart data
       const newChartData = [];
       for (let i = 6; i >= 0; i--) {
         const d = subDays(new Date(), i);
         const dateStr = format(d, "yyyy-MM-dd");
-        const dayName = format(d, "EE", { locale: ptBR }); // "seg", "ter"
+        const dayName = format(d, "EE", { locale: ptBR });
         
         const flow = cashFlow.find(c => c.date === dateStr);
         newChartData.push({
@@ -137,9 +136,7 @@ export default function DashboardPage() {
     },
   ];
 
-
-
-  if (isLoading) {
+if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -157,7 +154,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
+      
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Olá, bem-vindo! 👋
@@ -168,8 +165,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {kpiCards.map((card) => (
           <Card
             key={card.title}
@@ -199,7 +195,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Chart */}
+        
         <Card className="lg:col-span-2 bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
@@ -256,8 +252,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Today's appointments */}
-        <Card className="bg-card border-border">
+<Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
               Agenda de Hoje

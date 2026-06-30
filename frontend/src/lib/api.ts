@@ -1,4 +1,4 @@
-const getApiUrl = () => {
+﻿const getApiUrl = () => {
   if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
   if (typeof window !== "undefined") {
     return `http://${window.location.hostname}:3333`;
@@ -18,7 +18,6 @@ class ApiError extends Error {
 
 class ApiClient {
   private accessToken: string | null = null;
-  // BUG-11: Controle de refresh automático
   private isRefreshing = false;
   private refreshQueue: Array<{
     resolve: (token: string) => void;
@@ -33,7 +32,6 @@ class ApiClient {
     return this.accessToken;
   }
 
-  // BUG-11: Tenta renovar o token usando o refresh token armazenado
   private async refreshAccessToken(): Promise<string> {
     const refreshToken =
       typeof window !== "undefined"
@@ -51,7 +49,6 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      // Refresh falhou — limpar tudo e redirecionar
       this.clearAuthAndRedirect();
       throw new ApiError("Sessão expirada. Faça login novamente.", 401);
     }
@@ -75,14 +72,12 @@ class ApiClient {
       localStorage.removeItem("@Bartime:refreshToken");
       localStorage.removeItem("@Bartime:professional");
       localStorage.removeItem("@Bartime:tenant");
-      // Redirecionar para login apenas se não estiver já na página de auth
       if (!window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/register")) {
         window.location.href = "/login";
       }
     }
   }
 
-  // BUG-11: Gerencia fila de refresh para evitar múltiplas chamadas simultâneas
   private async handleTokenRefresh(): Promise<string> {
     if (this.isRefreshing) {
       return new Promise((resolve, reject) => {
@@ -106,8 +101,6 @@ class ApiClient {
   }
 
   private async handleResponse<T>(response: Response, retryFn?: () => Promise<Response>): Promise<T> {
-    // BUG-11: Se 401 e temos um retry function, tentar renovar o token
-    // Evita tentar renovar token nas rotas de autenticação (login, register, refresh)
     const isAuthRoute = response.url.includes("/auth/business") || 
                         response.url.includes("/auth/refresh") || 
                         response.url.includes("/auth/register");
@@ -117,7 +110,7 @@ class ApiClient {
         const newToken = await this.handleTokenRefresh();
         this.accessToken = newToken;
         const retryResponse = await retryFn();
-        return this.handleResponse<T>(retryResponse); // sem retry na segunda tentativa
+        return this.handleResponse<T>(retryResponse);
       } catch {
         throw new ApiError("Sessão expirada. Faça login novamente.", 401);
       }
@@ -129,7 +122,6 @@ class ApiClient {
         statusCode: response.status,
       }));
 
-      // Redirecionar para a página de planos se a assinatura/teste expirou
       if (response.status === 403 && errorData.action === "subscribe") {
         if (typeof window !== "undefined" && !window.location.pathname.startsWith("/dashboard/planos")) {
           window.location.href = "/dashboard/planos";

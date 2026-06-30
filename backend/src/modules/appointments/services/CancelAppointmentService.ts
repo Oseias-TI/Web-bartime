@@ -1,4 +1,4 @@
-import { AppError } from '../../../shared/errors/AppError';
+﻿import { AppError } from '../../../shared/errors/AppError';
 import { localNowAsUTC } from '../../../shared/utils/timezone';
 import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
 import { IAppointmentRepository } from '../repositories/IAppointmentRepository';
@@ -26,7 +26,6 @@ export class CancelAppointmentService {
         if (userRole === 'BARBER' && appointment.professionalId !== userId) throw new AppError('Você não tem permissão para cancelar este agendamento.', 403);
         if (new Date(appointment.startTime).getTime() <= localNowAsUTC()) throw new AppError('Não é possível cancelar um agendamento que já iniciou.', 400);
 
-        // BUG-12: Usar transação para cancelar agendamento e comissões PENDING associadas atomicamente
         const updatedAppointment = await this.appointmentRepository.cancelAppointmentWithCommissions(appointmentId);
 
         if (appointment.googleEventId) {

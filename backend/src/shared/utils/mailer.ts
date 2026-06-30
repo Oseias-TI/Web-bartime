@@ -1,11 +1,8 @@
-import nodemailer from 'nodemailer';
+﻿import nodemailer from 'nodemailer';
 import dns from 'node:dns';
 
-// Força o Node a resolver domínios preferencialmente em IPv4
-// Isso corrige o erro ENETUNREACH ao tentar enviar emails via SMTP do Gmail e outros no Railway
 dns.setDefaultResultOrder('ipv4first');
 
-// BUG-10: Validar variáveis SMTP no carregamento do módulo para falhar rapidamente
 const REQUIRED_SMTP_VARS = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'] as const;
 for (const envVar of REQUIRED_SMTP_VARS) {
     if (!process.env[envVar]) {
@@ -17,7 +14,7 @@ const port = Number(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port,
-    secure: port === 465, // true for 465, false for other ports
+    secure: port === 465,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,

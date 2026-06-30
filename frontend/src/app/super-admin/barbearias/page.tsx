@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Search, Users, Scissors, CalendarDays, Plus, Copy, Edit2, ShieldAlert, CheckCircle2, Clock, XCircle, AlertCircle } from "lucide-react";
 import { toastManager } from "@/components/ui/toast";
 
-// Avatar helper
 const getInitials = (name: string) => {
   return name.substring(0, 2).toUpperCase();
 };
@@ -134,16 +133,15 @@ export default function SuperAdminTenantsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in pb-10">
-      
-      {/* Header & Command Bar */}
-      <div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 relative z-10">
+
+<div className="flex flex-col lg:flex-row justify-between lg:items-end gap-6 relative z-10">
         <div>
           <h1 className="text-3xl font-light text-white tracking-tight">Barbearias</h1>
           <p className="text-zinc-400 text-sm mt-2">Gerencie locatários, faturamentos e status operacionais da rede.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-          {/* Command K Vibe Search */}
+          
           <div className="relative w-full sm:w-[320px] group">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-zinc-500 group-focus-within:text-blue-500 transition-colors">
               <Search className="h-4 w-4" />
@@ -164,8 +162,7 @@ export default function SuperAdminTenantsPage() {
         </div>
       </div>
 
-      {/* Ghost Table */}
-      <div className="w-full relative z-10">
+<div className="w-full relative z-10">
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -199,7 +196,7 @@ export default function SuperAdminTenantsPage() {
                   <tr key={tenant.id} className="group hover:bg-white/[0.02] transition-colors duration-200">
                     <td className="py-4 px-4 align-top sm:align-middle">
                       <div className="flex items-center gap-4">
-                        {/* Virtual Avatar */}
+                        
                         <div className={`shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${getAvatarGradient(tenant.name)} flex items-center justify-center text-white font-medium text-sm shadow-sm ring-1 ring-white/10`}>
                           {getInitials(tenant.name)}
                         </div>

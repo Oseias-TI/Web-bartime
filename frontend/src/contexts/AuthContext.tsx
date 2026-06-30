@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/api";
@@ -52,7 +52,6 @@ interface RegisterData {
   consentVersion?: string;
 }
 
-// LGPD: Versão atual da política de privacidade — deve ser atualizada em sincronia com o backend
 export const CURRENT_PRIVACY_VERSION = '2026-06-11';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -108,14 +107,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = useCallback(async (data: RegisterData) => {
-    // BUG-05: Backend espera 'adminName', não 'name'
     const response = await api.post<AuthResponse>("/auth/register", {
       adminName: data.name,
       email: data.email,
       password: data.password,
       tenantName: data.tenantName,
       cnpj: data.cnpj,
-      // LGPD: Enviar versão da política de privacidade aceita
       consentVersion: data.consentVersion || CURRENT_PRIVACY_VERSION,
     });
 
@@ -131,13 +128,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      // BUG-07: Enviar refreshToken no body para que o backend possa revogá-lo
       const refreshToken = localStorage.getItem("@Bartime:refreshToken");
       if (refreshToken) {
         await api.post("/auth/logout", { refreshToken });
       }
     } catch {
-      // ignore errors on logout
     } finally {
       api.setToken(null);
       setProfessional(null);

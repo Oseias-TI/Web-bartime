@@ -1,4 +1,4 @@
-import { PublicBookingService } from '../../../../../src/modules/appointments/services/PublicBookingService';
+﻿import { PublicBookingService } from '../../../../../src/modules/appointments/services/PublicBookingService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { AppError } from '../../../../../src/shared/errors/AppError';
 
@@ -14,7 +14,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do GoogleCalendarService (evita chamadas reais à API do Google) ──
 jest.mock('../../../../../src/shared/services/GoogleCalendarService', () => ({
     googleCalendarService: {
         createEvent: jest.fn().mockResolvedValue('mock-event-id'),
@@ -22,7 +21,6 @@ jest.mock('../../../../../src/shared/services/GoogleCalendarService', () => ({
     },
 }));
 
-// ── Mock do Mailer (evita chamadas SMTP reais) ───────────────────────────
 jest.mock('../../../../../src/shared/utils/mailer', () => ({
     sendMail: jest.fn().mockResolvedValue(true),
 }));
@@ -54,7 +52,6 @@ describe('PublicBookingService (Unit)', () => {
 
     it('deve disparar AppError se a barbearia estiver fechada ou nao existir horario na disponibilidade', async () => {
         (prisma.tenant.findUnique as jest.Mock).mockResolvedValue({ id: 'tenant-1', name: 'Teste' });
-        // Retorna null simulando barbearia fechada no dia
         (prisma.businessHour.findFirst as jest.Mock).mockResolvedValue(null);
 
         const availability = await publicBookingService.getAvailability('teste-slug', '2030-06-05');
@@ -73,7 +70,6 @@ describe('PublicBookingService (Unit)', () => {
             return cb(prisma);
         });
 
-        // Simula sem conflitos
         (prisma.appointment.findFirst as jest.Mock).mockResolvedValue(null);
         (prisma.appointment.create as jest.Mock).mockResolvedValue({
             id: 'appt-1',
@@ -105,7 +101,6 @@ describe('PublicBookingService (Unit)', () => {
             return cb(prisma);
         });
 
-        // Simula conflito
         (prisma.appointment.findFirst as jest.Mock).mockResolvedValue({ id: 'appt-conflict' });
 
         await expect(publicBookingService.createAppointment({

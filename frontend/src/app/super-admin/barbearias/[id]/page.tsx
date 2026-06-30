@@ -28,7 +28,6 @@ export default function EditarBarbeariaPage() {
 
   const loadTenantData = useCallback(async () => {
     try {
-      // Reusing the getTenant API route we created
       const data = await api.get<any>(`/super-admin/tenants/${tenantId}`);
       setFormData({
         name: data.name || "",

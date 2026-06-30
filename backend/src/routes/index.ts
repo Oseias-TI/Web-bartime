@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { ensureAuthenticated } from '../shared/middlewares/ensureAuthenticated';
 import { ensureRole } from '../shared/middlewares/ensureRole';
 import { ensureSuperAdmin } from '../shared/middlewares/ensureSuperAdmin';
@@ -44,12 +44,8 @@ const tenant = new TenantController();
 const audit = new AuditController();
 const superAdmin = new SuperAdminController();
 
-// Rate limiting global
 routes.use(globalLimiter);
 
-// ═══════════════════════════════════════════════
-//  ROTAS PÚBLICAS
-// ═══════════════════════════════════════════════
 const publicBooking = new PublicBookingController();
 const clientAuth = new ClientAuthController();
 
@@ -60,7 +56,6 @@ routes.post('/auth/forgot-password', authLimiter, auth.forgotPassword);
 routes.post('/auth/reset-password', auth.resetPassword);
 routes.get('/auth/verify-email', auth.verifyEmail);
 
-// Agendamento Público
 routes.get('/public/tenants', publicBooking.getAllTenants);
 routes.get('/public/tenant/:slug', publicBooking.getTenant);
 routes.get('/public/tenant/:slug/services', publicBooking.getServices);
@@ -68,7 +63,6 @@ routes.get('/public/tenant/:slug/professionals', publicBooking.getProfessionals)
 routes.get('/public/tenant/:slug/availability', publicBooking.getAvailability);
 routes.post('/public/tenant/:slug/appointments', publicBookingLimiter, publicBooking.createAppointment);
 
-// Client Auth Público
 routes.get('/public/client/tenants', clientAuth.findTenants);
 routes.post('/public/tenant/:slug/client-auth/login', authLimiter, clientAuth.login);
 routes.post('/public/tenant/:slug/client-auth/register', authLimiter, clientAuth.register);
@@ -76,17 +70,11 @@ routes.post('/public/tenant/:slug/client-auth/setup', authLimiter, clientAuth.se
 routes.post('/public/tenant/:slug/client-auth/forgot-password', authLimiter, clientAuth.forgotPassword);
 routes.post('/public/tenant/:slug/client-auth/reset-password', clientAuth.resetPassword);
 
-// Dashboard do Cliente
 routes.get('/public/tenant/:slug/client/appointments', ensureClientAuthenticated, clients.listClientAppointments);
 
-// LGPD — Direitos do Titular (rotas do cliente autenticado)
 routes.get('/public/tenant/:slug/client/export', ensureClientAuthenticated, clients.exportOwnData);
 routes.delete('/public/tenant/:slug/client/data', ensureClientAuthenticated, clients.anonymizeOwnData);
 
-
-// ═══════════════════════════════════════════════
-//  PROTEGIDAS — sem checkSubscription
-// ═══════════════════════════════════════════════
 routes.use(ensureAuthenticated);
 
 routes.post('/auth/logout', auth.logout);
@@ -97,7 +85,6 @@ routes.get('/billing/status', billing.status);
 routes.post('/billing/checkout', ensureRole(['ADMIN']), billing.checkout);
 routes.post('/billing/portal', ensureRole(['ADMIN']), billing.portal);
 
-// ── Super Admin ─────────────────────────────────
 routes.get('/super-admin/stats', ensureSuperAdmin, superAdmin.stats);
 routes.get('/super-admin/tenants', ensureSuperAdmin, superAdmin.listTenants);
 routes.post('/super-admin/tenants', ensureSuperAdmin, superAdmin.createTenant);
@@ -110,20 +97,14 @@ routes.patch('/super-admin/users/:id/status', ensureSuperAdmin, superAdmin.updat
 routes.patch('/super-admin/users/:id/password', ensureSuperAdmin, superAdmin.updateUserPassword);
 routes.patch('/super-admin/users/:id/email', ensureSuperAdmin, superAdmin.updateUserEmail);
 
-// ═══════════════════════════════════════════════
-//  PROTEGIDAS — requer assinatura válida
-// ═══════════════════════════════════════════════
 routes.use(checkSubscription);
 
-// ── Tenant ──────────────────────────────────────
 routes.get('/tenant', tenant.get);
 routes.patch('/tenant', ensureRole(['ADMIN']), tenant.update);
 routes.patch('/tenant/logo', ensureRole(['ADMIN']), uploadConfig.single('logo'), tenant.updateLogo);
 
-// ── Auditoria (apenas ADMIN) ────────────────────
 routes.get('/audit', ensureRole(['ADMIN']), audit.list);
 
-// ── Equipe ──────────────────────────────────────
 routes.post(
     '/professionals',
     ensureRole(['ADMIN']),
@@ -131,7 +112,6 @@ routes.post(
     auth.createProfessional
 );
 routes.get('/professionals', professionals.list);
-// BUG-05: Rota /avatar deve vir ANTES de /:id para evitar que o Express capture "avatar" como id
 routes.patch('/professionals/avatar', uploadConfig.single('avatar'), avatar.update);
 routes.get('/professionals/:id', professionals.show);
 routes.patch(
@@ -147,40 +127,32 @@ routes.delete(
     professionals.deactivate
 );
 
-// ── Serviços ────────────────────────────────────
 routes.post('/services', ensureRole(['ADMIN']), auditLog({ action: 'SERVICE_CREATED', entity: 'Service' }), services.create);
 routes.get('/services', services.list);
 routes.patch('/services/:id', ensureRole(['ADMIN']), auditLog({ action: 'SERVICE_UPDATED', entity: 'Service' }), services.update);
 routes.delete('/services/:id', ensureRole(['ADMIN']), auditLog({ action: 'SERVICE_DEACTIVATED', entity: 'Service' }), services.deactivate);
 
-// ── Horário de Funcionamento ────────────────────
 routes.get('/business-hours', businessHours.list);
 routes.put('/business-hours', ensureRole(['ADMIN']), auditLog({ action: 'BUSINESS_HOURS_UPDATED', entity: 'BusinessHour' }), businessHours.upsert);
 
-// ── Disponibilidade ─────────────────────────────
 routes.get('/appointments/availability', availability.getSlots);
 
-// ── Clientes (CRM) ──────────────────────────────
 routes.post('/clients', auditLog({ action: 'CLIENT_CREATED', entity: 'Client' }), clients.create);
 routes.get('/clients', clients.list);
 routes.get('/clients/inactive', clients.listInactive);
-// LGPD Art. 37 — Registrar acesso a dados pessoais detalhados
 routes.get('/clients/:id/profile', auditLog({ action: 'CLIENT_PROFILE_VIEWED', entity: 'Client' }), clients.showProfile);
 routes.get('/clients/:id/spending', auditLog({ action: 'CLIENT_SPENDING_VIEWED', entity: 'Client' }), clients.showSpending);
 routes.patch('/clients/:id', auditLog({ action: 'CLIENT_UPDATED', entity: 'Client' }), clients.update);
 routes.post('/clients/:id/redeem', auditLog({ action: 'POINTS_REDEEMED', entity: 'Client' }), clients.redeemPoints);
 
-// LGPD — Direitos do Titular (rotas administrativas)
 routes.get('/clients/:id/export', ensureRole(['ADMIN']), auditLog({ action: 'CLIENT_DATA_EXPORTED', entity: 'Client' }), clients.exportClientData);
 routes.delete('/clients/:id/data', ensureRole(['ADMIN']), auditLog({ action: 'CLIENT_DATA_ANONYMIZED', entity: 'Client' }), clients.anonymizeClientData);
 
-// ── Agendamentos ────────────────────────────────
 routes.post('/appointments', auditLog({ action: 'APPOINTMENT_CREATED', entity: 'Appointment' }), appointments.create);
 routes.get('/appointments', appointments.listByDay);
 routes.patch('/appointments/:id/complete', auditLog({ action: 'APPOINTMENT_COMPLETED', entity: 'Appointment' }), appointments.complete);
 routes.patch('/appointments/:id/cancel', auditLog({ action: 'APPOINTMENT_CANCELED', entity: 'Appointment' }), appointments.cancel);
 
-// ── Financeiro (apenas ADMIN) ───────────────────
 routes.post('/financial/transactions', ensureRole(['ADMIN']), auditLog({ action: 'TRANSACTION_CREATED', entity: 'Transaction' }), financial.createTransaction);
 routes.get('/financial/transactions', ensureRole(['ADMIN']), financial.listTransactions);
 routes.get('/financial/transactions/:id', ensureRole(['ADMIN']), financial.getTransaction);
@@ -190,7 +162,6 @@ routes.get('/financial/cash-flow', ensureRole(['ADMIN']), financial.cashFlow);
 routes.get('/financial/summary', ensureRole(['ADMIN']), financial.summary);
 routes.post('/financial/payout', ensureRole(['ADMIN']), auditLog({ action: 'PAYOUT_EXECUTED', entity: 'Commission' }), financial.payout);
 
-// ── Relatórios (apenas ADMIN) ───────────────────
 routes.get('/reports', ensureRole(['ADMIN']), reports.generate);
 routes.get('/reports/professional/:id', ensureRole(['ADMIN']), reports.generateByProfessional);
 routes.get('/reports/export/excel', ensureRole(['ADMIN']), exports_.excel);

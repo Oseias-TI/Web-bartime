@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../lib/prisma';
 
 const BLOCKED_STATUSES = ['CANCELED', 'UNPAID'];
 
 export async function checkSubscription(req: Request, res: Response, next: NextFunction) {
     try {
-        // BUG-03: SUPER_ADMIN não possui tenantId relevante — acesso irrestrito
         if (req.user.role === 'SUPER_ADMIN') return next();
 
         const tenant = await prisma.tenant.findUnique({

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 
 const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -15,13 +15,11 @@ const DaySchema = z
     })
     .refine(data => {
         if (!data.open) return true;
-        // Validação Turno 1
         if (!data.openTime || !data.closeTime || data.openTime >= data.closeTime) return false;
-        // Validação Turno 2 (opcional)
         if (data.openTime2 || data.closeTime2) {
-            if (!data.openTime2 || !data.closeTime2) return false; // Deve ter os dois ou nenhum
-            if (data.openTime2 >= data.closeTime2) return false; // Inicio 2 < Fim 2
-            if (data.openTime2 <= data.closeTime) return false; // Turno 2 deve ser depois do Turno 1
+            if (!data.openTime2 || !data.closeTime2) return false;
+            if (data.openTime2 >= data.closeTime2) return false;
+            if (data.openTime2 <= data.closeTime) return false;
         }
         return true;
     }, { message: 'Se estiver aberto, informe horários válidos. O turno 2 (se houver) deve começar após o fim do turno 1.' });

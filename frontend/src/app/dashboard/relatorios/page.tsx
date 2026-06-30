@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { format, subDays } from "date-fns";
@@ -37,7 +37,6 @@ export default function RelatoriosPage() {
   const [reportData, setReportData] = useState<Report | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Filters
   const [period, setPeriod] = useState("30");
   const [startDate, setStartDate] = useState(format(subDays(new Date(), 30), "yyyy-MM-dd"));
   const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -104,7 +103,7 @@ export default function RelatoriosPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Controls */}
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Relatórios</h1>
@@ -154,7 +153,7 @@ export default function RelatoriosPage() {
         </div>
       ) : (
         <>
-          {/* Top KPIs */}
+          
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-card border-border">
               <CardContent className="p-6">
@@ -204,7 +203,7 @@ export default function RelatoriosPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Top Services */}
+            
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-base font-semibold flex items-center">
@@ -249,8 +248,7 @@ export default function RelatoriosPage() {
               </CardContent>
             </Card>
 
-            {/* Top Professionals */}
-            <Card className="bg-card border-border">
+<Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-base font-semibold flex items-center">
                   <Users className="size-4 mr-2" /> Receita por Profissional

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import { superAdminService, PlatformStats } from "@/services/super-admin.service";
@@ -79,7 +79,7 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
@@ -106,8 +106,7 @@ export default function SuperAdminDashboard() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card border-border hover:border-primary/20 transition-colors group">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -180,7 +179,7 @@ export default function SuperAdminDashboard() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Chart */}
+        
         <Card className="lg:col-span-2 bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
@@ -241,8 +240,7 @@ export default function SuperAdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Volume Summary */}
-        <Card className="bg-card border-border">
+<Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base font-semibold">
               Estatísticas Totais

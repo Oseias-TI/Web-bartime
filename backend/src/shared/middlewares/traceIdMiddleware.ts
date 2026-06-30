@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../utils/logger';
 
-// BUG-14: Sanitizar campos sensíveis antes de logar
 const SENSITIVE_FIELDS = ['password', 'currentPassword', 'newPassword', 'confirmPassword', 'token', 'refreshToken'];
 
 function sanitizeForLog(body: Record<string, any>): Record<string, any> {
@@ -19,11 +18,9 @@ export const traceIdMiddleware = (req: Request, res: Response, next: NextFunctio
   const traceId: string = Array.isArray(headerTraceId) ? headerTraceId[0] : headerTraceId || uuidv4();
   req.headers['x-trace-id'] = traceId;
   
-  // Attach traceId to locals for convenience
   res.locals.traceId = traceId;
 
   const childLogger = logger.child({ traceId });
-  // Store logger in request object
   (req as any).logger = childLogger;
 
   childLogger.info(`Incoming Request: ${req.method} ${req.url}`, {

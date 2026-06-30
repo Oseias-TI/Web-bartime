@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ function VerifyEmailContent() {
   return (
     <div className="animate-fade-in">
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
-        {/* Logo */}
+        
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
             <Scissors className="size-7 text-black" />
@@ -68,8 +68,7 @@ function VerifyEmailContent() {
           </div>
         </div>
 
-        {/* Loading */}
-        {status === "loading" && (
+{status === "loading" && (
           <div className="flex flex-col items-center text-center space-y-4 py-8">
             <div className="flex size-16 items-center justify-center">
               <Loader2 className="size-10 text-black animate-spin" />
@@ -85,8 +84,7 @@ function VerifyEmailContent() {
           </div>
         )}
 
-        {/* Success */}
-        {status === "success" && (
+{status === "success" && (
           <div className="space-y-6">
             <div className="flex flex-col items-center text-center space-y-4 py-4">
               <div className="flex size-16 items-center justify-center rounded-full bg-[#5cb97a]/10 border border-[#5cb97a]/20">
@@ -115,8 +113,7 @@ function VerifyEmailContent() {
           </div>
         )}
 
-        {/* Error */}
-        {status === "error" && (
+{status === "error" && (
           <div className="space-y-6">
             <div className="flex flex-col items-center text-center space-y-4 py-4">
               <div className="flex size-16 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20">

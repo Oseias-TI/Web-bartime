@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { prisma } from '../../../lib/prisma';
 import { asyncHandler } from '../../../shared/utils/asyncHandler';
 import { ProfessionalReportService } from '../services/ProfessionalReportService';
@@ -26,7 +26,6 @@ export class ReportController {
                 prisma.commission.groupBy({ by: ['professionalId'], where: { tenantId, createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: { professionalId: true }, orderBy: { _sum: { amount: 'desc' } }, take: 5 }),
                 prisma.client.count({ where: { tenantId, createdAt: { gte: start, lte: end } } }),
                 prisma.appointment.groupBy({ by: ['paymentMethod'], where: { tenantId, status: 'COMPLETED', startTime: { gte: start, lte: end } }, _count: { paymentMethod: true } }),
-                // Obter top services por count em agendamentos
                 prisma.appointment.groupBy({ by: ['serviceId'], where: { tenantId, status: 'COMPLETED', startTime: { gte: start, lte: end } }, _count: { serviceId: true }, orderBy: { _count: { serviceId: 'desc' } }, take: 5 })
             ]);
 

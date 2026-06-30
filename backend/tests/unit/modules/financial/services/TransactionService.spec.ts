@@ -1,4 +1,4 @@
-import { TransactionService } from '../../../../../src/modules/financial/services/TransactionService';
+﻿import { TransactionService } from '../../../../../src/modules/financial/services/TransactionService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { AppError } from '../../../../../src/shared/errors/AppError';
 
@@ -23,9 +23,7 @@ describe('TransactionService (Unit)', () => {
         jest.clearAllMocks();
     });
 
-    // ── create() ────────────────────────────────────────────────────────────
-
-    it('deve criar uma transacao com dados validos', async () => {
+it('deve criar uma transacao com dados validos', async () => {
         const txData = {
             tenantId,
             type: 'INCOME' as const,
@@ -43,9 +41,7 @@ describe('TransactionService (Unit)', () => {
         expect(result).toEqual(created);
     });
 
-    // ── findById() ──────────────────────────────────────────────────────────
-
-    it('deve retornar transacao existente', async () => {
+it('deve retornar transacao existente', async () => {
         const tx = { id: 'tx-1', tenantId, type: 'INCOME', amount: 50 };
 
         (prisma.transaction.findFirst as jest.Mock).mockResolvedValue(tx);
@@ -67,9 +63,7 @@ describe('TransactionService (Unit)', () => {
             .rejects.toMatchObject({ statusCode: 404 });
     });
 
-    // ── update() ────────────────────────────────────────────────────────────
-
-    it('deve atualizar transacao manual (sem appointmentId)', async () => {
+it('deve atualizar transacao manual (sem appointmentId)', async () => {
         const txId = 'tx-1';
         const existing = { id: txId, tenantId, type: 'EXPENSE', amount: 100, appointmentId: null };
         const updated = { ...existing, amount: 120 };
@@ -100,9 +94,7 @@ describe('TransactionService (Unit)', () => {
         expect(prisma.transaction.update).not.toHaveBeenCalled();
     });
 
-    // ── remove() ────────────────────────────────────────────────────────────
-
-    it('deve excluir transacao manual com sucesso', async () => {
+it('deve excluir transacao manual com sucesso', async () => {
         const txId = 'tx-1';
         const existing = { id: txId, tenantId, type: 'EXPENSE', amount: 100, appointmentId: null };
 

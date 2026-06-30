@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { CreateAppointmentInput } from '../dtos/CreateAppointmentSchema';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
@@ -17,7 +17,6 @@ function timeToMinutes(time: string): number {
 }
 
 export class AppointmentService {
-    // Injeção de dependência manual (no futuro pode usar tsyringe)
     constructor(
         private appointmentRepository: IAppointmentRepository = new PrismaAppointmentRepository()
     ) {}
@@ -25,7 +24,6 @@ export class AppointmentService {
     async createAppointment(data: CreateAppointmentData) {
         const startTime = new Date(data.startTime);
 
-        // TODO: Mover isso para um IServiceRepository e IBusinessHourRepository
         const [service, businessHour] = await Promise.all([
             prisma.service.findFirst({ where: { id: data.serviceId, tenantId: data.tenantId, active: true } }),
             prisma.businessHour.findUnique({ where: { tenantId_dayOfWeek: { tenantId: data.tenantId, dayOfWeek: startTime.getUTCDay() } } }),
@@ -59,7 +57,6 @@ export class AppointmentService {
 
         const endTime = new Date(startTime.getTime() + service.durationMin * 60_000);
 
-        // Utilizando o Repository ao invés do Prisma diretamente
         const hasConflict = await this.appointmentRepository.findConflictingAppointment(data.tenantId, data.professionalId, startTime, endTime);
         if (hasConflict) throw new AppError('Profissional já possui agendamento neste horário.', 409);
 
@@ -72,7 +69,6 @@ export class AppointmentService {
             endTime
         });
 
-        // Add to Google Calendar asynchronously
         googleCalendarService.createEvent({
             summary: `Agendamento: ${appointment.client.name} - ${appointment.service.name}`,
             description: `Cliente: ${appointment.client.name}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,

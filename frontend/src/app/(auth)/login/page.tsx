@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -59,7 +59,7 @@ export default function LoginPage() {
   return (
     <div className="animate-fade-in">
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
-        {/* Logo */}
+        
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
             <Scissors className="size-7 text-black" />

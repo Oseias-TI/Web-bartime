@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { getPaginationParams, buildPaginatedResult } from '../../../shared/utils/paginate';
 import { SubscriptionStatus } from '@prisma/client';
@@ -90,7 +90,7 @@ export class SuperAdminService {
 
         if (filter === 'Diário') {
             startOfPeriod.setDate(now.getDate() - 1);
-            pointsToGenerate = 24; // 24 hours
+            pointsToGenerate = 24;
         } else if (filter === 'Semanal') {
             startOfPeriod.setDate(now.getDate() - 7);
             pointsToGenerate = 7;
@@ -102,7 +102,7 @@ export class SuperAdminService {
         } else if (filter === 'Anual') {
             startOfPeriod.setDate(now.getDate() - 365);
             pointsToGenerate = 12;
-            daysPerPoint = 30; // approx
+            daysPerPoint = 30;
         }
 
         const [
@@ -131,7 +131,6 @@ export class SuperAdminService {
             prisma.client.count(),
         ]);
 
-        // Historical data
         const historicalPoints = Array.from({ length: pointsToGenerate }).map((_, i) => {
             const d = new Date();
             if (filter === 'Diário') {
@@ -236,7 +235,6 @@ export class SuperAdminService {
     }
 
     async createTenant(data: { name: string; cnpj: string; slug: string }) {
-        // Basic validation
         if (!data.name || !data.cnpj || !data.slug) {
             throw new AppError('Nome, CNPJ e Slug são obrigatórios.', 400);
         }
@@ -284,26 +282,21 @@ export class SuperAdminService {
             throw new AppError('Não é possível excluir a Barbearia/Tenant do Sistema Principal.', 403);
         }
 
-        // Hard delete in a transaction, cleaning up all dependent records manually
         await prisma.$transaction(async (tx) => {
-            // Level 3 Dependencies (Dependents of Professional / Client / Appointment)
             await tx.refreshToken.deleteMany({ where: { professional: { tenantId } } });
             await tx.clientPasswordResetToken.deleteMany({ where: { client: { tenantId } } });
             await tx.appointmentReminder.deleteMany({ where: { appointment: { tenantId } } });
             await tx.commission.deleteMany({ where: { tenantId } });
             await tx.transaction.deleteMany({ where: { tenantId } });
 
-            // Level 2 Dependencies (Appointments)
             await tx.appointment.deleteMany({ where: { tenantId } });
 
-            // Level 1 Dependencies (Direct children of Tenant)
             await tx.businessHour.deleteMany({ where: { tenantId } });
             await tx.auditLog.deleteMany({ where: { tenantId } });
             await tx.client.deleteMany({ where: { tenantId } });
             await tx.service.deleteMany({ where: { tenantId } });
             await tx.professional.deleteMany({ where: { tenantId } });
 
-            // Finally, delete the tenant
             await tx.tenant.delete({ where: { id: tenantId } });
         });
 
@@ -354,7 +347,6 @@ export class SuperAdminService {
             select: { id: true, name: true, active: true }
         });
 
-        // Se desativar o usuário, revoga os tokens
         if (!active) {
             await prisma.refreshToken.deleteMany({ where: { professionalId } });
         }
@@ -375,7 +367,6 @@ export class SuperAdminService {
             select: { id: true, name: true, email: true }
         });
 
-        // Opcional: deslogar o usuário em todos os dispositivos após a troca de senha pelo SuperAdmin
         await prisma.refreshToken.deleteMany({ where: { professionalId } });
 
         return { message: 'Senha alterada com sucesso.', user: updated };
@@ -403,7 +394,6 @@ export class SuperAdminService {
             select: { id: true, name: true, email: true }
         });
 
-        // Opcional: revogar os tokens porque o e-mail mudou (exige relogar)
         await prisma.refreshToken.deleteMany({ where: { professionalId } });
 
         return { message: 'E-mail alterado com sucesso.', user: updated };

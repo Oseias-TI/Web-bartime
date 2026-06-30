@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { billingService } from "@/services/billing.service";
@@ -60,7 +60,7 @@ export default function PlanosPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 items-start">
-        {/* Status Atual */}
+        
         <Card className="border-2 border-primary/20 bg-primary/5">
           <CardHeader>
             <CardTitle>Status da Conta</CardTitle>
@@ -103,8 +103,7 @@ export default function PlanosPage() {
           </CardFooter>
         </Card>
 
-        {/* Detalhes do Plano */}
-        <Card>
+<Card>
           <CardHeader>
             <CardTitle>O que está incluso</CardTitle>
             <CardDescription>Tudo que você precisa para crescer</CardDescription>

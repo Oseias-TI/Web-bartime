@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { googleCalendarService } from '../../../shared/services/GoogleCalendarService';
 import { sendMail } from '../../../shared/utils/mailer';
@@ -50,11 +50,10 @@ export class PublicBookingService {
         });
 
         if (!businessHour || !businessHour.openTime || !businessHour.closeTime) {
-            return []; // Fechado
+            return [];
         }
 
-        // BUG-13: Obter duração do serviço para verificar conflitos com a duração real
-        let serviceDurationMin = 30; // fallback padrão
+        let serviceDurationMin = 30;
         if (serviceId) {
             const service = await prisma.service.findFirst({ where: { id: serviceId, tenantId: tenant.id, active: true } });
             if (service) serviceDurationMin = service.durationMin;
@@ -72,7 +71,6 @@ export class PublicBookingService {
             shifts.push({ openMinutes: openH * 60 + openM, closeMinutes: closeH * 60 + closeM });
         }
 
-        // Gerar slots de 30 em 30 min
         const slots: string[] = [];
         
         for (const shift of shifts) {
@@ -98,7 +96,6 @@ export class PublicBookingService {
             }
         });
 
-        // BUG-13: Verificar conflito com a duração completa do serviço, não apenas o horário de início
         const availableSlots = slots.filter(slot => {
             const [slotH, slotM] = slot.split(':').map(Number);
             const slotStartMs = new Date(`${date}T${slot}:00.000Z`).getTime();
@@ -126,7 +123,6 @@ export class PublicBookingService {
             professionalId = prof.id;
         }
 
-        // Criar ou obter cliente (busca por telefone ou email)
         let client = await prisma.client.findFirst({
             where: { 
                 tenantId: tenant.id, 
@@ -147,7 +143,6 @@ export class PublicBookingService {
                 }
             });
         } else if (data.clientEmail && !client.email) {
-            // Se o cliente existe mas não tinha email, atualiza
             client = await prisma.client.update({
                 where: { id: client.id },
                 data: { email: data.clientEmail }
@@ -157,7 +152,6 @@ export class PublicBookingService {
         const startDate = new Date(data.startTime);
         const endDate = new Date(startDate.getTime() + service.durationMin * 60000);
 
-        // BUG-09: Usar transação para evitar race condition (dois clientes agendando o mesmo horário)
         const appointment = await prisma.$transaction(async (tx) => {
             const conflict = await tx.appointment.findFirst({
                 where: {
@@ -188,7 +182,6 @@ export class PublicBookingService {
             });
         });
 
-        // Add to Google Calendar asynchronously
         googleCalendarService.createEvent({
             summary: `Agendamento Web: ${appointment.client.name} - ${appointment.service.name}`,
             description: `Cliente: ${appointment.client.name}\nEmail: ${data.clientEmail || 'N/A'}\nTelefone: ${data.clientPhone}\nServiço: ${appointment.service.name}\nProfissional: ${appointment.professional.name}`,

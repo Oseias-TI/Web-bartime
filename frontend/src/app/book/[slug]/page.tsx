@@ -40,13 +40,11 @@ export default function AuthenticatedClientPage() {
   const { slug } = useParams();
   const router = useRouter();
   
-  // Dashboard State
   const [isLoading, setIsLoading] = useState(true);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [clientInfo, setClientInfo] = useState<any>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   
-  // Booking State
   const [isBookingFlow, setIsBookingFlow] = useState(false);
   const [step, setStep] = useState(1);
   const [services, setServices] = useState<Service[]>([]);
@@ -173,7 +171,6 @@ export default function AuthenticatedClientPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center">
-      {/* Header */}
       <header className="w-full max-w-md bg-white dark:bg-zinc-900 border-b p-6 shadow-sm flex flex-col relative">
         {!isBookingFlow ? (
           <>
@@ -222,7 +219,6 @@ export default function AuthenticatedClientPage() {
         )}
       </header>
 
-      {/* Main Content Area */}
       <main className="w-full max-w-md flex-1 p-4 pb-24">
         
         {!isBookingFlow ? (
@@ -240,7 +236,6 @@ export default function AuthenticatedClientPage() {
               <CalendarIcon className="w-5 h-5 mr-2" /> Novo Agendamento
             </Button>
 
-            {/* Próximos Agendamentos */}
             <section>
               <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">Próximos Cortes</h2>
               
@@ -274,7 +269,6 @@ export default function AuthenticatedClientPage() {
               )}
             </section>
 
-            {/* Histórico */}
             <section>
               <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-4">Histórico</h2>
               
@@ -299,7 +293,6 @@ export default function AuthenticatedClientPage() {
           </div>
         ) : (
           <div className="w-full">
-            {/* STEP 1: SERVICE */}
             {step === 1 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                 <button onClick={() => setIsBookingFlow(false)} className="text-sm text-zinc-500 flex items-center gap-1 mb-4 hover:text-primary transition-colors">
@@ -330,7 +323,6 @@ export default function AuthenticatedClientPage() {
               </div>
             )}
 
-            {/* STEP 2: PROFESSIONAL */}
             {step === 2 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                 <button onClick={() => setStep(1)} className="text-sm text-zinc-500 flex items-center gap-1 mb-4 hover:text-primary transition-colors">
@@ -367,7 +359,6 @@ export default function AuthenticatedClientPage() {
               </div>
             )}
 
-            {/* STEP 3: DATE AND TIME */}
             {step === 3 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                 <button onClick={() => setStep(2)} className="text-sm text-zinc-500 flex items-center gap-1 mb-4 hover:text-primary transition-colors">
@@ -480,7 +471,6 @@ export default function AuthenticatedClientPage() {
               </div>
             )}
 
-            {/* STEP 4: CONFIRMATION (CLIENT INFO SKIP) */}
             {step === 4 && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                 <button onClick={() => setStep(3)} className="text-sm text-zinc-500 flex items-center gap-1 mb-4 hover:text-primary transition-colors">
@@ -516,7 +506,6 @@ export default function AuthenticatedClientPage() {
               </div>
             )}
 
-            {/* STEP 5: SUCCESS */}
             {step === 5 && (
               <div className="animate-in zoom-in-95 duration-500 flex flex-col items-center justify-center text-center pt-10">
                 <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">

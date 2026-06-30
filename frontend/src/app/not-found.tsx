@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Scissors, ArrowLeft, Search } from "lucide-react";
@@ -9,14 +9,14 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
-      {/* Background effects */}
+      
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-black/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] bg-black/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative text-center max-w-md mx-auto">
-        {/* Animated 404 */}
+        
         <div className="relative mb-8">
           <h1 className="text-[120px] md:text-[160px] font-black leading-none tracking-tighter bg-gradient-to-b from-[#4a3d2e] to-[#2a1f12] bg-clip-text text-transparent select-none font-[family-name:var(--font-playfair)]">
             404

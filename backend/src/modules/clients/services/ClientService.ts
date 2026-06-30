@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import { redisClient } from '../../../lib/redis';
 import { AppError } from '../../../shared/errors/AppError';
 import { UpdateClientInput } from '../dtos/UpdateClientSchema';
@@ -21,7 +21,6 @@ export class ClientService {
         if (exists) throw new AppError('Telefone já cadastrado para outro cliente.', 409);
 
         const client = await prisma.client.create({ data });
-        // Invalidate cache
         await redisClient.del(`clients:list:${data.tenantId}`);
         return client;
     }
@@ -56,7 +55,7 @@ export class ClientService {
         const result = buildPaginatedResult(data, total, params);
 
         if (redisClient.isReady) {
-            await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(result)); // Cache for 5 minutes
+            await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(result));
         }
 
         return result;
@@ -78,7 +77,6 @@ export class ClientService {
     }
 
     async getClientSpending(tenantId: string, clientId: string) {
-        // BUG-18: Incluir loyaltyPoints para calcular corretamente pointsToNextReward
         const client = await prisma.client.findFirst({ where: { id: clientId, tenantId }, select: { id: true, name: true, loyaltyPoints: true } });
         if (!client) throw new AppError('Cliente não encontrado.', 404);
 
@@ -97,7 +95,6 @@ export class ClientService {
             totalSpent: totalSpent.toFixed(2),
             avgTicket: avgTicket.toFixed(2),
             lastVisit: completed[0]?.startTime ?? null,
-            // BUG-18: Calcular pontos faltando para a próxima recompensa com base nos pontos atuais
             pointsToNextReward: POINTS_PER_REWARD - (client.loyaltyPoints % POINTS_PER_REWARD),
         };
     }
@@ -116,7 +113,6 @@ export class ClientService {
             where: {
                 tenantId,
                 id: { notIn: recentIds.map(a => a.clientId) },
-                // BUG-14: Adicionar tenantId no filtro aninhado para garantir isolamento por tenant
                 appointments: { some: { status: 'COMPLETED', tenantId } },
             },
             select: {
@@ -155,7 +151,6 @@ export class ClientService {
 
         const updated = await prisma.client.update({ where: { id: clientId }, data });
 
-        // Invalidate list cache and possibly profile cache if implemented
         if (redisClient.isReady) {
             const keys = await redisClient.keys(`clients:list:${tenantId}*`);
             if (keys.length > 0) await redisClient.del(keys);
@@ -192,31 +187,19 @@ export class ClientService {
         return appointments;
     }
 
-    // ═══════════════════════════════════════════════
-    //  LGPD — Direitos do Titular (Art. 18)
-    // ═══════════════════════════════════════════════
-
-    /**
-     * LGPD Art. 18, VI — Direito à eliminação dos dados pessoais.
-     * Anonimiza os dados do cliente ao invés de deletar, preservando
-     * integridade referencial com agendamentos e registros financeiros.
-     */
-    async anonymizeClient(tenantId: string, clientId: string, ipAddress?: string) {
+async anonymizeClient(tenantId: string, clientId: string, ipAddress?: string) {
         const client = await prisma.client.findFirst({ where: { id: clientId, tenantId } });
         if (!client) throw new AppError('Cliente não encontrado.', 404);
 
-        // Verificar se já foi anonimizado
         if (client.name === '[Removido]') {
             throw new AppError('Os dados deste cliente já foram removidos.', 400);
         }
 
-        // Cancelar agendamentos pendentes antes da anonimização
         await prisma.appointment.updateMany({
             where: { clientId, tenantId, status: 'PENDING' },
             data: { status: 'CANCELED' },
         });
 
-        // Anonimizar dados pessoais e registrar no audit trail
         const anonymized = await prisma.$transaction(async tx => {
             const updated = await tx.client.update({
                 where: { id: clientId },
@@ -232,7 +215,6 @@ export class ClientService {
                 },
             });
 
-            // Registrar revogação de consentimento
             await tx.consentLog.create({
                 data: {
                     clientId,
@@ -242,7 +224,6 @@ export class ClientService {
                 },
             });
 
-            // Registrar no audit log
             await tx.auditLog.create({
                 data: {
                     tenantId,
@@ -257,7 +238,6 @@ export class ClientService {
             return updated;
         });
 
-        // Invalidar cache
         if (redisClient.isReady) {
             const keys = await redisClient.keys(`clients:list:${tenantId}*`);
             if (keys.length > 0) await redisClient.del(keys);
@@ -266,11 +246,7 @@ export class ClientService {
         return { message: 'Dados pessoais removidos com sucesso conforme LGPD Art. 18, VI.' };
     }
 
-    /**
-     * LGPD Art. 18, V — Direito à portabilidade dos dados.
-     * Retorna todos os dados pessoais do cliente em formato estruturado.
-     */
-    async exportClientData(tenantId: string, clientId: string) {
+async exportClientData(tenantId: string, clientId: string) {
         const client = await prisma.client.findFirst({
             where: { id: clientId, tenantId },
             select: {

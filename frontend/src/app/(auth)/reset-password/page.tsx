@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -126,7 +126,7 @@ function ResetPasswordContent() {
   return (
     <div className="animate-fade-in">
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
-        {/* Logo */}
+        
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
             <Scissors className="size-7 text-black" />
@@ -161,7 +161,7 @@ function ResetPasswordContent() {
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Password */}
+            
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-neutral-300">
                 Nova Senha
@@ -189,7 +189,7 @@ function ResetPasswordContent() {
               {errors.password && (
                 <p className="text-xs text-red-400">{errors.password.message}</p>
               )}
-              {/* Strength indicator */}
+              
               {passwordValue && (
                 <div className="space-y-1.5">
                   <div className="flex gap-1">
@@ -211,8 +211,7 @@ function ResetPasswordContent() {
               )}
             </div>
 
-            {/* Confirm */}
-            <div className="space-y-2">
+<div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
                 className="text-sm font-medium text-neutral-300"

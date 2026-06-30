@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+﻿import cron from 'node-cron';
 import { prisma } from '../../lib/prisma';
 import { sendMail } from '../utils/mailer';
 import { ReminderType } from '@prisma/client';
@@ -6,7 +6,7 @@ import { ReminderType } from '@prisma/client';
 async function sendReminder(hoursBeforeLabel: ReminderType, hoursBeforeMs: number) {
     const now = new Date();
     const windowStart = new Date(now.getTime() + hoursBeforeMs);
-    const windowEnd = new Date(windowStart.getTime() + 5 * 60 * 1000); // janela de 5 min
+    const windowEnd = new Date(windowStart.getTime() + 5 * 60 * 1000);
 
     const appointments = await prisma.appointment.findMany({
         where: {
@@ -59,12 +59,10 @@ async function sendReminder(hoursBeforeLabel: ReminderType, hoursBeforeMs: numbe
 }
 
 export function startReminderJobs() {
-    // Roda a cada 5 minutos — verifica agendamentos em 24h
     cron.schedule('*/5 * * * *', () => {
         sendReminder(ReminderType.EMAIL_24H, 24 * 60 * 60 * 1000).catch(console.error);
     });
 
-    // Roda a cada 5 minutos — verifica agendamentos em 1h
     cron.schedule('*/5 * * * *', () => {
         sendReminder(ReminderType.EMAIL_1H, 60 * 60 * 1000).catch(console.error);
     });

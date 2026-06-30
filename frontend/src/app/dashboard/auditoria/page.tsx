@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
@@ -111,7 +111,7 @@ export default function AuditoriaPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Auditoria</h1>
         <p className="text-muted-foreground">
@@ -119,8 +119,7 @@ export default function AuditoriaPage() {
         </p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+<div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
@@ -155,8 +154,7 @@ export default function AuditoriaPage() {
         </Select>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-3">
+<div className="grid gap-4 md:grid-cols-3">
         <Card className="bg-card border-border">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -200,8 +198,7 @@ export default function AuditoriaPage() {
         </Card>
       </div>
 
-      {/* Logs Table */}
-      <Card className="bg-card border-border">
+<Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-base font-semibold">Registros</CardTitle>
           <CardDescription>
@@ -267,8 +264,7 @@ export default function AuditoriaPage() {
             </div>
           )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
+{totalPages > 1 && (
             <div className="flex items-center justify-between pt-4 mt-4 border-t border-border">
               <p className="text-sm text-muted-foreground">
                 Página {page} de {totalPages}

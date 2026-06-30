@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { AlertTriangle, Mail, X, Loader2 } from "lucide-react";
@@ -12,7 +12,6 @@ export function EmailVerificationBanner() {
   const [isDismissed, setIsDismissed] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  // Don't show if already verified, dismissed, or no user
   if (!professional || professional.emailVerified || isDismissed) {
     return null;
   }

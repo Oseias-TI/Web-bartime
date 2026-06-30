@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
@@ -18,8 +18,6 @@ export class RefreshTokenService {
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRES_DAYS);
 
-        // BUG-15: Não apagar todos os tokens — isso deslogava todos os dispositivos simultaneamente.
-        // Tokens antigos expirarão naturalmente no prazo de REFRESH_TOKEN_EXPIRES_DAYS.
         await prisma.refreshToken.create({
             data: { token: refreshToken, professionalId, expiresAt },
         });

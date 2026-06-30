@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 import { localNowAsUTC, localDateString } from '../../../shared/utils/timezone';
 
@@ -27,7 +27,6 @@ const SLOT_INTERVAL_MIN = 15;
 
 export class AvailabilityService {
     async getSlots({ tenantId, professionalId, serviceId, date }: AvailabilityInput): Promise<TimeSlot[]> {
-        // Comparar com data local do servidor (não UTC) para evitar bloquear consultas à noite
         if (date < localDateString()) throw new AppError('Não é possível consultar datas passadas.', 400);
 
         const requestedDate = new Date(`${date}T00:00:00.000Z`);
@@ -50,7 +49,6 @@ export class AvailabilityService {
         const serviceDurationMs = service.durationMin * 60_000;
         const slotIntervalMs = SLOT_INTERVAL_MIN * 60_000;
         
-        // Usar o "agora" na mesma convenção local-as-UTC para marcar slots passados
         const nowLocalAsUTC = localNowAsUTC();
 
         const shifts = [];
@@ -67,8 +65,7 @@ export class AvailabilityService {
             });
         }
 
-
-        for (const shift of shifts) {
+for (const shift of shifts) {
             let cursor = shift.start;
             while (cursor + serviceDurationMs <= shift.end) {
                 const slotStart = new Date(cursor);

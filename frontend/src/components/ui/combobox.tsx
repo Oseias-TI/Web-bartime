@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Combobox as ComboboxPrimitive } from "@base-ui/react/combobox";
 import { ChevronsUpDownIcon, XIcon } from "lucide-react";
@@ -51,7 +51,6 @@ function ComboboxInput({
   const { multiple } = React.useContext(ComboboxContext);
   const sizeValue = (size ?? "default") as "sm" | "default" | "lg" | number;
 
-  // multiple mode
   if (multiple) {
     return (
       <ComboboxPrimitive.Input
@@ -68,7 +67,6 @@ function ComboboxInput({
     );
   }
 
-  // single mode
   return (
     <div className="relative not-has-[>*.w-full]:w-fit w-full has-disabled:opacity-64">
       {startAddon && (

@@ -1,4 +1,4 @@
-export interface ICreateAppointmentDTO {
+﻿export interface ICreateAppointmentDTO {
     tenantId: string;
     clientId: string;
     professionalId: string;
@@ -45,7 +45,6 @@ export interface IAppointmentRepository {
     listByDay(tenantId: string, start: Date, end: Date, professionalId?: string, skip?: number, take?: number): Promise<any[]>;
     countByDay(tenantId: string, start: Date, end: Date, professionalId?: string): Promise<number>;
     
-    // Aggregate transactional methods
     cancelAppointmentWithCommissions(appointmentId: string): Promise<any>;
     completeAppointmentAndCreateFinancials(
         appointmentId: string, 

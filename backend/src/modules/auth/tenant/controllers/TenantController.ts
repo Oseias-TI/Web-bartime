@@ -1,24 +1,21 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { TenantService } from '../services/TenantService';
 import { UpdateTenantSchema } from '../dtos/UpdateTenantSchema';
 import { asyncHandler } from '../../../../shared/utils/asyncHandler';
 import { AppError } from '../../../../shared/errors/AppError';
 
 export class TenantController {
-    // GET /tenant — retorna dados da barbearia logada
     get = asyncHandler(async (req: Request, res: Response) => {
         const result = await new TenantService().get(req.user.tenantId);
         return res.json(result);
     });
 
-    // PATCH /tenant — edita nome da barbearia
     update = asyncHandler(async (req: Request, res: Response) => {
         const data = UpdateTenantSchema.parse(req.body);
         const result = await new TenantService().update(req.user.tenantId, data);
         return res.json(result);
     });
 
-    // PATCH /tenant/logo — faz upload da logo
     updateLogo = asyncHandler(async (req: Request, res: Response) => {
         console.log("Recebeu PATCH /tenant/logo");
         console.log("req.file:", req.file);

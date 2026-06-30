@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { ArrowLeft, Send, Shield, CheckCircle2 } from "lucide-react";
@@ -24,7 +24,6 @@ export default function SolicitacaoPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Gerar o mailto com os dados preenchidos
     const selectedType = REQUEST_TYPES.find(r => r.value === requestType);
     const subject = encodeURIComponent(`[LGPD] Solicitação de Direito do Titular - ${selectedType?.label || "Geral"}`);
     const body = encodeURIComponent(
@@ -92,7 +91,7 @@ export default function SolicitacaoPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Nome */}
+          
           <div>
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">Nome completo</label>
             <input
@@ -105,8 +104,7 @@ export default function SolicitacaoPage() {
             />
           </div>
 
-          {/* Email */}
-          <div>
+<div>
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">E-mail de contato</label>
             <input
               type="email"
@@ -118,8 +116,7 @@ export default function SolicitacaoPage() {
             />
           </div>
 
-          {/* Tipo de solicitação */}
-          <div>
+<div>
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-3">Tipo de solicitação</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {REQUEST_TYPES.map((type) => (
@@ -149,8 +146,7 @@ export default function SolicitacaoPage() {
             </div>
           </div>
 
-          {/* Detalhes */}
-          <div>
+<div>
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">Detalhes adicionais</label>
             <textarea
               value={details}
@@ -162,15 +158,13 @@ export default function SolicitacaoPage() {
             />
           </div>
 
-          {/* Info */}
-          <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 space-y-1">
+<div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 space-y-1">
             <p>• Ao enviar, seu cliente de e-mail será aberto com a solicitação preenchida.</p>
             <p>• Responderemos em até <strong>15 dias úteis</strong> conforme Art. 18, §5 da LGPD.</p>
             <p>• Podemos solicitar verificação de identidade para proteger seus dados.</p>
           </div>
 
-          {/* Submit */}
-          <button
+<button
             type="submit"
             disabled={!name || !email || !requestType || !details}
             className="w-full h-12 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm text-sm"

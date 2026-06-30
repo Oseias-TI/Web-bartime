@@ -1,4 +1,4 @@
-import { AuthenticateBusinessService } from '../../../../../src/modules/auth/services/AuthenticateBusinessService';
+﻿import { AuthenticateBusinessService } from '../../../../../src/modules/auth/services/AuthenticateBusinessService';
 import { prisma } from '../../../../../src/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { AppError } from '../../../../../src/shared/errors/AppError';
@@ -30,7 +30,6 @@ describe('AuthenticateBusinessService (Unit)', () => {
     });
 
     it('deve autenticar e retornar tokens quando as credenciais forem validas', async () => {
-        // Arrange
         const email = 'test@example.com';
         const password = 'Password123';
         
@@ -65,13 +64,10 @@ describe('AuthenticateBusinessService (Unit)', () => {
             expiresIn: 3600
         });
 
-        // Mock method on prototype
         (RefreshTokenService.prototype.generateTokens as jest.Mock) = mockGenerateTokens;
 
-        // Act
         const result = await authService.execute({ email, password });
 
-        // Assert
         expect(prisma.professional.findFirst).toHaveBeenCalledWith({
             where: { email, active: true },
             orderBy: { role: 'desc' },
@@ -87,21 +83,17 @@ describe('AuthenticateBusinessService (Unit)', () => {
     });
 
     it('deve lancar AppError quando o email nao for encontrado', async () => {
-        // Arrange
         (prisma.professional.findFirst as jest.Mock).mockResolvedValue(null);
 
-        // Act & Assert
         await expect(authService.execute({ email: 'wrong@test.com', password: '123' }))
             .rejects.toBeInstanceOf(AppError);
         expect(bcrypt.compare).not.toHaveBeenCalled();
     });
 
     it('deve lancar AppError quando a senha estiver incorreta', async () => {
-        // Arrange
         (prisma.professional.findFirst as jest.Mock).mockResolvedValue({ password: 'hashed-password' });
         (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-        // Act & Assert
         await expect(authService.execute({ email: 'test@example.com', password: 'wrong' }))
             .rejects.toBeInstanceOf(AppError);
         expect(prisma.tenant.findUnique).not.toHaveBeenCalled();

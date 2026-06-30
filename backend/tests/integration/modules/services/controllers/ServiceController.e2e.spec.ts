@@ -1,8 +1,7 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-// ── Mock do Prisma ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/prisma', () => ({
     prisma: {
         service: {
@@ -15,7 +14,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do Redis ──────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/redis', () => ({
     redisClient: {
         del: jest.fn(),
@@ -25,7 +23,6 @@ jest.mock('../../../../../src/lib/redis', () => ({
     },
 }));
 
-// ── Mock do Logger ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/logger', () => ({
     __esModule: true,
     default: {
@@ -40,7 +37,6 @@ jest.mock('../../../../../src/shared/utils/logger', () => ({
     },
 }));
 
-// ── Mock Middlewares ──────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/middlewares/checkSubscription', () => ({
     checkSubscription: (req: any, res: any, next: any) => next(),
 }));
@@ -78,9 +74,7 @@ describe('ServiceController (Integration)', () => {
         jest.clearAllMocks();
     });
 
-    // ── POST /services ──────────────────────────────────────────────────────
-
-    it('deve retornar 201 Created ao criar servico com dados validos', async () => {
+it('deve retornar 201 Created ao criar servico com dados validos', async () => {
         const serviceData = { name: 'Corte Degradê', price: 45.0, durationMin: 30 };
         const created = { id: uuidv4(), tenantId, ...serviceData, active: true };
 
@@ -151,9 +145,7 @@ describe('ServiceController (Integration)', () => {
         expect(response.status).toBe(403);
     });
 
-    // ── GET /services ───────────────────────────────────────────────────────
-
-    it('deve retornar 200 OK com lista de servicos', async () => {
+it('deve retornar 200 OK com lista de servicos', async () => {
         const services = [
             { id: uuidv4(), tenantId, name: 'Corte', price: 30, durationMin: 30, active: true },
             { id: uuidv4(), tenantId, name: 'Barba', price: 20, durationMin: 15, active: true },
@@ -170,9 +162,7 @@ describe('ServiceController (Integration)', () => {
         expect(response.body[0]).toHaveProperty('name');
     });
 
-    // ── PATCH /services/:id ─────────────────────────────────────────────────
-
-    it('deve retornar 200 OK ao atualizar servico existente', async () => {
+it('deve retornar 200 OK ao atualizar servico existente', async () => {
         const serviceId = uuidv4();
         const existing = { id: serviceId, tenantId, name: 'Corte', price: 30, durationMin: 30 };
         const updated = { ...existing, price: 35 };
@@ -189,9 +179,7 @@ describe('ServiceController (Integration)', () => {
         expect(response.body.price).toBe(35);
     });
 
-    // ── DELETE /services/:id ────────────────────────────────────────────────
-
-    it('deve retornar 204 No Content ao desativar servico', async () => {
+it('deve retornar 204 No Content ao desativar servico', async () => {
         const serviceId = uuidv4();
         const existing = { id: serviceId, tenantId, name: 'Corte', price: 30, active: true };
 

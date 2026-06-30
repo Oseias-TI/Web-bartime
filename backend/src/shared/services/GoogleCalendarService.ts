@@ -1,4 +1,4 @@
-import { google, calendar_v3 } from 'googleapis';
+﻿import { google, calendar_v3 } from 'googleapis';
 import path from 'path';
 
 export class GoogleCalendarService {
@@ -6,8 +6,6 @@ export class GoogleCalendarService {
     private calendarId: string;
 
     constructor() {
-        // Por padrão, usa o email da service account se nenhuma agenda específica for passada
-        // ou pode-se usar uma variável de ambiente GOOGLE_CALENDAR_ID
         this.calendarId = process.env.GOOGLE_CALENDAR_ID || 'primary';
         this.initialize();
     }
@@ -19,12 +17,10 @@ export class GoogleCalendarService {
             
             let auth;
 
-            // Prioriza a variável de ambiente (Railway), mas faz fallback pro arquivo (Local)
             if (process.env.GOOGLE_CREDENTIALS) {
                 const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
                 
                 if (credentials.private_key) {
-                    // Tenta garantir que os \n escapados voltem a ser quebras de linha reais
                     credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
                 }
 

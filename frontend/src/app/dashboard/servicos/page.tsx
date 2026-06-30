@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -60,7 +60,6 @@ export default function ServicosPage() {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Form
   const [formName, setFormName] = useState("");
   const [formPrice, setFormPrice] = useState("");
   const [formDuration, setFormDuration] = useState("");
@@ -150,7 +149,7 @@ export default function ServicosPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Serviços</h1>
@@ -237,8 +236,7 @@ export default function ServicosPage() {
         )}
       </div>
 
-      {/* Services Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading
           ? [...Array(6)].map((_, i) => (
               <Card key={i} className="bg-card border-border">
@@ -293,8 +291,7 @@ export default function ServicosPage() {
             ))}
       </div>
 
-      {/* Inactive Services */}
-      {inactiveServices.length > 0 && (
+{inactiveServices.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
             Serviços Inativos ({inactiveServices.length})

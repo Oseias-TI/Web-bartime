@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
@@ -83,7 +83,6 @@ export function ClientProfileDrawer({
       setProfile(profileData);
       setSpending(spendingData);
     } catch {
-      // Use basic client data if profile endpoint fails
       setProfile({
         ...client,
         totalAppointments: 0,
@@ -163,7 +162,7 @@ export function ClientProfileDrawer({
             </div>
           ) : profile ? (
             <div className="space-y-6">
-              {/* ─── Client Info ─── */}
+              
               <div className="flex items-start gap-4">
                 <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <User className="size-7 text-primary" />
@@ -192,8 +191,7 @@ export function ClientProfileDrawer({
                 </div>
               </div>
 
-              {/* ─── Stats Row ─── */}
-              <div className="grid grid-cols-3 gap-3">
+<div className="grid grid-cols-3 gap-3">
                 <div className="rounded-lg border border-border p-3 text-center">
                   <p className="text-xl font-bold text-primary">
                     {profile.totalAppointments}
@@ -222,8 +220,7 @@ export function ClientProfileDrawer({
 
               <Separator />
 
-              {/* ─── Loyalty Points ─── */}
-              <div>
+<div>
                 <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
                   <Star className="size-4 text-amber-500" />
                   Programa de Fidelidade
@@ -271,8 +268,7 @@ export function ClientProfileDrawer({
                 </div>
               </div>
 
-              {/* ─── Spending Chart ─── */}
-              {chartData.length > 0 && (
+{chartData.length > 0 && (
                 <div>
                   <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
                     <TrendingUp className="size-4 text-emerald-500" />
@@ -347,8 +343,7 @@ export function ClientProfileDrawer({
 
               <Separator />
 
-              {/* ─── Appointment History ─── */}
-              <div>
+<div>
                 <h4 className="text-sm font-semibold flex items-center gap-2 mb-3">
                   <Calendar className="size-4 text-blue-500" />
                   Histórico de Agendamentos
@@ -400,8 +395,7 @@ export function ClientProfileDrawer({
                 )}
               </div>
 
-              {/* ─── Last Visit ─── */}
-              {profile.lastVisit && (
+{profile.lastVisit && (
                 <p className="text-xs text-muted-foreground text-center">
                   Última visita:{" "}
                   {format(new Date(profile.lastVisit), "dd/MM/yyyy 'às' HH:mm", {

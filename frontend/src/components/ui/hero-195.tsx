@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { useState } from "react";
@@ -106,13 +106,13 @@ function Hero195({
         className
       )}
     >
-      {/* Background */}
+      
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-br from-white/10 via-white/5 to-transparent rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-6xl mx-auto">
-        {/* Top section — headline */}
+        
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-20 mt-4 md:mt-10">
           <div className="space-y-6 flex flex-col items-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-neutral-300">
@@ -190,8 +190,7 @@ function Hero195({
                         </p>
                       </div>
 
-                      {/* Controls */}
-                      <button 
+<button 
                         onClick={() => setCurrentPreview((prev) => (prev === 0 ? previews.length - 1 : prev - 1))}
                         className="absolute left-4 top-1/2 -translate-y-1/2 size-10 rounded-full bg-black/60 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/90 focus:opacity-100"
                       >
@@ -205,8 +204,7 @@ function Hero195({
                         <ChevronRight className="size-5" />
                       </button>
 
-                      {/* Indicators */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                         {previews.map((_, idx) => (
                           <button 
                             key={idx} 
@@ -223,8 +221,7 @@ function Hero195({
           </div>
         </div>
 
-        {/* Bottom section — feature tabs */}
-        <Tabs
+<Tabs
           value={activeTab}
           onValueChange={setActiveTab}
           className="w-full"

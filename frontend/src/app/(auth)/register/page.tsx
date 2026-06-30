@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,6 @@ const registerSchema = z
   .object({
     name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
     email: z.string().email("Email inválido"),
-    // BUG-06: Alinhado com as regras do backend (min 8, maiúscula, número)
     password: z
       .string()
       .min(8, "Senha deve ter no mínimo 8 caracteres")
@@ -77,7 +76,6 @@ export default function RegisterPage() {
         password: data.password,
         tenantName: data.tenantName,
         cnpj: data.cnpj.replace(/\D/g, ""),
-        // LGPD: Enviar versão da política de privacidade aceita pelo usuário
         consentVersion: CURRENT_PRIVACY_VERSION,
       });
       setStep(3);
@@ -94,7 +92,7 @@ export default function RegisterPage() {
   return (
     <div className="animate-fade-in">
       <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl shadow-black/20">
-        {/* Logo */}
+        
         {step !== 3 && (
           <div className="flex flex-col items-center gap-3 mb-8">
             <div className="flex size-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-white/5">
@@ -109,8 +107,7 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* Step indicator */}
-        {step !== 3 && (
+{step !== 3 && (
           <div className="flex items-center gap-2 mb-6">
             <div
               className={`h-1 flex-1 rounded-full transition-colors ${

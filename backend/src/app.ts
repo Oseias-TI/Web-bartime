@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -26,11 +26,9 @@ app.use(express.json());
 import path from 'path';
 app.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 
-// BUG-02: Validar origens contra ALLOWED_ORIGINS ao invés de aceitar qualquer origem
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',').map(s => s.trim());
 app.use(cors({
     origin: (origin, callback) => {
-        // Permitir requests sem origin (ex: ferramentas, mobile, server-to-server)
         if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
@@ -43,7 +41,6 @@ app.use(cors({
 app.use(traceIdMiddleware);
 app.use(metricsMiddleware);
 
-// BUG-03: /metrics protegido — requer autenticação + super admin
 app.get('/metrics', ensureAuthenticated, ensureSuperAdmin, metricsEndpoint);
 
 app.use(routes);

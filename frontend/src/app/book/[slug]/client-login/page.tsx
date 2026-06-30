@@ -18,11 +18,9 @@ export default function ClientLoginPage() {
   const [tenant, setTenant] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
-  // Login State
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   
-  // Register State
   const [regName, setRegName] = useState("");
   const [regPhone, setRegPhone] = useState("");
   const [regEmail, setRegEmail] = useState("");
@@ -77,7 +75,6 @@ export default function ClientLoginPage() {
         phone: regPhone,
         email: regEmail,
         password: regPassword,
-        // LGPD: Enviar versão da política de privacidade aceita
         consentVersion: CURRENT_PRIVACY_VERSION,
       });
 
@@ -115,7 +112,6 @@ export default function ClientLoginPage() {
           )}
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b">
           <button 
             className={cn("flex-1 py-3 text-sm font-semibold transition-colors border-b-2", activeTab === 'login' ? "border-primary text-primary" : "border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300")}

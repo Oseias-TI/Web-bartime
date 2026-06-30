@@ -1,8 +1,7 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 
-// ── Mock do Prisma ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/prisma', () => ({
     prisma: {
         service: { findFirst: jest.fn() },
@@ -16,7 +15,6 @@ jest.mock('../../../../../src/lib/prisma', () => ({
     },
 }));
 
-// ── Mock do Redis ──────────────────────────────────────────────────────────
 jest.mock('../../../../../src/lib/redis', () => ({
     redisClient: {
         del: jest.fn(),
@@ -26,7 +24,6 @@ jest.mock('../../../../../src/lib/redis', () => ({
     },
 }));
 
-// ── Mock do Logger ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/logger', () => ({
     __esModule: true,
     default: {
@@ -41,12 +38,10 @@ jest.mock('../../../../../src/shared/utils/logger', () => ({
     },
 }));
 
-// ── Mock do Mailer ────────────────────────────────────────────────────────
 jest.mock('../../../../../src/shared/utils/mailer', () => ({
     sendMail: jest.fn().mockResolvedValue(true),
 }));
 
-// ── Mock Middlewares de Auth/Subscription ─────────────────────────────────
 jest.mock('../../../../../src/shared/middlewares/checkSubscription', () => ({
     checkSubscription: (req: any, res: any, next: any) => next(),
 }));
@@ -84,7 +79,6 @@ describe('AppointmentController (Integration)', () => {
     });
 
     it('deve retornar 201 Created quando o agendamento for criado', async () => {
-        // Arrange
         const data = {
             clientId: uuidv4(),
             professionalId: uuidv4(),
@@ -108,20 +102,17 @@ describe('AppointmentController (Integration)', () => {
         (prisma.appointment.findFirst as jest.Mock).mockResolvedValue(null);
         (prisma.appointment.create as jest.Mock).mockResolvedValue(createdAppt);
 
-        // Act
         const response = await request(app)
             .post('/appointments')
             .set('Authorization', `Bearer ${token}`)
             .send(data);
 
-        // Assert
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('id');
         expect(response.body.clientId).toBe(data.clientId);
     });
 
     it('deve retornar 409 Conflict se houver choque de horario', async () => {
-        // Arrange
         const data = {
             clientId: uuidv4(),
             professionalId: uuidv4(),
@@ -133,15 +124,13 @@ describe('AppointmentController (Integration)', () => {
         (prisma.businessHour.findUnique as jest.Mock).mockResolvedValue({ open: true, openTime: '08:00', closeTime: '18:00' });
         
         (prisma.$transaction as jest.Mock).mockImplementation(async (cb) => cb(prisma));
-        (prisma.appointment.findFirst as jest.Mock).mockResolvedValue({ id: 'conflict-id' }); // Conflito simulado
+        (prisma.appointment.findFirst as jest.Mock).mockResolvedValue({ id: 'conflict-id' });
 
-        // Act
         const response = await request(app)
             .post('/appointments')
             .set('Authorization', `Bearer ${token}`)
             .send(data);
 
-        // Assert
         expect(response.status).toBe(409);
         expect(response.body.message).toMatch(/já possui agendamento/i);
     });

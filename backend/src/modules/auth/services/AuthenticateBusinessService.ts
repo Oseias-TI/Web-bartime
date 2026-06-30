@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+﻿import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { AppError } from '../../../shared/errors/AppError';
 import { AuthInput } from '../dtos/AuthSchema';
@@ -8,7 +8,7 @@ export class AuthenticateBusinessService {
     async execute({ email, password }: AuthInput) {
         const professional = await prisma.professional.findFirst({
             where: { email, active: true },
-            orderBy: { role: 'desc' } // Prioriza SUPER_ADMIN (S > R > B > A) caso o mesmo e-mail exista em vários tenants
+            orderBy: { role: 'desc' }
         });
 
         if (!professional) throw new AppError('E-mail ou senha incorretos.', 401);
@@ -34,7 +34,7 @@ export class AuthenticateBusinessService {
             );
 
         return {
-            token: accessToken, // Frontend AuthContext expects this
+            token: accessToken,
             accessToken,
             refreshToken,
             expiresIn,

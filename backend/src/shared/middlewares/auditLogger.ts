@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../../lib/prisma';
 
 interface AuditOptions {
@@ -8,7 +8,6 @@ interface AuditOptions {
     getMetadata?: (req: Request, res: Response) => Record<string, any> | undefined;
 }
 
-// BUG-16: Sanitizar campos sensíveis do body antes de salvar no AuditLog
 const SENSITIVE_FIELDS = ['password', 'currentPassword', 'newPassword', 'confirmPassword', 'token', 'refreshToken'];
 
 function sanitizeBody(body: Record<string, any>): Record<string, any> {
@@ -23,7 +22,6 @@ export function auditLog(options: AuditOptions) {
     return (req: Request, res: Response, next: NextFunction) => {
         const originalJson = res.json.bind(res);
 
-        // Intercepta o json() para capturar o entityId da resposta
         res.json = function (body: any) {
             const entityId = options.getEntityId
                 ? options.getEntityId(req)
@@ -33,7 +31,6 @@ export function auditLog(options: AuditOptions) {
                 ? options.getMetadata(req, res)
                 : { body: sanitizeBody(req.body) };
 
-            // Registra só se a requisição foi bem-sucedida
             if (res.statusCode < 400) {
                 prisma.auditLog.create({
                     data: {

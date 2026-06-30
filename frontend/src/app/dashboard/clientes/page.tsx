@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import {
@@ -58,11 +58,9 @@ export default function ClientesPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("ativos");
 
-  // Profile drawer
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Form state
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
@@ -248,7 +246,7 @@ export default function ClientesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Clientes</h1>
@@ -336,8 +334,7 @@ export default function ClientesPage() {
         </Dialog>
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+<Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <TabsList>
             <TabsTrigger value="ativos">
@@ -404,8 +401,7 @@ export default function ClientesPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Profile Drawer */}
-      <ClientProfileDrawer
+<ClientProfileDrawer
         client={selectedClient}
         open={isProfileOpen}
         onOpenChange={setIsProfileOpen}

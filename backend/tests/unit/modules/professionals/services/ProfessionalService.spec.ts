@@ -1,4 +1,4 @@
-import { ProfessionalService } from '../../../../../src/modules/professionals/services/ProfessionalService';
+﻿import { ProfessionalService } from '../../../../../src/modules/professionals/services/ProfessionalService';
 import { prisma } from '../../../../../src/lib/prisma';
 import { AppError } from '../../../../../src/shared/errors/AppError';
 
@@ -25,9 +25,7 @@ describe('ProfessionalService (Unit)', () => {
         jest.clearAllMocks();
     });
 
-    // ── findById() ──────────────────────────────────────────────────────────
-
-    it('deve retornar profissional ativo quando encontrado', async () => {
+it('deve retornar profissional ativo quando encontrado', async () => {
         const professional = {
             id: 'prof-1',
             name: 'João Barbeiro',
@@ -57,9 +55,7 @@ describe('ProfessionalService (Unit)', () => {
             .rejects.toMatchObject({ statusCode: 404 });
     });
 
-    // ── deactivate() ────────────────────────────────────────────────────────
-
-    it('deve desativar profissional e cancelar agendamentos pendentes', async () => {
+it('deve desativar profissional e cancelar agendamentos pendentes', async () => {
         const profId = 'prof-barber';
         const requesterId = 'prof-admin';
         const existing = { id: profId, tenantId, name: 'Carlos', role: 'BARBER', active: true };
@@ -106,7 +102,7 @@ describe('ProfessionalService (Unit)', () => {
         const existing = { id: profId, tenantId, name: 'Admin', role: 'ADMIN', active: true };
 
         (prisma.professional.findFirst as jest.Mock).mockResolvedValue(existing);
-        (prisma.professional.count as jest.Mock).mockResolvedValue(1); // Único admin
+        (prisma.professional.count as jest.Mock).mockResolvedValue(1);
 
         await expect(professionalService.deactivate(tenantId, profId, requesterId))
             .rejects.toBeInstanceOf(AppError);

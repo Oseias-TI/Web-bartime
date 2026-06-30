@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+﻿import cron from 'node-cron';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
@@ -16,7 +16,6 @@ function parseDatabaseUrl(url: string) {
 }
 
 async function runBackup() {
-    // BUG-09: Validar DATABASE_URL antes do cast para evitar falha silenciosa
     const databaseUrl = process.env.DATABASE_URL;
     if (!databaseUrl) {
         console.error('[Backup] ERRO: DATABASE_URL não definida. Backup abortado.');
@@ -27,11 +26,8 @@ async function runBackup() {
     const filename = `backup_${db.database}_${timestamp}.sql.gz`;
     const filepath = path.join(BACKUP_DIR, filename);
 
-    // Cria o diretório de backup se não existir
     if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
 
-    // BUG-04: PGPASSWORD passada via env do processo filho, não inline na string do comando
-    // Isso evita que a senha fique visível em `ps aux` e `/proc/<pid>/cmdline`
     const command = `pg_dump -h ${db.host} -p ${db.port} -U ${db.user} ${db.database} | gzip > ${filepath}`;
 
     try {
@@ -40,7 +36,6 @@ async function runBackup() {
         const sizeMb = (stat.size / 1024 / 1024).toFixed(2);
         console.log(`[Backup] Backup criado: ${filename} (${sizeMb} MB)`);
 
-        // Remove backups antigos
         await purgeOldBackups();
     } catch (err) {
         console.error('[Backup] Erro ao criar backup:', err);
@@ -64,7 +59,6 @@ async function purgeOldBackups() {
 }
 
 export function startBackupJob() {
-    // Roda todo dia às 3h da manhã
     cron.schedule('0 3 * * *', () => {
         runBackup().catch(console.error);
     });

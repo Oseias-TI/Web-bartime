@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -86,22 +86,18 @@ export default function ConfiguracoesPage() {
   const [isLoadingHours, setIsLoadingHours] = useState(false);
   const [isSavingHours, setIsSavingHours] = useState(false);
 
-  // Logo upload
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  // Avatar upload
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // Billing
   const [billingStatus, setBillingStatus] = useState<BillingStatus | null>(null);
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
   const [isBillingAction, setIsBillingAction] = useState(false);
 
-  // Security
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -126,9 +122,7 @@ export default function ConfiguracoesPage() {
     resolver: zodResolver(passwordSchema),
   });
 
-
-
-  const loadHours = useCallback(async () => {
+const loadHours = useCallback(async () => {
     setIsLoadingHours(true);
     try {
       const hours = await tenantService.getBusinessHours();
@@ -172,9 +166,7 @@ export default function ConfiguracoesPage() {
     }
   }, [activeTab, businessHours.length, billingStatus, loadHours, loadBillingCb]);
 
-
-
-  const onProfileSave = async (data: any) => {
+const onProfileSave = async (data: any) => {
     try {
       const payload = {
         ...data,
@@ -206,7 +198,6 @@ export default function ConfiguracoesPage() {
     setBusinessHours(newHours);
   };
 
-  // ─── Logo Upload ───
   const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -229,7 +220,6 @@ export default function ConfiguracoesPage() {
       return;
     }
 
-    // Preview
     const reader = new FileReader();
     reader.onload = (e) => setLogoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
@@ -251,7 +241,6 @@ export default function ConfiguracoesPage() {
     }
   };
 
-  // ─── Avatar Upload ───
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -274,7 +263,6 @@ export default function ConfiguracoesPage() {
       return;
     }
 
-    // Preview
     const reader = new FileReader();
     reader.onload = (e) => setAvatarPreview(e.target?.result as string);
     reader.readAsDataURL(file);
@@ -296,7 +284,6 @@ export default function ConfiguracoesPage() {
     }
   };
 
-  // ─── Billing Actions ───
   const handleBillingAction = async (action: "checkout" | "portal") => {
     setIsBillingAction(true);
     try {
@@ -316,7 +303,6 @@ export default function ConfiguracoesPage() {
     }
   };
 
-  // ─── Change Password ───
   const onPasswordSubmit = async (data: PasswordForm) => {
     try {
       await authService.changePassword(data.currentPassword, data.newPassword);
@@ -349,7 +335,7 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Menu lateral de configurações */}
+        
         <div className="w-full md:w-64 space-y-1">
           <button
             onClick={() => setActiveTab("perfil")}
@@ -403,8 +389,7 @@ export default function ConfiguracoesPage() {
           </button>
         </div>
 
-        {/* Área de conteúdo */}
-        <div className="flex-1">
+<div className="flex-1">
           {activeTab === "perfil" && (
             <Card className="bg-card border-border">
               <CardHeader>

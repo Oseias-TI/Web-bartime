@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+﻿import crypto from 'crypto';
 import { prisma } from '../../../lib/prisma';
 import { sendMail } from '../../../shared/utils/mailer';
 
@@ -12,9 +12,8 @@ export class SendVerificationEmailService {
         });
 
         if (!professional) return;
-        if (professional.emailVerified) return; // já verificado
+        if (professional.emailVerified) return;
 
-        // Invalida tokens anteriores
         await prisma.emailVerificationToken.deleteMany({ where: { professionalId } });
 
         const rawToken = crypto.randomBytes(32).toString('hex');

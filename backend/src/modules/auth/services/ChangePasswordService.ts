@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+﻿import bcrypt from 'bcryptjs';
 import { prisma } from '../../../lib/prisma';
 import { AppError } from '../../../shared/errors/AppError';
 
@@ -27,7 +27,6 @@ export class ChangePasswordService {
                 where: { id: professionalId },
                 data: { password: newPasswordHash },
             });
-            // Invalida todos os refresh tokens — força novo login em outros dispositivos
             await tx.refreshToken.deleteMany({ where: { professionalId } });
         });
 
