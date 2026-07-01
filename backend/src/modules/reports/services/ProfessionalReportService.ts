@@ -22,7 +22,7 @@ export class ProfessionalReportService {
                 prisma.commission.groupBy({ by: ['status'], where: { tenantId, professionalId, createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: true }),
                 prisma.appointment.groupBy({ by: ['serviceId'], where: { tenantId, professionalId, status: 'COMPLETED', startTime: { gte: start, lte: end } }, _count: { serviceId: true }, orderBy: { _count: { serviceId: 'desc' } }, take: 5 }),
                 prisma.appointment.groupBy({ by: ['status'], where: { tenantId, professionalId, startTime: { gte: start, lte: end } }, _count: { status: true } }),
-                prisma.transaction.groupBy({ by: ['paymentMethod'], where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end }, appointment: { professionalId } }, _sum: { amount: true } }),
+                prisma.transaction.groupBy({ by: ['paymentMethod'], where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end }, appointment: { professionalId, status: { not: 'CANCELED' } } }, _sum: { amount: true } }),
             ]);
 
         const completed = appointments.filter(a => a.status === 'COMPLETED');

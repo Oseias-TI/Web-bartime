@@ -26,7 +26,7 @@ export interface CashFlow {
 }
 
 export interface CreateTransactionData {
-  type: "INCOME" | "EXPENSE";
+  type: "ENTRADA" | "SAIDA";
   category: string;
   amount: number;
   description?: string;

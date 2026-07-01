@@ -1,6 +1,14 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../../../lib/prisma';
 import { ITransactionRepository, ICreateTransactionData, ITransactionSummary } from '../ITransactionRepository';
 import { UpdateTransactionInput } from '../../dtos/UpdateTransactionSchema';
+
+const activeTransactionWhere: Prisma.TransactionWhereInput = {
+    OR: [
+        { appointmentId: null },
+        { appointment: { status: { not: 'CANCELED' } } },
+    ],
+};
 
 export class PrismaTransactionRepository implements ITransactionRepository {
     async create(data: ICreateTransactionData): Promise<any> {
@@ -17,7 +25,7 @@ export class PrismaTransactionRepository implements ITransactionRepository {
 
     async listByPeriod(tenantId: string, start: Date, end: Date): Promise<any[]> {
         return prisma.transaction.findMany({ 
-            where: { tenantId, createdAt: { gte: start, lte: end } }, 
+            where: { tenantId, createdAt: { gte: start, lte: end }, ...activeTransactionWhere },
             orderBy: { createdAt: 'desc' } 
         });
     }
@@ -43,7 +51,7 @@ export class PrismaTransactionRepository implements ITransactionRepository {
 
     async getDailyCashFlow(tenantId: string, start: Date, end: Date): Promise<any[]> {
         const transactions = await prisma.transaction.findMany({ 
-            where: { tenantId, createdAt: { gte: start, lte: end } }, 
+            where: { tenantId, createdAt: { gte: start, lte: end }, ...activeTransactionWhere },
             select: { type: true, amount: true, createdAt: true } 
         });
         
@@ -66,11 +74,13 @@ export class PrismaTransactionRepository implements ITransactionRepository {
     }
 
     async getSummary(tenantId: string, start: Date, end: Date, pendingCommissions: number): Promise<ITransactionSummary> {
+        const baseWhere = { tenantId, createdAt: { gte: start, lte: end }, ...activeTransactionWhere };
+
         const [incomeResult, expenseResult, byCategory, byPaymentMethod] = await Promise.all([
-            prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: true }),
-            prisma.transaction.aggregate({ where: { tenantId, type: 'EXPENSE', createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: true }),
-            prisma.transaction.groupBy({ by: ['category', 'type'], where: { tenantId, createdAt: { gte: start, lte: end } }, _sum: { amount: true }, orderBy: { _sum: { amount: 'desc' } } }),
-            prisma.transaction.groupBy({ by: ['paymentMethod'], where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end } }, _sum: { amount: true } }),
+            prisma.transaction.aggregate({ where: { ...baseWhere, type: 'INCOME' }, _sum: { amount: true }, _count: true }),
+            prisma.transaction.aggregate({ where: { ...baseWhere, type: 'EXPENSE' }, _sum: { amount: true }, _count: true }),
+            prisma.transaction.groupBy({ by: ['category', 'type'], where: baseWhere, _sum: { amount: true }, orderBy: { _sum: { amount: 'desc' } } }),
+            prisma.transaction.groupBy({ by: ['paymentMethod'], where: { ...baseWhere, type: 'INCOME' }, _sum: { amount: true } }),
         ]);
 
         const totalIncome = Number(incomeResult._sum.amount ?? 0);

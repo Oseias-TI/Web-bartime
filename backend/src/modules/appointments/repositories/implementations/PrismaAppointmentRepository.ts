@@ -85,6 +85,10 @@ export class PrismaAppointmentRepository implements IAppointmentRepository {
                 data: { status: 'CANCELED' },
             });
 
+            await tx.transaction.deleteMany({
+                where: { appointmentId },
+            });
+
             return tx.appointment.update({
                 where: { id: appointmentId },
                 data: { status: 'CANCELED' },

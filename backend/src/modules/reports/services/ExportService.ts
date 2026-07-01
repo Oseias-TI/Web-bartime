@@ -9,6 +9,13 @@ interface ExportParams {
     end: Date;
 }
 
+const activeTransactionWhere = {
+    OR: [
+        { appointmentId: null },
+        { appointment: { status: { not: 'CANCELED' as const } } },
+    ],
+};
+
 export class ExportService {
 
     async exportToExcel(params: ExportParams, res: Response) {
@@ -25,7 +32,7 @@ export class ExportService {
                 orderBy: { startTime: 'asc' },
             }),
             prisma.transaction.findMany({
-                where: { tenantId, createdAt: { gte: start, lte: end } },
+                where: { tenantId, createdAt: { gte: start, lte: end }, ...activeTransactionWhere },
                 orderBy: { createdAt: 'desc' },
             }),
             prisma.commission.findMany({
@@ -128,8 +135,8 @@ export class ExportService {
 
         const [incomeResult, expenseResult, totalAppointments, pendingCommissions, topProfessionals] =
             await Promise.all([
-                prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: true }),
-                prisma.transaction.aggregate({ where: { tenantId, type: 'EXPENSE', createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: true }),
+                prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end }, ...activeTransactionWhere }, _sum: { amount: true }, _count: true }),
+                prisma.transaction.aggregate({ where: { tenantId, type: 'EXPENSE', createdAt: { gte: start, lte: end }, ...activeTransactionWhere }, _sum: { amount: true }, _count: true }),
                 prisma.appointment.count({ where: { tenantId, status: 'COMPLETED', startTime: { gte: start, lte: end } } }),
                 prisma.commission.aggregate({ where: { tenantId, status: 'PENDING' }, _sum: { amount: true } }),
                 prisma.commission.groupBy({

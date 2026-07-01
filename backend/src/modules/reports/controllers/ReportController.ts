@@ -8,6 +8,13 @@ function parsePeriod(start: string, end: string) {
     return { startDate: new Date(`${start}T00:00:00.000Z`), endDate: new Date(`${end}T23:59:59.999Z`) };
 }
 
+const activeTransactionWhere = {
+    OR: [
+        { appointmentId: null },
+        { appointment: { status: { not: 'CANCELED' as const } } },
+    ],
+};
+
 export class ReportController {
     generate = asyncHandler(async (req: Request, res: Response) => {
         const { tenantId } = req.user;
@@ -21,7 +28,7 @@ export class ReportController {
                 prisma.appointment.count({ where: { tenantId, startTime: { gte: start, lte: end } } }),
                 prisma.appointment.count({ where: { tenantId, status: 'COMPLETED', startTime: { gte: start, lte: end } } }),
                 prisma.appointment.count({ where: { tenantId, status: 'CANCELED', startTime: { gte: start, lte: end } } }),
-                prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end } }, _sum: { amount: true } }),
+                prisma.transaction.aggregate({ where: { tenantId, type: 'INCOME', createdAt: { gte: start, lte: end }, ...activeTransactionWhere }, _sum: { amount: true } }),
                 prisma.commission.aggregate({ where: { tenantId, status: 'PENDING' }, _sum: { amount: true } }),
                 prisma.commission.groupBy({ by: ['professionalId'], where: { tenantId, createdAt: { gte: start, lte: end } }, _sum: { amount: true }, _count: { professionalId: true }, orderBy: { _sum: { amount: 'desc' } }, take: 5 }),
                 prisma.client.count({ where: { tenantId, createdAt: { gte: start, lte: end } } }),

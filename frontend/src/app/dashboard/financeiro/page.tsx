@@ -86,7 +86,7 @@ export default function FinanceiroPage() {
   const [isLoadingProfessionals, setIsLoadingProfessionals] = useState(false);
   const [payingOutId, setPayingOutId] = useState<string | null>(null);
 
-  const [formType, setFormType] = useState<"INCOME" | "EXPENSE">("INCOME");
+  const [formType, setFormType] = useState<"ENTRADA" | "SAIDA">("ENTRADA");
   const [formCategory, setFormCategory] = useState("");
   const [formAmount, setFormAmount] = useState("");
   const [formDescription, setFormDescription] = useState("");
@@ -176,7 +176,7 @@ export default function FinanceiroPage() {
       toastManager.add({ title: "Transação registrada!", type: "success" });
       setIsModalOpen(false);
       
-      setFormType("INCOME");
+      setFormType("ENTRADA");
       setFormCategory("");
       setFormAmount("");
       setFormDescription("");
@@ -198,6 +198,10 @@ export default function FinanceiroPage() {
     entradas: item.income,
     saidas: item.expense,
   }));
+  const transactionTypeItems = [
+    { value: "ENTRADA", label: "Entrada" },
+    { value: "SAIDA", label: "Saída" },
+  ];
 
   const getInitials = (name: string) =>
     name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -254,15 +258,16 @@ export default function FinanceiroPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tipo</label>
                   <Select
+                    items={transactionTypeItems}
                     value={formType}
-                    onValueChange={(v) => setFormType(v as "INCOME" | "EXPENSE" || "INCOME")}
+                    onValueChange={(v) => setFormType((v as "ENTRADA" | "SAIDA") || "ENTRADA")}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectPopup>
-                      <SelectItem value="INCOME">Entrada (Receita)</SelectItem>
-                      <SelectItem value="EXPENSE">Saída (Despesa)</SelectItem>
+                      <SelectItem value="ENTRADA">Entrada</SelectItem>
+                      <SelectItem value="SAIDA">Saída</SelectItem>
                     </SelectPopup>
                   </Select>
                 </div>
