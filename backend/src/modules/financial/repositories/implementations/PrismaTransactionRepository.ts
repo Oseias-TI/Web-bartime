@@ -4,7 +4,15 @@ import { UpdateTransactionInput } from '../../dtos/UpdateTransactionSchema';
 
 export class PrismaTransactionRepository implements ITransactionRepository {
     async create(data: ICreateTransactionData): Promise<any> {
-        return prisma.transaction.create({ data });
+        const { type, ...transactionData } = data;
+        const prismaType = type === 'ENTRADA' ? 'INCOME' : 'EXPENSE';
+
+        return prisma.transaction.create({
+            data: {
+                ...transactionData,
+                type: prismaType,
+            },
+        });
     }
 
     async listByPeriod(tenantId: string, start: Date, end: Date): Promise<any[]> {
