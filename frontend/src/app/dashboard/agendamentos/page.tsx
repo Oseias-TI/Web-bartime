@@ -203,6 +203,15 @@ export default function AgendamentosPage() {
   };
 
   const freeSlots = availableSlots.filter((s) => s.available);
+  const clientItems = clients.map((c) => ({ value: c.id, label: c.name }));
+  const serviceItems = services.map((s) => ({ value: s.id, label: s.name }));
+  const professionalItems = professionals.map((p) => ({ value: p.id, label: p.name }));
+  const paymentMethodItems = [
+    { value: "PIX", label: "PIX" },
+    { value: "CASH", label: "Dinheiro" },
+    { value: "CARD_DEBIT", label: "Cartão de Débito" },
+    { value: "CARD_CREDIT", label: "Cartão de Crédito" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -243,7 +252,7 @@ export default function AgendamentosPage() {
                   onChange={(e) => setSearchClient(e.target.value)}
                   className="mb-2"
                 />
-                <Select value={formClientId} onValueChange={(v) => setFormClientId(v || "")}>
+                <Select items={clientItems} value={formClientId} onValueChange={(v) => setFormClientId(v || "")}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o cliente" />
                   </SelectTrigger>
@@ -259,7 +268,7 @@ export default function AgendamentosPage() {
 
 <div className="space-y-2">
                 <label className="text-sm font-medium">Serviço</label>
-                <Select value={formServiceId} onValueChange={(v) => setFormServiceId(v || "")}>
+                <Select items={serviceItems} value={formServiceId} onValueChange={(v) => setFormServiceId(v || "")}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o serviço" />
                   </SelectTrigger>
@@ -275,7 +284,7 @@ export default function AgendamentosPage() {
 
 <div className="space-y-2">
                 <label className="text-sm font-medium">Profissional</label>
-                <Select value={formProfessionalId} onValueChange={(v) => setFormProfessionalId(v || "")}>
+                <Select items={professionalItems} value={formProfessionalId} onValueChange={(v) => setFormProfessionalId(v || "")}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o profissional" />
                   </SelectTrigger>
@@ -401,7 +410,7 @@ export default function AgendamentosPage() {
           </Button>
         </div>
 
-        <Select value={filterProfessional} onValueChange={(v) => setFilterProfessional(v || "")}>
+        <Select items={[{ value: "", label: "Todos" }, ...professionalItems]} value={filterProfessional} onValueChange={(v) => setFilterProfessional(v || "")}>
           <SelectTrigger className="w-[200px]">
             <Filter className="size-4 mr-2" />
             <SelectValue placeholder="Todos profissionais" />
@@ -525,7 +534,7 @@ export default function AgendamentosPage() {
           <DialogPanel className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Forma de Pagamento</label>
-              <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v || "PIX")}>
+              <Select items={paymentMethodItems} value={paymentMethod} onValueChange={(v) => setPaymentMethod(v || "PIX")}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione" />
                 </SelectTrigger>
